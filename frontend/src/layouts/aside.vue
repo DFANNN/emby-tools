@@ -9,7 +9,9 @@
     >
       <el-menu-item class="logo-wrapper">
         <img src="../assets/logo.png" alt="" />
-        <template #title></template>
+        <template #title>
+          <span class="logo-text">emby-tools</span>
+        </template>
       </el-menu-item>
       <el-sub-menu index="1">
         <template #title>
@@ -83,6 +85,10 @@ const handleClose = (key: string, keyPath: string[]) => {
     img {
       width: 63px;
       height: 63px;
+    }
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
     }
   }
 }
