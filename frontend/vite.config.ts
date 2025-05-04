@@ -10,7 +10,8 @@ export default defineConfig({
   plugins: [
     vue(),
     AutoImport({
-      resolvers: [ElementPlusResolver()]
+      imports: ['vue', 'vue-router', 'pinia'],
+      dirs: ['./src/stores']
     }),
     Components({
       resolvers: [ElementPlusResolver()]

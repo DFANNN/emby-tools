@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "element-plus": "^2.9.9",
+    "pinia": "^3.0.2",
     "vue": "^3.5.13",
     "vue-router": "4"
   },
@@ -17,6 +19,7 @@
     "@types/node": "^22.15.3",
     "@vitejs/plugin-vue": "^5.2.2",
     "@vue/tsconfig": "^0.7.0",
+    "sass": "^1.87.0",
     "typescript": "~5.7.2",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.5.0",
