@@ -1,78 +1,28 @@
 <template>
   <div class="aside-container">
-    <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo"
-      :collapse="layoutStore.isCollapse"
-      @open="handleOpen"
-      @close="handleClose"
-    >
+    <el-menu default-active="2" class="el-menu-vertical-demo" :collapse="layoutStore.isCollapse">
       <el-menu-item class="logo-wrapper">
         <img src="../assets/logo.png" alt="" />
         <template #title>
           <span class="logo-text">emby-tools</span>
         </template>
       </el-menu-item>
-      <el-sub-menu index="1">
-        <template #title>
-          <el-icon><location /></el-icon>
-          <span>Navigator One</span>
-        </template>
-        <el-menu-item-group>
-          <template #title><span>Group One</span></template>
-          <el-menu-item index="1-1">item one</el-menu-item>
-          <el-menu-item index="1-2">item two</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="Group Two">
-          <el-menu-item index="1-3">item three</el-menu-item>
-        </el-menu-item-group>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-      </el-sub-menu>
+      <template v-for="item in menuStore.menuList" :key="item.name">
+        <MenuItem :menuItem="item" />
+      </template>
     </el-menu>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Menu as IconMenu, Location } from '@element-plus/icons-vue'
+import MenuItem from '@/layouts/menuItem.vue'
 
 const layoutStore = useLayoutStore()
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
+const menuStore = useMenuStore()
+
+onMounted(() => {
+  menuStore.getMenu()
+})
 </script>
 
 <script setup lang="ts"></script>
