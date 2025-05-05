@@ -6,12 +6,15 @@
       :collapse="layoutStore.isCollapse"
       class="el-menu-vertical-demo"
     >
+      <!-- logo -->
       <el-menu-item class="logo-wrapper">
         <img src="../assets/logo.png" alt="" />
         <template #title>
           <span class="logo-text">emby-tools</span>
         </template>
       </el-menu-item>
+
+      <!-- 菜单 -->
       <template v-for="item in menuStore.menuList" :key="item.name">
         <MenuItem :menuItem="item" />
       </template>
