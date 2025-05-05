@@ -1,31 +1,25 @@
 // 存储布局参数的store
 import { defineStore } from 'pinia'
-import { useDark } from '@vueuse/core'
 
 export const useLayoutStore = defineStore('layout', () => {
   // 控制菜单折叠
   const isCollapse = ref(false)
 
-  // 控制暗夜/明亮模式
-  const isDark = useDark({
-    selector: 'html', // 默认就是 html
-    valueDark: 'dark',
-    valueLight: 'light',
-    storageKey: 'vueuse-color-scheme'
-  })
-
   // 当前主题模式，支持三种值 (light, dark, auto)
-  const themeMode = ref(localStorage.getItem('vueuse-color-scheme') || 'light')
+  const themeMode = ref(localStorage.getItem('themeMode') || 'light')
 
-  // 监听 themeMode 改变 isDark 和 localStorage
+  /**
+   * 监听 themeMode改变
+   * 将最新的themeMode值存储在localStorage中
+   */
   watch(themeMode, val => {
+    const html = document.documentElement
+    localStorage.setItem('themeMode', val)
     if (val === 'auto') {
-      localStorage.removeItem('vueuse-color-scheme')
       const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      isDark.value = systemDark
+      html.className = systemDark ? 'dark' : 'light'
     } else {
-      localStorage.setItem('vueuse-color-scheme', val)
-      isDark.value = val === 'dark'
+      html.className = val
     }
   })
 
