@@ -1,6 +1,11 @@
 <template>
   <div class="aside-container">
-    <el-menu default-active="2" class="el-menu-vertical-demo" :collapse="layoutStore.isCollapse">
+    <el-menu
+      :router="true"
+      default-active="/layouts/embyPoster"
+      :collapse="layoutStore.isCollapse"
+      class="el-menu-vertical-demo"
+    >
       <el-menu-item class="logo-wrapper">
         <img src="../assets/logo.png" alt="" />
         <template #title>
