@@ -12,16 +12,22 @@ export const useLayoutStore = defineStore('layout', () => {
    * 监听 themeMode改变
    * 将最新的themeMode值存储在localStorage中
    */
-  watch(themeMode, val => {
-    const html = document.documentElement
-    localStorage.setItem('themeMode', val)
-    if (val === 'auto') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      html.className = systemDark ? 'dark' : 'light'
-    } else {
-      html.className = val
+  watch(
+    themeMode,
+    val => {
+      const html = document.documentElement
+      localStorage.setItem('themeMode', val)
+      if (val === 'auto') {
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        html.className = systemDark ? 'dark' : 'light'
+      } else {
+        html.className = val
+      }
+    },
+    {
+      immediate: true
     }
-  })
+  )
 
   // 切换主题方法：auto → light → dark → auto ...
   const toggleTheme = () => {

@@ -21,6 +21,6 @@ import HeaderComponent from '@/layouts/header.vue'
 
 <style scoped lang="scss">
 .header {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--el-menu-border-color);
 }
 </style>
