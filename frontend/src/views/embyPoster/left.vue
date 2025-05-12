@@ -12,7 +12,7 @@
           <el-input v-model="linkEmbyForm.token" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" class="link-button">连接</el-button>
+          <el-button type="primary" class="link-button" @click="linkEmbyHandler">连接</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { linkEmby } from '@/api/embyPoster'
 const linkEmbyForm = ref({
   ip: '',
   port: '',
@@ -83,6 +84,14 @@ const options = [
     label: 'Option5'
   }
 ]
+
+const linkEmbyHandler = async () => {
+  const data = await linkEmby(linkEmbyForm.value)
+}
+
+onMounted(() => {
+  console.log(import.meta.env)
+})
 </script>
 
 <style scoped lang="scss">
