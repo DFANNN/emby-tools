@@ -22,7 +22,7 @@
         <el-form label-width="auto" :model="posterRuleForm">
           <el-form-item label="媒体库" label-position="left">
             <el-select v-model="posterRuleForm.a" multiple placeholder="Select">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in options" :key="item.Id" :label="item.Name" :value="item.Id" />
             </el-select>
           </el-form-item>
           <el-form-item label="样式" label-position="left">
@@ -44,6 +44,7 @@
           </el-form-item>
         </el-form>
       </div>
+      <img :src="item.ImageTags.Primary" alt="" v-for="item in options" style="width: 300px" />
     </div>
   </div>
 </template>
@@ -51,9 +52,9 @@
 <script setup lang="ts">
 import { linkEmby } from '@/api/embyPoster'
 const linkEmbyForm = ref({
-  ip: '',
-  port: '',
-  token: ''
+  ip: '192.168.59.119',
+  port: '8096',
+  token: 'd4913e011af24325b03de84b020a9a11'
 })
 
 const posterRuleForm = ref({
@@ -62,31 +63,14 @@ const posterRuleForm = ref({
   c: ''
 })
 
-const options = [
-  {
-    value: 'Option1',
-    label: 'Option1'
-  },
-  {
-    value: 'Option2',
-    label: 'Option2'
-  },
-  {
-    value: 'Option3',
-    label: 'Option3'
-  },
-  {
-    value: 'Option4',
-    label: 'Option4'
-  },
-  {
-    value: 'Option5',
-    label: 'Option5'
-  }
-]
+const options = ref([])
 
 const linkEmbyHandler = async () => {
-  const data = await linkEmby(linkEmbyForm.value)
+  const { data: res } = await linkEmby(linkEmbyForm.value)
+  if (res.code === 200) {
+    options.value = res.data
+    posterRuleForm.value.a = res.data.map(item => item.Id)
+  }
 }
 
 onMounted(() => {
