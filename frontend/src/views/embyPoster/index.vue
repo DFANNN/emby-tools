@@ -1,24 +1,19 @@
 <template>
   <div class="index-container">
     <div class="left">
-      <linkEmby />
+      <LinkEmby />
+      <PosterRules />
     </div>
     <div class="right">
-      <previewPoster />
+      <PreviewPoster />
     </div>
-    <!-- <RightComponent /> -->
-    <!-- <div class="left">
-      <LeftComponent />
-    </div>
-    <div class="right">
-      <RightComponent />
-    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import linkEmby from '@/views/embyPoster/linkEmby.vue'
-import previewPoster from '@/views/embyPoster/previewPoster.vue'
+import LinkEmby from '@/views/embyPoster/linkEmby.vue'
+import PreviewPoster from '@/views/embyPoster/previewPoster.vue'
+import PosterRules from '@/views/embyPoster/posterRules.vue'
 </script>
 
 <style scoped lang="scss">
@@ -30,6 +25,9 @@ import previewPoster from '@/views/embyPoster/previewPoster.vue'
   .left {
     width: 30%;
     min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
   .right {
     flex: 1;

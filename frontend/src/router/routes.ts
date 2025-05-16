@@ -40,6 +40,12 @@ const routes = [
         meta: { title: 'emby媒体库封面', icon: 'Picture', isMenu: true }
       },
       {
+        path: 'embyPoster1',
+        name: 'embyPoster1',
+        component: () => import('@/views/embyPoster/right.vue'),
+        meta: { title: 'emby媒体库封面1', icon: 'Picture', isMenu: true }
+      },
+      {
         path: 'tvSeriesMode',
         name: 'tvSeriesMode',
         component: () => import('@/views/rename/tvSeriesMode/index.vue'),

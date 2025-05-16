@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useLayoutStore = defineStore('layout', () => {
   // 控制菜单折叠
-  const isCollapse = ref(false)
+  const isCollapse = ref(true)
 
   // 当前主题模式，支持三种值 (light, dark, auto)
   const themeMode = ref(localStorage.getItem('themeMode') || 'light')

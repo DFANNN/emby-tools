@@ -39,6 +39,12 @@ const uploadPoster = async () => {
 
 <style scoped lang="scss">
 .preview-poster-container {
+  height: 100%;
+  overflow-y: auto;
+  background: var(--el-bg-color-overlay);
+  border-radius: var(--el-border-radius-base);
+  padding: 1.5rem;
+  box-shadow: var(--el-box-shadow-light);
   .preview-header {
     display: flex;
     justify-content: space-between;
