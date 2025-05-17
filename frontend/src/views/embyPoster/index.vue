@@ -20,14 +20,12 @@ import PosterRules from '@/views/embyPoster/posterRules.vue'
 .index-container {
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
-  height: calc(100vh - 60px - 40px);
+  gap: 1rem;
   .left {
-    width: 30%;
-    min-width: 400px;
+    width: 360px;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 20px;
   }
   .right {
     flex: 1;

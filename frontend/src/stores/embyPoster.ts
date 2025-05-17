@@ -25,6 +25,41 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
       description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
       layout: '3',
       source: 'local'
+    },
+    {
+      id: '4',
+      name: '规则三',
+      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
+      layout: '3',
+      source: 'local'
+    },
+    {
+      id: '5',
+      name: '规则三',
+      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
+      layout: '3',
+      source: 'local'
+    },
+    {
+      id: '6',
+      name: '规则三',
+      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
+      layout: '3',
+      source: 'local'
+    },
+    {
+      id: '7',
+      name: '规则三',
+      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
+      layout: '3',
+      source: 'local'
+    },
+    {
+      id: '8',
+      name: '规则三',
+      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
+      layout: '3',
+      source: 'local'
     }
   ])
 

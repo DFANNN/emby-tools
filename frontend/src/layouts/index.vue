@@ -6,7 +6,7 @@
         <el-header class="header">
           <HeaderComponent />
         </el-header>
-        <el-main>
+        <el-main class="main">
           <RouterView />
         </el-main>
       </el-container>
@@ -22,5 +22,9 @@ import HeaderComponent from '@/layouts/header.vue'
 <style scoped lang="scss">
 .header {
   border-bottom: 1px solid var(--el-menu-border-color);
+}
+.main {
+  height: calc(100vh - 60px - 40px);
+  overflow-y: auto;
 }
 </style>

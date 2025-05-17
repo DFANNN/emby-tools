@@ -9,7 +9,11 @@
           </el-button>
         </el-tooltip>
         <el-tooltip content="选择规则" placement="top">
-          <el-button type="primary" text @click="selectPosterRulesRef?.showDialog()">
+          <el-button
+            type="primary"
+            text
+            @click="selectPosterRulesRef?.showDialog(embyPosterStore.currentGeneratePosterRule.id)"
+          >
             <el-icon><Select /></el-icon>
           </el-button>
         </el-tooltip>

@@ -1,6 +1,6 @@
 <template>
   <div class="rule-card-container">
-    <div class="rule-item">
+    <div :class="{ 'rule-item': true, 'info-card': props.isUpdateOrDelete, active: props.isSelect }">
       <div class="rule-item-header">
         <span class="rule-name">{{ props.rules.name }}</span>
         <div class="rule-actions" v-if="props.isUpdateOrDelete">
@@ -70,6 +70,18 @@ const props = defineProps({
     cursor: pointer;
     transition: all 0.3s ease;
     border: 1px solid var(--el-border-color-lighter);
+
+    &.info-card {
+      padding: 1.5rem 2rem;
+      background: var(--el-bg-color-overlay);
+      &:hover {
+        border-color: var(--el-color-primary);
+      }
+      &.active {
+        border-color: var(--el-color-primary);
+        background: var(--el-color-primary-light-9);
+      }
+    }
 
     .rule-item-header {
       display: flex;
