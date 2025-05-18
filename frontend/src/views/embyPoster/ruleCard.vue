@@ -4,7 +4,11 @@
       <div class="rule-item-header">
         <span class="rule-name">{{ props.rules.name }}</span>
         <div class="rule-actions" v-if="props.isUpdateOrDelete">
-          <el-button type="primary" link>
+          <el-button
+            type="primary"
+            link
+            @click.stop="createUpdateRuleRef?.showDialog('update', JSON.parse(JSON.stringify(props.rules)))"
+          >
             <el-icon><Edit /></el-icon>
           </el-button>
           <el-button type="danger" link>
@@ -30,15 +34,18 @@
         </el-tag>
       </div>
     </div>
+    <CreateUpdateRule ref="createUpdateRuleRef" />
   </div>
 </template>
 
 <script setup lang="ts">
+import CreateUpdateRule from '@/views/embyPoster/createUpdateRule.vue'
 import { useEmbyPosterStore } from '@/stores/embyPoster'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import type { RuleForm } from '@/types/embyPoster'
 
 const embyPosterStore = useEmbyPosterStore()
+const createUpdateRuleRef = useTemplateRef('createUpdateRuleRef')
 
 const props = defineProps({
   // 规则数组

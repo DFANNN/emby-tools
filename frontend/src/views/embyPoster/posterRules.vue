@@ -4,7 +4,7 @@
       <h2>封面生成规则</h2>
       <div class="header-actions">
         <el-tooltip content="添加规则" placement="top">
-          <el-button type="primary" text @click="createUpdateRuleRef?.showDialog()">
+          <el-button type="primary" text @click="createUpdateRuleRef?.showDialog('create')">
             <el-icon><Plus /></el-icon>
           </el-button>
         </el-tooltip>
@@ -34,7 +34,7 @@
         :disabled="!currentRuleId"
         class="generate-btn"
       >
-        <el-icon><Picture /></el-icon>生成封面
+        生成封面
       </el-button>
     </div>
 
@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { useEmbyPosterStore } from '@/stores/embyPoster'
-import { Plus, Select, Picture } from '@element-plus/icons-vue'
+import { Plus, Select } from '@element-plus/icons-vue'
 import RuleCard from '@/views/embyPoster/ruleCard.vue'
 import CreateUpdateRule from '@/views/embyPoster/createUpdateRule.vue'
 import SelectPosterRules from '@/views/embyPoster/selectPosterRules.vue'
@@ -204,12 +204,10 @@ const generatePoster = async () => {
   .generate-action {
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid var(--el-border-color-lighter);
     display: flex;
     justify-content: center;
     .generate-btn {
       width: 100%;
-      height: 40px;
       font-size: 14px;
     }
   }

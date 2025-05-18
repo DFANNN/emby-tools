@@ -77,8 +77,8 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     id: undefined,
     name: '',
     description: '',
-    layout: '1',
-    source: 'tmdb'
+    layout: '',
+    source: ''
   })
 
   // 布局样式
