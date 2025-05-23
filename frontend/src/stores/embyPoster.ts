@@ -3,6 +3,11 @@ import { defineStore } from 'pinia'
 import type { RuleForm } from '@/types/embyPoster'
 
 export const useEmbyPosterStore = defineStore('embyPoster', () => {
+  // emby 媒体库列表
+  const embyMediaLibraryList = ref([])
+  // 连接状态
+  const connectionStatus = ref(false)
+
   //所有规则
   const allRuleList = ref([
     {
@@ -95,6 +100,8 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
   ])
 
   return {
+    embyMediaLibraryList,
+    connectionStatus,
     allRuleList,
     currentGeneratePosterRule,
     rulesForm,

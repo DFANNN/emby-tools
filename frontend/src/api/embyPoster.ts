@@ -1,5 +1,5 @@
-import request from '@/utils/request'
+import { embyRequest } from '@/utils/request'
 
-export const linkEmby = (data: any) => {
-  return request.post('/emby/linkEmby', data)
+export const linkEmby = () => {
+  return embyRequest.get('/Library/MediaFolders')
 }
