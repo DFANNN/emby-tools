@@ -44,9 +44,9 @@ const connectionFormRef = useTemplateRef<FormInstance>('connectionFormRef')
 // 连接emby的表单
 const connectionForm = ref<IConnectionForm>({
   protocol: 'http',
-  ip: '192.168.59.119',
+  ip: '',
   port: '8096',
-  apiKey: 'd4913e011af24325b03de84b020a9a11'
+  apiKey: ''
 })
 
 // 连接emby
@@ -56,6 +56,7 @@ const connectToEmby = async () => {
   setEmbyUrl(url, connectionForm.value.apiKey)
   const res = await linkEmby()
   if (res.status === 200) {
+    // 获取媒体库列表
     embyPosterStore.embyMediaLibraryList = res.data.Items.map((item: any) => {
       return {
         Id: item.Id, // 媒体库id
@@ -64,8 +65,26 @@ const connectToEmby = async () => {
         ImageUrl: `${url}/Items/${item.Id}/Images/Primary` //封面图片地址
       }
     })
+    // 默认全选需要生成封面的媒体库
+    embyPosterStore.needGeneratePosterMediaLibraryForm.ids = embyPosterStore.embyMediaLibraryList.map(item => item.Id)
+    // 获取需要生成封面的媒体库列表
+    embyPosterStore.needGeneratePosterMediaLibraryList = embyPosterStore.embyMediaLibraryList.filter(item =>
+      embyPosterStore.needGeneratePosterMediaLibraryForm.ids.includes(item.Id)
+    )
     embyPosterStore.connectionStatus = true
   }
+}
+
+// 从localStorage中获取emby的url和apiKey,并且设置到connectionForm中
+const getEmbyUrlAndApiKey = () => {
+  const url = localStorage.getItem('emby_url')
+  const apiKey = localStorage.getItem('emby_token')
+  if (!url && !apiKey) return
+  const embyUrl = new URL(url!)
+  connectionForm.value.protocol = embyUrl.protocol.replace(':', '')
+  connectionForm.value.ip = embyUrl.hostname
+  connectionForm.value.port = embyUrl.port
+  connectionForm.value.apiKey = apiKey!
 }
 
 const rules = ref<FormRules>({
@@ -73,6 +92,10 @@ const rules = ref<FormRules>({
   ip: [{ required: true, message: '请输入服务器地址', trigger: 'blur' }],
   port: [{ required: true, message: '请输入端口号', trigger: 'blur' }],
   apiKey: [{ required: true, message: '请输入 API Token', trigger: 'blur' }]
+})
+
+onMounted(() => {
+  getEmbyUrlAndApiKey()
 })
 </script>
 

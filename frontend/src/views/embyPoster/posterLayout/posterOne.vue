@@ -1,8 +1,8 @@
 <template>
   <div class="cover-demo" :style="{ background: poster.backgroundGradient }">
     <div class="cover-left">
-      <div class="cover-title">{{ poster.title }}</div>
-      <div class="cover-subtitle">{{ poster.subtitle }}</div>
+      <div class="cover-title">{{ poster.Name }}</div>
+      <div class="cover-subtitle">{{ poster.CollectionType }}</div>
     </div>
     <div class="cover-right">
       <div class="cover-card" v-for="(url, i) in poster.imageUrls" :key="i" :style="getImageStyle(i)">

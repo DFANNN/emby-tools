@@ -20,6 +20,25 @@
       </div>
     </div>
 
+    <!-- 选择需要生成封面的媒体库列表 -->
+    <el-form
+      :model="embyPosterStore.needGeneratePosterMediaLibraryForm"
+      :rules="rules"
+      label-position="top"
+      ref="needGeneratePosterMediaLibraryFormRef"
+    >
+      <el-form-item label="选择媒体库" prop="ids">
+        <el-select v-model="embyPosterStore.needGeneratePosterMediaLibraryForm.ids" multiple placeholder="请选择媒体库">
+          <el-option
+            :label="item.Name"
+            :value="item.Id"
+            v-for="item in embyPosterStore.embyMediaLibraryList"
+            :key="item.Id"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <!-- 规则列表 -->
     <div class="rules-list">
       <RuleCard :rules="embyPosterStore.currentGeneratePosterRule" />
@@ -27,15 +46,7 @@
 
     <!-- 生成按钮 -->
     <div class="generate-action">
-      <el-button
-        type="primary"
-        @click="generatePoster"
-        :loading="generating"
-        :disabled="!currentRuleId"
-        class="generate-btn"
-      >
-        生成封面
-      </el-button>
+      <el-button type="primary" @click="generatePoster" class="generate-btn"> 生成封面 </el-button>
     </div>
 
     <CreateUpdateRule ref="createUpdateRuleRef" />
@@ -49,138 +60,35 @@ import { Plus, Select } from '@element-plus/icons-vue'
 import RuleCard from '@/views/embyPoster/ruleCard.vue'
 import CreateUpdateRule from '@/views/embyPoster/createUpdateRule.vue'
 import SelectPosterRules from '@/views/embyPoster/selectPosterRules.vue'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 const embyPosterStore = useEmbyPosterStore()
 
-interface RuleForm {
-  name: string
-  description: string
-  layout: string
-  primaryColor: string
-  secondaryColor: string
-  textColor: string
-  effects: string[]
-  source: string
-}
-// 规则管理相关
-interface Rule {
-  id: string
-  name: string
-  description: string
-  config: {
-    layout: string
-    primaryColor: string
-    secondaryColor: string
-    textColor: string
-    effects: string[]
-    source: string
-  }
-}
-
 const createUpdateRuleRef = useTemplateRef('createUpdateRuleRef')
 const selectPosterRulesRef = useTemplateRef('selectPosterRulesRef')
-
-const rulesForm = reactive<RuleForm>({
-  name: '',
-  description: '',
-  layout: 'grid',
-  primaryColor: '#409EFF',
-  secondaryColor: '#67C23A',
-  textColor: '#FFFFFF',
-  effects: ['gradient'],
-  source: 'local'
-})
-
-const currentRuleId = ref<string>('')
-const generating = ref(false)
-
-// 默认规则
-const defaultRules: Rule[] = [
-  {
-    id: '1',
-    name: '默认网格布局',
-    description: '使用网格布局展示本地媒体库内容，适合电影和剧集展示',
-    config: {
-      layout: 'grid',
-      primaryColor: '#409EFF',
-      secondaryColor: '#67C23A',
-      textColor: '#FFFFFF',
-      effects: ['gradient'],
-      source: 'local'
-    }
-  },
-  {
-    id: '2',
-    name: '瀑布流布局',
-    description: '使用瀑布流布局展示TMDB热门内容，适合展示海报墙',
-    config: {
-      layout: 'masonry',
-      primaryColor: '#E6A23C',
-      secondaryColor: '#F56C6C',
-      textColor: '#FFFFFF',
-      effects: ['gradient', 'blur'],
-      source: 'tmdb'
-    }
-  },
-  {
-    id: '3',
-    name: '轮播图布局',
-    description: '使用轮播图展示精选内容，适合展示推荐内容',
-    config: {
-      layout: 'carousel',
-      primaryColor: '#909399',
-      secondaryColor: '#303133',
-      textColor: '#FFFFFF',
-      effects: ['gradient', 'glow'],
-      source: 'local'
-    }
-  }
-]
-
-// 初始化规则列表
-const savedRules = ref<Rule[]>([...defaultRules])
-
-const showRuleDialog = (type: string, rule?: Rule) => {
-  if (type === 'add') {
-    rulesForm.name = ''
-    rulesForm.description = ''
-    rulesForm.layout = 'grid'
-    rulesForm.primaryColor = '#409EFF'
-    rulesForm.secondaryColor = '#67C23A'
-    rulesForm.textColor = '#FFFFFF'
-    rulesForm.effects = ['gradient']
-    rulesForm.source = 'local'
-  } else if (type === 'edit') {
-    if (rule) {
-      rulesForm.name = rule.name
-      rulesForm.description = rule.description
-      rulesForm.layout = rule.config.layout
-      rulesForm.primaryColor = rule.config.primaryColor
-      rulesForm.secondaryColor = rule.config.secondaryColor
-      rulesForm.textColor = rule.config.textColor
-      rulesForm.effects = rule.config.effects
-      rulesForm.source = rule.config.source
-    }
-  }
-  //   ruleDialogVisible.value = true
-}
-
-const showSelectRuleDialog = () => {
-  //   tempSelectedRuleId.value = currentRuleId.value
-  //   selectRuleDialogVisible.value = true
-}
+const needGeneratePosterMediaLibraryFormRef = useTemplateRef<FormInstance>('needGeneratePosterMediaLibraryFormRef')
 
 // 生成封面
 const generatePoster = async () => {
-  generating.value = true
-  try {
-    // TODO: 实现封面生成
-    await new Promise(resolve => setTimeout(resolve, 1000)) // 模拟生成过程
-    // hasGeneratedPosters.value = true
-  } finally {
-    generating.value = false
+  // 验证表单
+  await needGeneratePosterMediaLibraryFormRef.value?.validate()
+  // 验证emby连接状态
+  if (!embyPosterStore.connectionStatus) {
+    ElMessage.warning('请先连接Emby')
+    return
   }
+  // 整理需要生成封面的数据
+  for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
+    item.imageUrls = await embyPosterStore.generatePreviewImageUrls(item.Id)
+    item.backgroundGradient = embyPosterStore.getRandomGradient()
+  }
+  // 显示预览海报
+  embyPosterStore.showPreviewPoster = true
 }
+
+const rules = ref<FormRules>({
+  ids: [{ required: true, message: '请选择媒体库', trigger: 'blur' }]
+})
 </script>
 
 <style scoped lang="scss">
