@@ -2,7 +2,7 @@
   <div class="preview-poster-container">
     <div class="preview-header">
       <h2>预览效果</h2>
-      <el-button type="success" @click="uploadPoster" :disabled="!hasGeneratedPosters">上传到 Emby</el-button>
+      <el-button type="success" @click="uploadPoster">上传到 Emby</el-button>
     </div>
     <div class="preview-container">
       <div class="poster-grid">
@@ -23,7 +23,7 @@
           class="poster-item"
           v-else
         >
-          <PosterOne :poster="poster" />
+          <PosterOne :poster="poster" :media-id="poster.Id" class="poster-jpg" />
           <div class="poster-title">{{ poster.Name }}</div>
         </div>
       </div>
@@ -32,14 +32,30 @@
 </template>
 
 <script setup lang="ts">
+import html2canvas from 'html2canvas'
+import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
 import PosterOne from '@/views/embyPoster/posterLayout/posterOne.vue'
 
 const embyPosterStore = useEmbyPosterStore()
 
-const hasGeneratedPosters = ref(false)
-
 const uploadPoster = async () => {
   // TODO: 实现封面上传
+  const posterElements = document.querySelectorAll('.poster-jpg')
+  for (const posterElement of posterElements) {
+    // 获取当前海报的媒体库ID
+    const mediaLibraryId = posterElement.getAttribute('media-id')
+    // 当前海报html转换为canvas
+    const canvas = await html2canvas(posterElement as HTMLElement, {
+      useCORS: true,
+      allowTaint: false
+    })
+    // 转换为 Base64 图片（默认 PNG 格式）
+    let base64Image = canvas.toDataURL('image/png')
+    base64Image = base64Image.replace('data:image/png;base64,', '')
+    // 上传到 Emby
+    const res = await embyReplaceMediaLibraryPoster(mediaLibraryId!, base64Image)
+    console.log(`res->`, res)
+  }
 }
 </script>
 

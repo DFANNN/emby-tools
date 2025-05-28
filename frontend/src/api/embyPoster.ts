@@ -8,3 +8,12 @@ export const linkEmby = () => {
 export const embyMediaLibraryItems = (id: string) => {
   return embyRequest.get(`/emby/Items?ParentId=${id}`)
 }
+
+// emby替换当前媒体库封面
+export const embyReplaceMediaLibraryPoster = (id: string, posterBase64: string) => {
+  return embyRequest.post(`/Items/${id}/Images/Primary`, posterBase64, {
+    headers: {
+      'Content-Type': 'image/png'
+    }
+  })
+}
