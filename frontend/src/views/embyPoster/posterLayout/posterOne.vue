@@ -5,7 +5,7 @@
       <div class="cover-subtitle">{{ poster.CollectionType }}</div>
     </div>
     <div class="cover-right">
-      <div class="cover-card" v-for="(url, i) in poster.imageUrls" :key="i" :style="getImageStyle(i)">
+      <div class="cover-card" v-for="(url, i) in poster.imageUrls" :key="i">
         <img :src="url" />
       </div>
     </div>
@@ -13,71 +13,88 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps(['poster'])
-
-const getImageStyle = (index: number) => {
-  const positions = [
-    { top: '10px', left: '30px', rotate: 'rotate(-10deg)', zIndex: 4 },
-    { top: '30px', left: '70px', rotate: 'rotate(6deg)', zIndex: 3 },
-    { top: '60px', left: '50px', rotate: 'rotate(-4deg)', zIndex: 2 },
-    { top: '90px', left: '100px', rotate: 'rotate(8deg)', zIndex: 1 }
-  ]
-  const style = positions[index] || positions[0]
-  return {
-    top: style.top,
-    left: style.left,
-    transform: style.rotate,
-    zIndex: style.zIndex
-  }
-}
+defineProps(['poster'])
 </script>
 
 <style scoped lang="scss">
 .cover-demo {
   display: flex;
-  width: 320px;
-  height: 180px;
+  width: 640px;
+  height: 360px;
   background: linear-gradient(120deg, #3a7bd5 0%, #00d2ff 100%);
+  overflow: hidden;
   .cover-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding-left: 18px;
-    min-width: 80px;
+    padding-left: 36px;
+    min-width: 160px;
     .cover-title {
-      font-size: 18px;
+      font-size: 36px;
       color: #fff;
       font-family: 'FZLanTingHei', '微软雅黑', sans-serif;
       font-weight: bold;
-      letter-spacing: 2px;
-      margin-bottom: 2px;
+      letter-spacing: 4px;
+      margin-bottom: 4px;
     }
     .cover-subtitle {
-      font-size: 8px;
+      font-size: 16px;
       color: #e0e0e0;
-      letter-spacing: 3px;
+      letter-spacing: 6px;
       font-family: 'Roboto Mono', monospace;
     }
   }
   .cover-right {
-    flex: 2.2;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    min-width: 140px;
+    flex: 0.8;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    min-width: 280px;
     padding-right: 0;
     .cover-card {
-      position: absolute;
-      width: 60px;
-      height: 80px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      width: 120px;
+      height: 160px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
       overflow: hidden;
       background: #fff;
       transition: transform 0.2s;
+      transform: rotate(20deg) !important;
+      &:nth-child(1) {
+        margin-top: -60px;
+      }
+      &:nth-child(2) {
+        margin-top: -40px;
+      }
+      &:nth-child(3) {
+        margin-top: -20px;
+      }
+      &:nth-child(4) {
+        margin-top: -60px;
+        margin-left: -60px;
+      }
+      &:nth-child(5) {
+        margin-top: -40px;
+        margin-left: -60px;
+      }
+      &:nth-child(6) {
+        margin-top: -20px;
+        margin-left: -60px;
+      }
+      &:nth-child(7) {
+        margin-top: -60px;
+        margin-left: -120px;
+      }
+      &:nth-child(8) {
+        margin-top: -40px;
+        margin-left: -120px;
+      }
+      &:nth-child(9) {
+        margin-top: -20px;
+        margin-left: -120px;
+      }
       img {
         width: 100%;
         height: 100%;

@@ -12,13 +12,14 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/core": "^13.1.0",
     "axios": "^1.9.0",
+    "dom-to-image": "^2.6.0",
     "element-plus": "^2.9.9",
-    "html2canvas": "^1.4.1",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",
     "vue-router": "4"
   },
   "devDependencies": {
+    "@types/dom-to-image": "^2.6.7",
     "@types/node": "^22.15.3",
     "@vitejs/plugin-vue": "^5.2.2",
     "@vue/tsconfig": "^0.7.0",

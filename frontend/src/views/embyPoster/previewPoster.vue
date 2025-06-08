@@ -32,29 +32,35 @@
 </template>
 
 <script setup lang="ts">
-import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image'
 import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
 import PosterOne from '@/views/embyPoster/posterLayout/posterOne.vue'
 
 const embyPosterStore = useEmbyPosterStore()
 
 const uploadPoster = async () => {
-  // TODO: 实现封面上传
   const posterElements = document.querySelectorAll('.poster-jpg')
+
   for (const posterElement of posterElements) {
-    // 获取当前海报的媒体库ID
-    const mediaLibraryId = posterElement.getAttribute('media-id')
-    // 当前海报html转换为canvas
-    const canvas = await html2canvas(posterElement as HTMLElement, {
-      useCORS: true,
-      allowTaint: false
+    // 获取当前媒体库id
+    const mediaId = posterElement.getAttribute('media-id')
+    // 生成png图片
+    const domImage = await domtoimage.toPng(posterElement as HTMLElement, {
+      // 画布的宽高
+      width: 640 * 2,
+      height: 360 * 2,
+      style: {
+        transform: 'scale(2)',
+        transformOrigin: 'top left',
+        // 元素的真是宽高
+        width: '640px',
+        height: '360px'
+      }
     })
-    // 转换为 Base64 图片（默认 PNG 格式）
-    let base64Image = canvas.toDataURL('image/png')
-    base64Image = base64Image.replace('data:image/png;base64,', '')
-    // 上传到 Emby
-    const res = await embyReplaceMediaLibraryPoster(mediaLibraryId!, base64Image)
-    console.log(`res->`, res)
+    // 删除base64图片的前缀
+    const base64Image = domImage.replace('data:image/png;base64,', '')
+    // 上传到emby
+    const res = await embyReplaceMediaLibraryPoster(mediaId!, base64Image)
   }
 }
 </script>
@@ -74,6 +80,7 @@ const uploadPoster = async () => {
     margin-bottom: 1.5rem;
   }
   .preview-container {
+    height: calc(100vh - 59px - 40px - 48px - 35px - 24px - 1px);
     overflow-y: auto;
     padding: 1rem;
     background: var(--el-bg-color);
@@ -81,7 +88,7 @@ const uploadPoster = async () => {
     .poster-grid {
       display: grid;
       gap: 1.5rem;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(640px, 1fr));
 
       .poster-item {
         display: flex;
@@ -89,8 +96,8 @@ const uploadPoster = async () => {
         align-items: center;
         justify-content: flex-start;
         .original-img {
-          width: 320px;
-          height: 180px;
+          width: 640px;
+          height: 360px;
         }
       }
       .poster-title {

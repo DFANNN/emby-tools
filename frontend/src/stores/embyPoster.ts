@@ -1,17 +1,68 @@
 // embyPoster的仓库
 import { defineStore } from 'pinia'
-import { embyMediaLibraryItems } from '@/api/embyPoster'
-import type { RuleForm, IEmbyMediaLibraryItem } from '@/types/embyPoster'
+import { ElMessage } from 'element-plus'
+import { setEmbyUrl } from '@/utils/request'
+import { linkEmby, embyMediaLibraryItems } from '@/api/embyPoster'
+import type { IRuleForm, IEmbyMediaLibraryItem, IConnectionForm } from '@/types/embyPoster'
 
 export const useEmbyPosterStore = defineStore('embyPoster', () => {
+  // 连接emby数据的表单
+  const connectionForm = ref<IConnectionForm>({
+    protocol: 'http',
+    ip: '',
+    port: '8096',
+    apiKey: ''
+  })
+  // 连接emby的方法
+  const connectToEmby = async () => {
+    const url = `${connectionForm.value.protocol}://${connectionForm.value.ip}:${connectionForm.value.port}`
+    setEmbyUrl(url, connectionForm.value.apiKey)
+    const res = await linkEmby()
+    console.log(res)
+    if (res.status === 200) {
+      // 获取媒体库列表
+      embyMediaLibraryList.value = res.data.Items.map((item: any) => {
+        return {
+          Id: item.Id, // 媒体库id
+          Name: item.Name, // 媒体库名称
+          CollectionType: item.CollectionType, // 媒体库类型
+          ImageUrl: `${url}/Items/${item.Id}/Images/Primary` //封面图片地址
+        }
+      })
+      // 默认全选需要生成封面的媒体库
+      ruleForm.value.ids = embyMediaLibraryList.value.map(item => item.Id)
+      // 获取需要生成封面的媒体库列表
+      needGeneratePosterMediaLibraryList.value = embyMediaLibraryList.value.filter(item =>
+        ruleForm.value.ids.includes(item.Id)
+      )
+      connectionStatus.value = true
+      ElMessage.success('Emby连接成功')
+    } else {
+      ElMessage.error('Emby连接失败')
+    }
+  }
+  // 从localStorage中获取emby的url和apiKey,并且设置到connectionForm中
+  const getEmbyUrlAndApiKey = () => {
+    const url = localStorage.getItem('emby_url')
+    const apiKey = localStorage.getItem('emby_token')
+    if (!url && !apiKey) return
+    const embyUrl = new URL(url!)
+    connectionForm.value.protocol = embyUrl.protocol.replace(':', '')
+    connectionForm.value.ip = embyUrl.hostname
+    connectionForm.value.port = embyUrl.port
+    connectionForm.value.apiKey = apiKey!
+  }
+
   // emby 媒体库列表
   const embyMediaLibraryList = ref<IEmbyMediaLibraryItem[]>([])
   // 连接状态
   const connectionStatus = ref(false)
 
   // 需要生成封面的媒体库id
-  const needGeneratePosterMediaLibraryForm = ref<{ ids: string[] }>({
-    ids: []
+  const ruleForm = ref<IRuleForm>({
+    ids: [],
+    posterTemplate: '',
+    pictureSource: ''
   })
   // 获取需要生成封面的媒体库列表
   const needGeneratePosterMediaLibraryList = ref<IEmbyMediaLibraryItem[]>([])
@@ -84,91 +135,13 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     const res = await embyMediaLibraryItems(id)
     // 随机获取4张图片
     if (res.status === 200 && res.data) {
-      const randomList = getRandomNumber(res.data.TotalRecordCount)
+      const randomList = getRandomNumber(res.data.TotalRecordCount, 9)
       imageUrls = randomList.map(item => {
         return `${url}/Items/${res.data.Items[item].Id}/Images/Primary`
       })
     }
     return imageUrls
   }
-
-  //所有规则
-  const allRuleList = ref([
-    {
-      id: '1',
-      name: '规则一',
-      description: '第一个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '1',
-      source: 'tmdb'
-    },
-    {
-      id: '2',
-      name: '规则二',
-      description: '第二个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '2',
-      source: 'tmdb'
-    },
-    {
-      id: '3',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    },
-    {
-      id: '4',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    },
-    {
-      id: '5',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    },
-    {
-      id: '6',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    },
-    {
-      id: '7',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    },
-    {
-      id: '8',
-      name: '规则三',
-      description: '第三个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-      layout: '3',
-      source: 'local'
-    }
-  ])
-
-  // 当前生成封面的规则
-  const currentGeneratePosterRule = ref({
-    id: '1',
-    name: '规则一',
-    description: '第一个内置规则哦第一个内置规则哦第一个内置规则哦第一个内置规则哦！！！',
-    layout: '1',
-    source: 'tmdb'
-  })
-
-  // 规则表单
-  const rulesForm = ref<RuleForm>({
-    id: undefined,
-    name: '',
-    description: '',
-    layout: '',
-    source: ''
-  })
 
   // 布局样式
   const layoutList = ref([
@@ -184,16 +157,16 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
   ])
 
   return {
+    connectionForm,
+    connectToEmby,
+    getEmbyUrlAndApiKey,
     embyMediaLibraryList,
     connectionStatus,
-    needGeneratePosterMediaLibraryForm,
+    ruleForm,
     needGeneratePosterMediaLibraryList,
     showPreviewPoster,
     getRandomGradient,
     generatePreviewImageUrls,
-    allRuleList,
-    currentGeneratePosterRule,
-    rulesForm,
     layoutList,
     sourceList
   }

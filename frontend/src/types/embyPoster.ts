@@ -1,10 +1,11 @@
 // 规则表单
-export interface RuleForm {
-  id?: string
-  name: string
-  description: string
-  layout: string
-  source: string
+export interface IRuleForm {
+  // 需要生成封面的媒体库id数组
+  ids: string[]
+  // 封面模版
+  posterTemplate: string
+  // 图片来源
+  pictureSource: string
 }
 
 // 连接emby的表单
