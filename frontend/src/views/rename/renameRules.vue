@@ -5,7 +5,7 @@
       <div class="rename-path-wrap">
         <el-input v-model="renameStore.path" placeholder="请选择或输入文件夹路径">
           <template #append>
-            <el-button :icon="FolderAdd" @click="renameStore.dialogVisible = true" />
+            <el-button :icon="FolderAdd" @click="renameStore.showDialog()" />
           </template>
         </el-input>
       </div>

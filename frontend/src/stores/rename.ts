@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { folderContent } from '@/api/rename'
 
 export const useRenameStore = defineStore('rename', () => {
   // 重命名文件夹的路径
@@ -18,9 +19,22 @@ export const useRenameStore = defineStore('rename', () => {
   // dialog对话框开关
   const dialogVisible = ref(false)
 
+  // 获取文件夹内容
+  const getFolderContent = async () => {
+    const data = await folderContent('')
+    console.log(data)
+  }
+
+  // 展示对话框
+  const showDialog = () => {
+    getFolderContent()
+    dialogVisible.value = true
+  }
+
   return {
     path,
     ruleForm,
-    dialogVisible
+    dialogVisible,
+    showDialog
   }
 })
