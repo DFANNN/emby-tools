@@ -230,9 +230,53 @@ export const useRenameStore = defineStore('rename', () => {
     renameFileList.value = renameFileList.value.filter(f => !ids.has(f.id))
   }
 
+  // 替换模式预览
+  const previewReplace = () => {
+    renameFileList.value = renameFileList.value.map(file => {
+      const newName = file.name.replace(ruleForm.value.targetName, ruleForm.value.replaceName)
+      return {
+        ...file,
+        newName,
+        status: 'success',
+        statusText: '准备重命名'
+      }
+    })
+  }
+
+  // 插入模式预览
+  const previewInsert = () => {
+    renameFileList.value = renameFileList.value.map(file => {
+      let newName = ''
+      if (ruleForm.value.insertPosition === 'start') {
+        newName = `${ruleForm.value.insertText}${file.name}`
+      } else {
+        newName = `${file.name}${ruleForm.value.insertText}`
+      }
+      return {
+        ...file,
+        newName,
+        status: 'success',
+        statusText: '准备重命名'
+      }
+    })
+  }
+
   // 执行重命名
   const executeRename = async () => {
+    const everyNewName = renameFileList.value.every(file => file.newName)
+    if (!everyNewName) {
+      ElMessage.warning('有文件未生成新名称，请检查文件重命名预览')
+      return
+    }
+
     // TODO: 实现实际的重命名操作
+    const params = renameFileList.value.map(file => {
+      return {
+        targetName: file.fullPath,
+        newName: file.fullPath.replace(file.name, file.newName as string)
+      }
+    })
+    console.log(params)
     ElMessage.success('重命名成功')
   }
 
@@ -255,6 +299,8 @@ export const useRenameStore = defineStore('rename', () => {
     reanalyzeFiles,
     deleteFile,
     batchDeleteFiles,
-    executeRename
+    executeRename,
+    previewReplace,
+    previewInsert
   }
 })

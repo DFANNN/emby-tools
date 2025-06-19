@@ -92,7 +92,10 @@ const previewRename = async () => {
   }
   // 验证表单
   await ruleFormRef.value?.validate()
+  await renameStore.getRenameFileList()
   if (renameStore.ruleForm.model === 'tv') renameStore.reanalyzeFiles()
+  if (renameStore.ruleForm.model === 'replace') renameStore.previewReplace()
+  if (renameStore.ruleForm.model === 'insert') renameStore.previewInsert()
 }
 </script>
 

@@ -42,7 +42,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="解析信息" min-width="150">
+      <el-table-column label="解析信息" min-width="150" v-if="renameStore.ruleForm.model === 'tv'">
         <template #default="{ row }">
           <div v-if="row.parseResult">
             <div>季：{{ row.parseResult.season !== undefined ? row.parseResult.season : '未知' }}</div>
@@ -183,6 +183,10 @@ const editFileName = (file: IRenameFileItem) => {
 
 // 确认编辑
 const confirmEdit = () => {
+  if (editForm.value.newName.trim() === '') {
+    ElMessage.warning('新文件名不能为空')
+    return
+  }
   if (!editingFile.value) return
   // 最后一次更新，确保所有变更都已应用
   updatePreviewName()
