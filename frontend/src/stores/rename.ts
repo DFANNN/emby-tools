@@ -1,7 +1,17 @@
 import { defineStore } from 'pinia'
 import { folderContent } from '@/api/rename'
-import type { IDiskFolderItem } from '@/types/rename'
+import type { IDiskFolderItem, IRenameFileItem, IParseResult } from '@/types/rename'
 import { ElMessage } from 'element-plus'
+
+// 文件名解析模式
+const EPISODE_PATTERNS = [
+  /[Ss](\d{1,2})[Ee](\d{1,2})/, // S01E02
+  /(\d{1,2})x(\d{1,2})/, // 1x02
+  /[第](\d{1,2})[季集].*?(\d{1,2})/, // 第1季第2集
+  /[Ee][Pp]\.?(\d{1,2})/, // EP02
+  /[\[\(](\d{1,2})[\]\)]/, // [02] 或 (02)
+  /\b(\d{1,2})\b/ // 单纯数字（最后匹配）
+]
 
 export const useRenameStore = defineStore('rename', () => {
   // 重命名文件夹的路径
@@ -10,8 +20,7 @@ export const useRenameStore = defineStore('rename', () => {
   const ruleForm = ref({
     model: 'tv', // 更名模式
     newFileName: '', // 新文件名
-    seasonNumber: 1, // 季号
-    episodeNumber: 1, // 集数
+    seasonNumber: undefined, // 季号
     targetName: '', // 查找文本
     replaceName: '', // 替换文本
     insertText: '', // 插入文本
@@ -28,7 +37,7 @@ export const useRenameStore = defineStore('rename', () => {
   const currentPathList = ref<IDiskFolderItem[]>([])
 
   // 重命名文件list（绑定表格）
-  const renameFileList = ref<IDiskFolderItem[]>([])
+  const renameFileList = ref<IRenameFileItem[]>([])
   // 文件类型列表 （表格筛选用）
   const fileTypeList = computed(() => {
     let fileTypes = renameFileList.value.filter(item => item.fileType).map(item => item.fileType)
@@ -101,6 +110,132 @@ export const useRenameStore = defineStore('rename', () => {
     getFolderContent()
   }
 
+  // 解析文件名
+  const parseFileName = (fileName: string): IParseResult => {
+    let result: IParseResult = {
+      confidence: 0
+    }
+
+    // 移除扩展名
+    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
+
+    for (const pattern of EPISODE_PATTERNS) {
+      const match = nameWithoutExt.match(pattern)
+      if (match) {
+        if (match.length === 3) {
+          result.season = parseInt(match[1])
+          result.episode = parseInt(match[2])
+          result.confidence = 0.9
+        } else if (match.length === 2) {
+          result.episode = parseInt(match[1])
+          result.confidence = 0.7
+        }
+        break
+      }
+    }
+
+    return result
+  }
+
+  // 重新解析所有文件
+  const reanalyzeFiles = () => {
+    renameFileList.value = renameFileList.value.map(file => {
+      const parseResult = parseFileName(file.name)
+      // 如果设置了默认季号，优先使用默认季号，否则才使用解析结果
+      if (ruleForm.value.seasonNumber) {
+        parseResult.season = ruleForm.value.seasonNumber
+      }
+      return {
+        ...file,
+        parseResult,
+        status: parseResult.confidence > 0.5 ? 'success' : 'warning',
+        statusText: parseResult.confidence > 0.5 ? '解析成功' : '低置信度，请检查'
+      }
+    })
+    generateNewNames()
+  }
+
+  // 生成新文件名
+  const generateNewNames = () => {
+    renameFileList.value = renameFileList.value.map(file => {
+      if (!file.parseResult) return file
+
+      const season = file.parseResult.season
+      const episode = file.parseResult.episode
+
+      // 如果没有解析出季号，则跳过重命名
+      if (season === undefined) {
+        return {
+          ...file,
+          status: 'warning',
+          statusText: '无法解析季号，请手动编辑'
+        }
+      }
+
+      // 如果没有解析出集号，则跳过重命名
+      if (episode === undefined) {
+        return {
+          ...file,
+          status: 'warning',
+          statusText: '无法解析集号，请手动编辑'
+        }
+      }
+
+      let newName = ''
+
+      // 使用解析结果中的季号（已在reanalyzeFiles中处理过默认季号）
+      const seasonPart = season !== undefined ? `S${String(season).padStart(2, '0')}` : ''
+      newName = `${ruleForm.value.newFileName} ${seasonPart}E${String(episode).padStart(2, '0')}`
+      // switch (ruleForm.value.model) {
+      //   case 'tv':
+      //     // 使用解析结果中的季号（已在reanalyzeFiles中处理过默认季号）
+      //     const seasonPart = season !== undefined ? `S${String(season).padStart(2, '0')}` : ''
+      //     newName = `${ruleForm.value.newFileName} ${seasonPart}E${String(episode).padStart(2, '0')}`
+      //     break
+      //   case 'replace':
+      //     newName = file.name.replace(ruleForm.value.targetName, ruleForm.value.replaceName)
+      //     break
+      //   case 'insert':
+      //     newName =
+      //       ruleForm.value.insertPosition === 'start'
+      //         ? `${ruleForm.value.insertText}${file.name}`
+      //         : `${file.name}${ruleForm.value.insertText}`
+      //     break
+      // }
+
+      // 保持原始扩展名
+      const ext = file.name.split('.').pop()
+      newName = `${newName}.${ext}`
+
+      return {
+        ...file,
+        newName,
+        status: 'success',
+        statusText: '准备重命名'
+      }
+    })
+  }
+
+  // 删除单个文件
+  const deleteFile = (file: IRenameFileItem) => {
+    const index = renameFileList.value.findIndex(f => f.id === file.id)
+    if (index !== -1) {
+      renameFileList.value.splice(index, 1)
+    }
+  }
+
+  // 批量删除文件
+  const batchDeleteFiles = (files: IRenameFileItem[]) => {
+    const ids = new Set(files.map(f => f.id))
+    renameFileList.value = renameFileList.value.filter(f => !ids.has(f.id))
+  }
+
+  // 执行重命名
+  const executeRename = async () => {
+    // TODO: 实现实际的重命名操作
+    ElMessage.success('重命名成功')
+  }
+
   return {
     path,
     ruleForm,
@@ -116,6 +251,10 @@ export const useRenameStore = defineStore('rename', () => {
     cancelDialog,
     returnRoot,
     confirmDialog,
-    getRenameFileList
+    getRenameFileList,
+    reanalyzeFiles,
+    deleteFile,
+    batchDeleteFiles,
+    executeRename
   }
 })

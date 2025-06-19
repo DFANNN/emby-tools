@@ -25,22 +25,25 @@
 
           <div v-if="renameStore.ruleForm.model === 'tv'">
             <el-form-item label="电视剧名称" prop="newFileName">
-              <el-input v-model="renameStore.ruleForm.newFileName" placeholder="请输入" />
+              <el-input v-model="renameStore.ruleForm.newFileName" placeholder="请输入剧集名称" />
             </el-form-item>
-            <el-form-item label="当前季" prop="seasonNumber">
-              <el-input-number v-model="renameStore.ruleForm.seasonNumber" placeholder="请输入" class="number-input" />
-            </el-form-item>
-            <el-form-item label="起始集" prop="episodeNumber">
-              <el-input-number v-model="renameStore.ruleForm.episodeNumber" placeholder="请输入" class="number-input" />
+            <el-form-item label="默认季号（可选）" help="123" prop="seasonNumber">
+              <el-input-number
+                v-model="renameStore.ruleForm.seasonNumber"
+                :min="0"
+                placeholder="留空则自动解析"
+                class="number-input"
+              />
+              <div class="form-tip">留空时自动解析，填写后将优先生效并覆盖文件名中的季数。</div>
             </el-form-item>
           </div>
 
           <div v-if="renameStore.ruleForm.model === 'replace'">
             <el-form-item label="查找文本" prop="targetName">
-              <el-input v-model="renameStore.ruleForm.targetName" placeholder="请输入" />
+              <el-input v-model="renameStore.ruleForm.targetName" placeholder="请输入查找文本" />
             </el-form-item>
             <el-form-item label="替换文本" prop="replaceName">
-              <el-input v-model="renameStore.ruleForm.replaceName" placeholder="请输入" />
+              <el-input v-model="renameStore.ruleForm.replaceName" placeholder="请输入替换文本" />
             </el-form-item>
           </div>
 
@@ -52,14 +55,14 @@
               </el-select>
             </el-form-item>
             <el-form-item label="插入文本" prop="insertText">
-              <el-input v-model="renameStore.ruleForm.insertText" placeholder="请输入" />
+              <el-input v-model="renameStore.ruleForm.insertText" placeholder="请输入插入文本" />
             </el-form-item>
           </div>
         </el-form>
       </div>
     </div>
 
-    <el-button type="primary" class="preview-btn">预览重命名结果</el-button>
+    <el-button type="primary" class="preview-btn" @click="previewRename">预览重命名结果</el-button>
     <SelectFolder />
   </div>
 </template>
@@ -67,20 +70,30 @@
 <script setup lang="ts">
 import SelectFolder from '@/views/rename/selectFolder.vue'
 import { FolderAdd } from '@element-plus/icons-vue'
-import { type FormRules } from 'element-plus'
+import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
 
 const renameStore = useRenameStore()
+const ruleFormRef = ref<FormInstance>()
 
 const rules = ref<FormRules>({
   model: [{ required: true, message: '请选择模式', trigger: 'blur' }],
   newFileName: [{ required: true, message: '请输入电视剧名称', trigger: 'blur' }],
-  seasonNumber: [{ required: true, message: '请输入当前季', trigger: 'blur' }],
-  episodeNumber: [{ required: true, message: '请输入起始集', trigger: 'blur' }],
   targetName: [{ required: true, message: '请输入查找文本', trigger: 'blur' }],
   replaceName: [{ required: true, message: '请输入替换文本', trigger: 'blur' }],
   insertPosition: [{ required: true, message: '请选择插入位置', trigger: 'blur' }],
   insertText: [{ required: true, message: '请输入插入文本', trigger: 'blur' }]
 })
+
+// 预览重命名结果
+const previewRename = async () => {
+  if (!renameStore.path) {
+    ElMessage.warning('请先选择文件夹')
+    return
+  }
+  // 验证表单
+  await ruleFormRef.value?.validate()
+  if (renameStore.ruleForm.model === 'tv') renameStore.reanalyzeFiles()
+}
 </script>
 
 <style scoped lang="scss">
@@ -109,6 +122,12 @@ const rules = ref<FormRules>({
     }
     .number-input {
       width: 100%;
+    }
+    .form-tip {
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+      margin-top: 4px;
+      line-height: 1.2;
     }
   }
 
