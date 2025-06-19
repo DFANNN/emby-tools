@@ -1,5 +1,6 @@
 // 磁盘or文件夹列表
 export interface IDiskFolderItem {
+  id: number // 这个id 主要用于排序
   name: string // 展示名字
   newName?: string // 新的名字（重命名时使用）
   type: string // 文件夹、文件

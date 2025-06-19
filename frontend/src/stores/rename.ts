@@ -29,6 +29,18 @@ export const useRenameStore = defineStore('rename', () => {
 
   // 重命名文件list（绑定表格）
   const renameFileList = ref<IDiskFolderItem[]>([])
+  // 文件类型列表 （表格筛选用）
+  const fileTypeList = computed(() => {
+    let fileTypes = renameFileList.value.filter(item => item.fileType).map(item => item.fileType)
+    return [...new Set(fileTypes)].map(item => {
+      return {
+        text: item,
+        value: item
+      }
+    })
+  })
+  // 选中要更名的文件列表(用于更名发请求)
+  const selectRenameList = ref<IDiskFolderItem[]>([])
 
   // 获取文件夹内容
   const getFolderContent = async (path: string = '') => {
@@ -62,6 +74,15 @@ export const useRenameStore = defineStore('rename', () => {
     currentPathList.value = []
   }
 
+  // 获取重命名文件列表
+  const getRenameFileList = async () => {
+    const { data: res } = await folderContent(path.value)
+    if (res.code === 200) {
+      renameFileList.value = res.data
+      cancelDialog()
+    }
+  }
+
   // 对话框确定
   const confirmDialog = async () => {
     if (!currentPathList.value.length) {
@@ -70,12 +91,7 @@ export const useRenameStore = defineStore('rename', () => {
     }
     // 拿到当前path
     path.value = JSON.parse(JSON.stringify(currentPathList.value[currentPathList.value.length - 1]?.fullPath || ''))
-    // 获取需要重命名的文件列表
-    const { data: res } = await folderContent(path.value)
-    if (res.code === 200) {
-      renameFileList.value = res.data
-      cancelDialog()
-    }
+    getRenameFileList()
   }
 
   // 返回跟目录
@@ -92,11 +108,14 @@ export const useRenameStore = defineStore('rename', () => {
     diskFolderList,
     currentPathList,
     renameFileList,
+    fileTypeList,
+    selectRenameList,
     showDialog,
     selectFolderHandler,
     goToPath,
     cancelDialog,
     returnRoot,
-    confirmDialog
+    confirmDialog,
+    getRenameFileList
   }
 })

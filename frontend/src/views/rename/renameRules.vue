@@ -3,7 +3,11 @@
     <h2>emby重命名规则</h2>
     <div class="rename-rule-wrap">
       <div class="rename-path-wrap">
-        <el-input v-model="renameStore.path" placeholder="请选择或输入文件夹路径">
+        <el-input
+          v-model="renameStore.path"
+          placeholder="请选择或输入文件夹路径"
+          @keydown.enter="renameStore.getRenameFileList()"
+        >
           <template #append>
             <el-button :icon="FolderAdd" @click="renameStore.showDialog()" />
           </template>

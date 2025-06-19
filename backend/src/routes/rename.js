@@ -31,15 +31,19 @@ router.get('/folder-content', async (req, res) => {
     const dir = fs.opendirSync(dirPath)
     // 初始化文件数组，用于存储目录中的文件和子目录信息
     let data = []
+    let index = 0 // 新增索引变量
     // 遍历目录中的每一项
     for await (const dirent of dir) {
       // 将文件或目录的信息添加到数组中
       data.push({
+        id: index++,
         name: dirent.name,
         // 如果是目录，类型标记为1，否则为2
         type: dirent.isDirectory() ? 'folder' : 'file',
         // 使用path模块拼接完整的文件或目录路径
-        fullPath: path.join(dirPath, dirent.name)
+        fullPath: path.join(dirPath, dirent.name),
+        // 读取文件后缀
+        fileType: dirent.isDirectory() ? '' : path.extname(path.join(dirPath, dirent.name)).slice(1)
       })
     }
 
