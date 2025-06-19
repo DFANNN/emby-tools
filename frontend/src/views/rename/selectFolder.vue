@@ -3,7 +3,7 @@
     <div class="current-path">
       <div class="current-path-header">
         <el-tooltip content="返回根目录" placement="top">
-          <el-icon class="root-icon"><Monitor /></el-icon>
+          <el-icon class="root-icon" @click="renameStore.returnRoot()"><Monitor /></el-icon>
         </el-tooltip>
         <span>当前路径：</span>
       </div>
@@ -17,7 +17,7 @@
         <div class="path-divide" v-if="renameStore.currentPathList.length - 1 !== index">\</div>
       </div>
     </div>
-    <div class="select-folder-warp">
+    <div class="select-folder-warp" v-if="renameStore.diskFolderList.length">
       <div
         v-for="(item, index) in renameStore.diskFolderList"
         :key="index"
@@ -32,10 +32,14 @@
         <div class="folder-name">{{ item.name }}</div>
       </div>
     </div>
+    <div v-else class="folder-empty">
+      <el-empty description="暂无文件..." />
+    </div>
+
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="renameStore.cancelDialog()">取消</el-button>
-        <el-button type="primary" @click="renameStore.dialogVisible = false">确认</el-button>
+        <el-button type="primary" @click="renameStore.confirmDialog()">确认</el-button>
       </div>
     </template>
   </el-dialog>
@@ -114,5 +118,13 @@ const renameStore = useRenameStore()
       background: var(--el-border-color);
     }
   }
+}
+.folder-empty {
+  width: 100%;
+  height: 50vh;
+  border: 1px solid var(--el-border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-y: auto;
 }
 </style>

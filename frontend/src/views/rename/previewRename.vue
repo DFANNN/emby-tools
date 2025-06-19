@@ -7,12 +7,16 @@
       <el-button type="success">执行修改</el-button>
     </div>
 
-    <el-table :data="tableData" border style="height: calc(100vh - 59px - 40px - 48px - 35px - 24px - 1px)">
+    <el-table
+      :data="renameStore.renameFileList"
+      border
+      style="height: calc(100vh - 59px - 40px - 48px - 35px - 24px - 1px)"
+    >
       <el-table-column fixed type="selection" align="center" width="55" />
       <el-table-column fixed type="index" align="center" label="序号" width="60" />
       <el-table-column prop="name" label="原文件名" />
-      <el-table-column prop="state" label="新文件名" />
-      <el-table-column prop="address" label="文件类型" />
+      <el-table-column prop="newName" label="新文件名" />
+      <el-table-column prop="fileType" label="文件类型" />
       <el-table-column align="center" fixed="right" label="操作" width="60">
         <template #default>
           <el-icon><Delete class="delete-icon" /></el-icon>
@@ -24,44 +28,8 @@
 
 <script setup lang="ts">
 import { Delete } from '@element-plus/icons-vue'
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'TTomTm',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
-  }
-]
+
+const renameStore = useRenameStore()
 </script>
 
 <style scoped lang="scss">

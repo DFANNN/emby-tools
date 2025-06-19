@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { folderContent } from '@/api/rename'
 import type { IDiskFolderItem } from '@/types/rename'
+import { ElMessage } from 'element-plus'
 
 export const useRenameStore = defineStore('rename', () => {
   // 重命名文件夹的路径
@@ -25,6 +26,9 @@ export const useRenameStore = defineStore('rename', () => {
 
   // 当前用户正在操作的路径列表
   const currentPathList = ref<IDiskFolderItem[]>([])
+
+  // 重命名文件list（绑定表格）
+  const renameFileList = ref<IDiskFolderItem[]>([])
 
   // 获取文件夹内容
   const getFolderContent = async (path: string = '') => {
@@ -58,15 +62,41 @@ export const useRenameStore = defineStore('rename', () => {
     currentPathList.value = []
   }
 
+  // 对话框确定
+  const confirmDialog = async () => {
+    if (!currentPathList.value.length) {
+      ElMessage.warning('请选择一个文件夹')
+      return
+    }
+    // 拿到当前path
+    path.value = JSON.parse(JSON.stringify(currentPathList.value[currentPathList.value.length - 1]?.fullPath || ''))
+    // 获取需要重命名的文件列表
+    const { data: res } = await folderContent(path.value)
+    if (res.code === 200) {
+      renameFileList.value = res.data
+      cancelDialog()
+    }
+  }
+
+  // 返回跟目录
+  const returnRoot = () => {
+    currentPathList.value = []
+    diskFolderList.value = []
+    getFolderContent()
+  }
+
   return {
     path,
     ruleForm,
     dialogVisible,
     diskFolderList,
     currentPathList,
+    renameFileList,
     showDialog,
     selectFolderHandler,
     goToPath,
-    cancelDialog
+    cancelDialog,
+    returnRoot,
+    confirmDialog
   }
 })
