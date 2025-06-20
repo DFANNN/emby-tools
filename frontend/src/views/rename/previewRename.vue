@@ -1,7 +1,7 @@
 <template>
   <div class="preview-rename-container">
     <div class="preview-header">
-      <h2>预览重命名结果</h2>
+      <h2 class="header-name">预览重命名结果</h2>
       <div class="preview-operations">
         <el-button type="danger" @click="batchDelete" :disabled="!selectedFiles.length"> 批量删除 </el-button>
         <el-button type="success" @click="executeRename" :disabled="!renameStore.renameFileList.length">
@@ -229,6 +229,12 @@ const getRowClassName = (row: { row: IRenameFileItem }) => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    .header-name {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .preview-operations {
       display: flex;

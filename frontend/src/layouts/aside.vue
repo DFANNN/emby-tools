@@ -2,7 +2,7 @@
   <div class="aside-container">
     <el-menu
       :router="true"
-      default-active="/layouts/embyPoster"
+      :default-active="defaultActiveMenuItem"
       :collapse="layoutStore.isCollapse"
       class="el-menu-vertical-demo"
     >
@@ -27,9 +27,14 @@ import MenuItem from '@/layouts/menuItem.vue'
 
 const layoutStore = useLayoutStore()
 const menuStore = useMenuStore()
+const route = useRoute()
+
+// 默认激活的菜单
+const defaultActiveMenuItem = ref('')
 
 onMounted(() => {
   menuStore.getMenu()
+  defaultActiveMenuItem.value = route.path
 })
 </script>
 
