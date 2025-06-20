@@ -2,7 +2,8 @@
   <div class="preview-poster-container">
     <div class="preview-header">
       <h2 class="header-name">预览效果</h2>
-      <el-button type="success" @click="uploadPoster">上传到 Emby</el-button>
+      <el-button type="primary" @click="downloadPoster">下载封面图</el-button>
+      <el-button type="success" @click="executeUpload">上传到 Emby</el-button>
     </div>
     <div class="preview-container">
       <div class="poster-grid">
@@ -35,32 +36,99 @@
 import domtoimage from 'dom-to-image'
 import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
 import PosterOne from '@/views/embyPoster/posterLayout/posterOne.vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const embyPosterStore = useEmbyPosterStore()
 
+// 执行上传
+const executeUpload = () => {
+  ElMessageBox.confirm('确认执行上传到Emby操作吗？此操作会覆盖原有的封面图！', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    uploadPoster()
+  })
+}
+
+// 上传封面到emby
 const uploadPoster = async () => {
   const posterElements = document.querySelectorAll('.poster-jpg')
+  if (!posterElements.length) {
+    ElMessage.warning('没有可上传的封面！')
+    return
+  }
+  embyPosterStore.loading = true
+  embyPosterStore.loadingText = '正在上传中，请勿离开页面...'
 
-  for (const posterElement of posterElements) {
-    // 获取当前媒体库id
-    const mediaId = posterElement.getAttribute('media-id')
-    // 生成png图片
-    const domImage = await domtoimage.toPng(posterElement as HTMLElement, {
-      // 画布的宽高
-      width: 640 * 2,
-      height: 360 * 2,
-      style: {
-        transform: 'scale(2)',
-        transformOrigin: 'top left',
-        // 元素的真是宽高
-        width: '640px',
-        height: '360px'
+  try {
+    for (let i = 0; i < posterElements.length; i++) {
+      const posterElement = posterElements[i] as HTMLElement
+      try {
+        const mediaId = posterElement.getAttribute('media-id')
+        const domImage = await domtoimage.toPng(posterElement, {
+          width: 640 * 2,
+          height: 360 * 2,
+          style: {
+            transform: 'scale(2)',
+            transformOrigin: 'top left',
+            width: '640px',
+            height: '360px'
+          }
+        })
+        const base64Image = domImage.replace('data:image/png;base64,', '')
+        await embyReplaceMediaLibraryPoster(mediaId!, base64Image)
+      } catch (error) {
+        ElMessage.error('上传封面失败')
+        embyPosterStore.loading = false
+        return
       }
-    })
-    // 删除base64图片的前缀
-    const base64Image = domImage.replace('data:image/png;base64,', '')
-    // 上传到emby
-    const res = await embyReplaceMediaLibraryPoster(mediaId!, base64Image)
+    }
+    ElMessage.success('全部封面上传成功！')
+  } finally {
+    embyPosterStore.loading = false
+  }
+}
+
+// 下载封面图方法
+const downloadPoster = async () => {
+  const posterElements = document.querySelectorAll('.poster-jpg')
+  if (!posterElements.length) {
+    ElMessage.warning('没有可下载的封面！')
+    return
+  }
+  embyPosterStore.loading = true
+  embyPosterStore.loadingText = '正在下载中，请勿离开页面...'
+  try {
+    for (let i = 0; i < posterElements.length; i++) {
+      const posterElement = posterElements[i] as HTMLElement
+      try {
+        const name = posterElement.getAttribute('media-id') || 'poster'
+        const domImage = await domtoimage.toPng(posterElement, {
+          width: 640 * 2,
+          height: 360 * 2,
+          style: {
+            transform: 'scale(2)',
+            transformOrigin: 'top left',
+            width: '640px',
+            height: '360px'
+          }
+        })
+        const link = document.createElement('a')
+        link.href = domImage
+        link.download = `${name}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } catch (error) {
+        ElMessage.error('下载封面失败')
+        embyPosterStore.loading = false
+        return
+      }
+    }
+    ElMessage.success('全部封面下载完成！')
+  } finally {
+    embyPosterStore.loading = false
   }
 }
 </script>

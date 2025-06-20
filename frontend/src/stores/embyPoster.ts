@@ -6,6 +6,10 @@ import { linkEmby, embyMediaLibraryItems } from '@/api/embyPoster'
 import type { IRuleForm, IEmbyMediaLibraryItem, IConnectionForm } from '@/types/embyPoster'
 
 export const useEmbyPosterStore = defineStore('embyPoster', () => {
+  // loading
+  const loading = ref(false)
+  const loadingText = ref('')
+
   // 连接emby数据的表单
   const connectionForm = ref<IConnectionForm>({
     protocol: 'http',
@@ -61,8 +65,8 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
   // 需要生成封面的媒体库id
   const ruleForm = ref<IRuleForm>({
     ids: [],
-    posterTemplate: '',
-    pictureSource: ''
+    posterTemplate: '1',
+    pictureSource: 'local'
   })
   // 获取需要生成封面的媒体库列表
   const needGeneratePosterMediaLibraryList = ref<IEmbyMediaLibraryItem[]>([])
@@ -72,36 +76,90 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
 
   // 精选渐变色数组
   const gradients = [
-    'linear-gradient(120deg, #3a7bd5 0%, #00d2ff 100%)',
-    'linear-gradient(120deg, #ff9966 0%, #ff5e62 100%)',
-    'linear-gradient(120deg, #43cea2 0%, #185a9d 100%)',
-    'linear-gradient(120deg, #a18cd1 0%, #fbc2eb 100%)',
-    'linear-gradient(120deg, #f7971e 0%, #ffd200 100%)',
-    'linear-gradient(120deg, #96fbc4 0%, #f9f586 100%)',
-    'linear-gradient(120deg, #ff512f 0%, #2196f3 100%)',
-    'linear-gradient(120deg, #f953c6 0%, #b91d73 100%)',
-    'linear-gradient(120deg, #00c3ff 0%, #ffff1c 100%)',
-    'linear-gradient(120deg, #f7797d 0%, #FBD786 100%)',
-    'linear-gradient(120deg, #43e97b 0%, #38f9d7 100%)',
-    'linear-gradient(120deg, #fa709a 0%, #fee140 100%)',
+    // 柔和同色系深浅渐变
+    'linear-gradient(120deg, #232526 0%, #414345 100%)',
+    'linear-gradient(120deg, #283e51 0%, #485563 100%)',
+    'linear-gradient(120deg, #373b44 0%, #4286f4 100%)',
+    'linear-gradient(120deg, #1e3c72 0%, #2a5298 100%)',
+    'linear-gradient(120deg, #41295a 0%, #2F0743 100%)',
+    'linear-gradient(120deg, #232526 0%, #3a3a3a 100%)',
+    'linear-gradient(120deg, #232526 0%, #485563 100%)',
+    'linear-gradient(120deg, #232526 0%, #764ba2 100%)',
+    'linear-gradient(120deg, #232526 0%, #3498db 100%)',
+    'linear-gradient(120deg, #232526 0%, #b91d73 100%)',
+    'linear-gradient(120deg, #232526 0%, #185a9d 100%)',
+    'linear-gradient(120deg, #232526 0%, #43cea2 100%)',
+    'linear-gradient(120deg, #232526 0%, #fa709a 100%)',
+    'linear-gradient(120deg, #232526 0%, #30cfd0 100%)',
+    'linear-gradient(120deg, #232526 0%, #a1c4fd 100%)',
+    'linear-gradient(120deg, #232526 0%, #667eea 100%)',
+    'linear-gradient(120deg, #232526 0%, #c471f5 100%)',
+    'linear-gradient(120deg, #232526 0%, #48c6ef 100%)',
+    'linear-gradient(120deg, #232526 0%, #9795f0 100%)',
+    // 三色渐变，过渡更自然
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #6f86d6 100%)',
+    'linear-gradient(120deg, #283e51 0%, #485563 50%, #6f86d6 100%)',
+    'linear-gradient(120deg, #373b44 0%, #4286f4 50%, #6f86d6 100%)',
+    'linear-gradient(120deg, #1e3c72 0%, #2a5298 50%, #6f86d6 100%)',
+    'linear-gradient(120deg, #41295a 0%, #2F0743 50%, #764ba2 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #3498db 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #b91d73 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #43cea2 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #fa709a 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 50%, #c471f5 100%)',
+    // 经典蓝紫、蓝绿、粉紫等
     'linear-gradient(120deg, #30cfd0 0%, #330867 100%)',
     'linear-gradient(120deg, #5ee7df 0%, #b490ca 100%)',
+    'linear-gradient(120deg, #a18cd1 0%, #fbc2eb 100%)',
+    'linear-gradient(120deg, #f953c6 0%, #b91d73 100%)',
+    'linear-gradient(120deg, #43cea2 0%, #185a9d 100%)',
+    'linear-gradient(120deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(120deg, #c471f5 0%, #fa71cd 100%)',
+    'linear-gradient(120deg, #48c6ef 0%, #6f86d6 100%)',
+    'linear-gradient(120deg, #9795f0 0%, #fbc7d4 100%)',
+    'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)',
+    // 适当保留部分亮色但不过分极端的渐变
+    'linear-gradient(120deg, #f7971e 0%, #ffd200 100%)',
     'linear-gradient(120deg, #f6d365 0%, #fda085 100%)',
     'linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%)',
     'linear-gradient(120deg, #fdcbf1 0%, #e6dee9 100%)',
     'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)',
-    'linear-gradient(120deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)',
     'linear-gradient(120deg, #fddb92 0%, #d1fdff 100%)',
     'linear-gradient(120deg, #fcb69f 0%, #ffecd2 100%)',
-    'linear-gradient(120deg, #c471f5 0%, #fa71cd 100%)',
-    'linear-gradient(120deg, #48c6ef 0%, #6f86d6 100%)',
-    'linear-gradient(120deg, #9795f0 0%, #fbc7d4 100%)',
     'linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%)',
     'linear-gradient(120deg, #f9d423 0%, #ff4e50 100%)',
     'linear-gradient(120deg, #00b4db 0%, #0083b0 100%)',
     'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)',
-    'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)'
+    'linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%)',
+    // 新增柔和好看的渐变色
+    'linear-gradient(120deg, #536976 0%, #292e49 100%)',
+    'linear-gradient(120deg, #485563 0%, #29323c 100%)',
+    'linear-gradient(120deg, #134e5e 0%, #71b280 100%)',
+    'linear-gradient(120deg, #1f4037 0%, #99f2c8 100%)',
+    'linear-gradient(120deg, #a770ef 0%, #cf8bf3 50%, #fdb99b 100%)',
+    'linear-gradient(120deg, #f857a6 0%, #ff5858 100%)',
+    'linear-gradient(120deg, #396afc 0%, #2948ff 100%)',
+    'linear-gradient(120deg, #bdc3c7 0%, #2c3e50 100%)',
+    'linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%)',
+    'linear-gradient(120deg, #cfd9df 0%, #e2ebf0 100%)',
+    'linear-gradient(120deg, #f7797d 0%, #FBD786 100%)',
+    'linear-gradient(120deg, #f7971e 0%, #ffd200 100%)',
+    'linear-gradient(120deg, #fdcbf1 0%, #e6dee9 100%)',
+    'linear-gradient(120deg, #c471f5 0%, #fa71cd 100%)',
+    'linear-gradient(120deg, #f953c6 0%, #b91d73 100%)',
+    'linear-gradient(120deg, #43cea2 0%, #185a9d 100%)',
+    'linear-gradient(120deg, #283e51 0%, #485563 100%)',
+    'linear-gradient(120deg, #1a2980 0%, #26d0ce 100%)',
+    'linear-gradient(120deg, #0f2027 0%, #2c5364 100%)',
+    'linear-gradient(120deg, #232526 0%, #414345 100%)',
+    'linear-gradient(120deg, #000428 0%, #004e92 100%)',
+    'linear-gradient(120deg, #1e3c72 0%, #2a5298 100%)',
+    'linear-gradient(120deg, #f6d365 0%, #fda085 100%)',
+    'linear-gradient(120deg, #f9d423 0%, #ff4e50 100%)',
+    'linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%)',
+    'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)',
+    'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)',
+    'linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%)'
   ]
   // 获取随机渐变色
   const getRandomGradient = () => {
@@ -168,6 +226,8 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     getRandomGradient,
     generatePreviewImageUrls,
     layoutList,
-    sourceList
+    sourceList,
+    loading,
+    loadingText
   }
 })

@@ -2,7 +2,9 @@
   <div class="cover-demo" :style="{ background: poster.backgroundGradient }">
     <div class="cover-left">
       <div class="cover-title">{{ poster.Name }}</div>
-      <div class="cover-subtitle">{{ poster.CollectionType }}</div>
+      <div class="cover-subtitle">
+        {{ poster.CollectionType.toUpperCase() }}
+      </div>
     </div>
     <div class="cover-right">
       <div class="cover-card" v-for="(url, i) in poster.imageUrls" :key="i">
@@ -38,12 +40,17 @@ defineProps(['poster'])
       font-weight: bold;
       letter-spacing: 4px;
       margin-bottom: 4px;
+      word-break: break-all;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      max-width: 60%;
     }
     .cover-subtitle {
       font-size: 16px;
       color: #e0e0e0;
       letter-spacing: 6px;
-      font-family: 'Roboto Mono', monospace;
+      font-family: 'FZLanTingHei', 'Roboto Mono', monospace;
+      margin-left: 4px;
     }
   }
   .cover-right {

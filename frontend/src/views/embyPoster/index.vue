@@ -1,5 +1,5 @@
 <template>
-  <div class="index-container">
+  <div class="index-container" v-loading="embyPosterStore.loading" :element-loading-text="embyPosterStore.loadingText">
     <div class="left">
       <PosterRules />
     </div>
