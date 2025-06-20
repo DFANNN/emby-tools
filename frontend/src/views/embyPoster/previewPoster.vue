@@ -1,7 +1,7 @@
 <template>
   <div class="preview-poster-container">
     <div class="preview-header">
-      <h2>预览效果</h2>
+      <h2 class="header-name">预览效果</h2>
       <el-button type="success" @click="uploadPoster">上传到 Emby</el-button>
     </div>
     <div class="preview-container">
@@ -78,6 +78,12 @@ const uploadPoster = async () => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    .header-name {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .preview-container {
     height: calc(100vh - 59px - 40px - 48px - 35px - 24px - 1px);
