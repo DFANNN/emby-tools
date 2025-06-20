@@ -8,6 +8,7 @@ const app = express()
 // 中间件
 app.use(cors())
 app.use(responseHandler)
+app.use(express.json())
 
 // 路由
 app.use('/rename', renameRoutes)

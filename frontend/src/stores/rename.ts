@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import { folderContent } from '@/api/rename'
-import type { IDiskFolderItem, IRenameFileItem, IParseResult } from '@/types/rename'
+import { folderContent, batchRename } from '@/api/rename'
+import { getSeriesNameFromPath } from '@/utils/utils'
 import { ElMessage } from 'element-plus'
+import type { IDiskFolderItem, IRenameFileItem, IParseResult } from '@/types/rename'
 
 // 文件名解析模式
 const EPISODE_PATTERNS = [
@@ -100,6 +101,8 @@ export const useRenameStore = defineStore('rename', () => {
     }
     // 拿到当前path
     path.value = JSON.parse(JSON.stringify(currentPathList.value[currentPathList.value.length - 1]?.fullPath || ''))
+    // 截取文件路径中的名字
+    ruleForm.value.newFileName = getSeriesNameFromPath(path.value) || ''
     getRenameFileList()
   }
 
@@ -186,22 +189,6 @@ export const useRenameStore = defineStore('rename', () => {
       // 使用解析结果中的季号（已在reanalyzeFiles中处理过默认季号）
       const seasonPart = season !== undefined ? `S${String(season).padStart(2, '0')}` : ''
       newName = `${ruleForm.value.newFileName} ${seasonPart}E${String(episode).padStart(2, '0')}`
-      // switch (ruleForm.value.model) {
-      //   case 'tv':
-      //     // 使用解析结果中的季号（已在reanalyzeFiles中处理过默认季号）
-      //     const seasonPart = season !== undefined ? `S${String(season).padStart(2, '0')}` : ''
-      //     newName = `${ruleForm.value.newFileName} ${seasonPart}E${String(episode).padStart(2, '0')}`
-      //     break
-      //   case 'replace':
-      //     newName = file.name.replace(ruleForm.value.targetName, ruleForm.value.replaceName)
-      //     break
-      //   case 'insert':
-      //     newName =
-      //       ruleForm.value.insertPosition === 'start'
-      //         ? `${ruleForm.value.insertText}${file.name}`
-      //         : `${file.name}${ruleForm.value.insertText}`
-      //     break
-      // }
 
       // 保持原始扩展名
       const ext = file.name.split('.').pop()
@@ -269,15 +256,18 @@ export const useRenameStore = defineStore('rename', () => {
       return
     }
 
-    // TODO: 实现实际的重命名操作
+    // 整理数据
     const params = renameFileList.value.map(file => {
       return {
         targetName: file.fullPath,
         newName: file.fullPath.replace(file.name, file.newName as string)
       }
     })
-    console.log(params)
-    ElMessage.success('重命名成功')
+    const { data: res } = await batchRename(params)
+    if (res.code === 200 && res.data) {
+      renameFileList.value = res.data
+    }
+    ElMessage.success(res.message)
   }
 
   return {

@@ -53,4 +53,50 @@ router.get('/folder-content', async (req, res) => {
   }
 })
 
+// 批量重命名接口
+router.post('/batch-rename', async (req, res) => {
+  const renameList = req.body
+  console.log(renameList)
+  if (!Array.isArray(renameList)) {
+    return res.error('请求体必须为数组')
+  }
+  const results = []
+  for (const item of renameList) {
+    const { targetName, newName } = item
+    if (!targetName || !newName) {
+      results.push({
+        name: path.basename(targetName),
+        fullPath: targetName,
+        newName,
+        fileType: path.extname(targetName).slice(1),
+        status: 'error',
+        statusText: '参数缺失'
+      })
+      continue
+    }
+    try {
+      // 兼容多系统，路径直接用
+      fs.renameSync(targetName, newName)
+      results.push({
+        name: path.basename(newName),
+        fullPath: newName,
+        newName: '',
+        fileType: path.extname(newName).slice(1),
+        status: 'success',
+        statusText: '修改成功'
+      })
+    } catch (err) {
+      results.push({
+        name: path.basename(targetName),
+        fullPath: targetName,
+        newName,
+        fileType: path.extname(targetName).slice(1),
+        status: 'error',
+        statusText: err.message
+      })
+    }
+  }
+  return res.success(results, '批量重命名完成')
+})
+
 export default router

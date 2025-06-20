@@ -3,11 +3,7 @@
     <h2>emby重命名规则</h2>
     <div class="rename-rule-wrap">
       <div class="rename-path-wrap">
-        <el-input
-          v-model="renameStore.path"
-          placeholder="请选择或输入文件夹路径"
-          @keydown.enter="renameStore.getRenameFileList()"
-        >
+        <el-input v-model="renameStore.path" placeholder="请选择或输入文件夹路径" @keydown.enter="searchPath">
           <template #append>
             <el-button :icon="FolderAdd" @click="renameStore.showDialog()" />
           </template>
@@ -70,19 +66,17 @@
 <script setup lang="ts">
 import SelectFolder from '@/views/rename/selectFolder.vue'
 import { FolderAdd } from '@element-plus/icons-vue'
+import { getSeriesNameFromPath } from '@/utils/utils'
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
 
 const renameStore = useRenameStore()
 const ruleFormRef = ref<FormInstance>()
 
-const rules = ref<FormRules>({
-  model: [{ required: true, message: '请选择模式', trigger: 'blur' }],
-  newFileName: [{ required: true, message: '请输入电视剧名称', trigger: 'blur' }],
-  targetName: [{ required: true, message: '请输入查找文本', trigger: 'blur' }],
-  replaceName: [{ required: true, message: '请输入替换文本', trigger: 'blur' }],
-  insertPosition: [{ required: true, message: '请选择插入位置', trigger: 'blur' }],
-  insertText: [{ required: true, message: '请输入插入文本', trigger: 'blur' }]
-})
+const searchPath = () => {
+  // 截取文件路径中的名字
+  renameStore.ruleForm.newFileName = getSeriesNameFromPath(renameStore.path) || ''
+  renameStore.getRenameFileList()
+}
 
 // 预览重命名结果
 const previewRename = async () => {
@@ -97,6 +91,15 @@ const previewRename = async () => {
   if (renameStore.ruleForm.model === 'replace') renameStore.previewReplace()
   if (renameStore.ruleForm.model === 'insert') renameStore.previewInsert()
 }
+
+const rules = ref<FormRules>({
+  model: [{ required: true, message: '请选择模式', trigger: 'blur' }],
+  newFileName: [{ required: true, message: '请输入电视剧名称', trigger: 'blur' }],
+  targetName: [{ required: true, message: '请输入查找文本', trigger: 'blur' }],
+  replaceName: [{ required: true, message: '请输入替换文本', trigger: 'blur' }],
+  insertPosition: [{ required: true, message: '请选择插入位置', trigger: 'blur' }],
+  insertText: [{ required: true, message: '请输入插入文本', trigger: 'blur' }]
+})
 </script>
 
 <style scoped lang="scss">
