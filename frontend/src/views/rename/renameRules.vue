@@ -3,7 +3,7 @@
     <h2>emby重命名规则</h2>
     <div class="rename-rule-wrap">
       <div class="rename-path-wrap">
-        <el-input v-model="renameStore.path" placeholder="请选择或输入文件夹路径" @keydown.enter="searchPath">
+        <el-input v-model="renameStore.path" clearable placeholder="请选择或输入文件夹路径" @keydown.enter="searchPath">
           <template #append>
             <el-button :icon="FolderAdd" @click="renameStore.showDialog()" />
           </template>
@@ -13,7 +13,12 @@
         <el-form :model="renameStore.ruleForm" :rules="rules" label-position="top" ref="ruleFormRef">
           <el-form-item label="选择模式" prop="model">
             <el-radio-group v-model="renameStore.ruleForm.model">
-              <el-radio value="tv">电视剧集</el-radio>
+              <el-radio value="tv">
+                电视剧集
+                <el-tooltip :content="tvModelTooltip" placement="top">
+                  <el-icon><QuestionFilled /></el-icon>
+                </el-tooltip>
+              </el-radio>
               <el-radio value="replace">替换文本</el-radio>
               <el-radio value="insert">插入文本</el-radio>
             </el-radio-group>
@@ -21,7 +26,7 @@
 
           <div v-if="renameStore.ruleForm.model === 'tv'">
             <el-form-item label="电视剧名称" prop="newFileName">
-              <el-input v-model="renameStore.ruleForm.newFileName" placeholder="请输入剧集名称" />
+              <el-input v-model="renameStore.ruleForm.newFileName" clearable placeholder="请输入剧集名称" />
             </el-form-item>
             <el-form-item label="默认季号（可选）" help="123" prop="seasonNumber">
               <el-input-number
@@ -36,10 +41,10 @@
 
           <div v-if="renameStore.ruleForm.model === 'replace'">
             <el-form-item label="查找文本" prop="targetName">
-              <el-input v-model="renameStore.ruleForm.targetName" placeholder="请输入查找文本" />
+              <el-input v-model="renameStore.ruleForm.targetName" clearable placeholder="请输入查找文本" />
             </el-form-item>
             <el-form-item label="替换文本" prop="replaceName">
-              <el-input v-model="renameStore.ruleForm.replaceName" placeholder="请输入替换文本" />
+              <el-input v-model="renameStore.ruleForm.replaceName" clearable placeholder="请输入替换文本" />
             </el-form-item>
           </div>
 
@@ -51,7 +56,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="插入文本" prop="insertText">
-              <el-input v-model="renameStore.ruleForm.insertText" placeholder="请输入插入文本" />
+              <el-input v-model="renameStore.ruleForm.insertText" clearable placeholder="请输入插入文本" />
             </el-form-item>
           </div>
         </el-form>
@@ -67,10 +72,14 @@
 import SelectFolder from '@/views/rename/selectFolder.vue'
 import { FolderAdd } from '@element-plus/icons-vue'
 import { getSeriesNameFromPath } from '@/utils/utils'
+import { QuestionFilled } from '@element-plus/icons-vue'
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
 
 const renameStore = useRenameStore()
 const ruleFormRef = ref<FormInstance>()
+
+const tvModelTooltip =
+  '该模式适用于批量重命名电视剧集文件。会自动识别文件名中的季、集信息，并按统一格式进行规范化重命名，适合整理 Emby、Jellyfin 等媒体库的剧集文件。'
 
 const searchPath = () => {
   // 截取文件路径中的名字
