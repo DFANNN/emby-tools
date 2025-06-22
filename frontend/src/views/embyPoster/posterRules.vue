@@ -44,8 +44,7 @@
         <el-form-item label="图片来源" required prop="pictureSource">
           <el-radio-group v-model="embyPosterStore.ruleForm.pictureSource">
             <el-radio value="local">本地媒体库</el-radio>
-            <el-radio value="tmdb">TMDB 热门</el-radio>
-            <el-radio value="douban">豆瓣</el-radio>
+            <el-radio value="tmdb">TMDB</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
