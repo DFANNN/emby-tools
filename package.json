@@ -1,0 +1,13 @@
+{
+  "name": "emby-tools",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
+    "dev:frontend": "cd frontend && pnpm dev",
+    "dev:backend": "cd backend && pnpm dev",
+    "install:all": "pnpm install && cd frontend && pnpm install && cd ../backend && pnpm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
