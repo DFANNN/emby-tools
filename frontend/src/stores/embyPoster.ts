@@ -22,7 +22,6 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     const url = `${connectionForm.value.protocol}://${connectionForm.value.ip}:${connectionForm.value.port}`
     setEmbyUrl(url, connectionForm.value.apiKey)
     const res = await linkEmby()
-    console.log(res)
     if (res.status === 200) {
       // 获取媒体库列表
       embyMediaLibraryList.value = res.data.Items.map((item: any) => {
@@ -32,7 +31,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
           CollectionType: item.CollectionType, // 媒体库类型
           ImageUrl: `${url}/Items/${item.Id}/Images/Primary` //封面图片地址
         }
-      })
+      }).filter((item: any) => item.CollectionType !== 'music')
       // 默认全选需要生成封面的媒体库
       ruleForm.value.ids = embyMediaLibraryList.value.map(item => item.Id)
       // 获取需要生成封面的媒体库列表
@@ -64,9 +63,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
 
   // 需要生成封面的媒体库id
   const ruleForm = ref<IRuleForm>({
-    ids: [],
-    posterTemplate: '1',
-    pictureSource: 'local'
+    ids: []
   })
   // 获取需要生成封面的媒体库列表
   const needGeneratePosterMediaLibraryList = ref<IEmbyMediaLibraryItem[]>([])
@@ -222,18 +219,10 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     return imageUrls
   }
 
-  // 布局样式
-  const layoutList = ref([
-    { name: '样式一', value: '1' },
-    { name: '样式二', value: '2' },
-    { name: '样式三', value: '3' }
-  ])
-
-  //图片来源
-  const sourceList = ref([
-    { name: '本地媒体库', value: 'local' },
-    { name: 'TMDB 热门', value: 'tmdb' }
-  ])
+  // 清除数据
+  const clearData = () => {
+    showPreviewPoster.value = false
+  }
 
   return {
     connectionForm,
@@ -246,9 +235,8 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     showPreviewPoster,
     getRandomGradient,
     generatePreviewImageUrls,
-    layoutList,
-    sourceList,
     loading,
-    loadingText
+    loadingText,
+    clearData
   }
 })

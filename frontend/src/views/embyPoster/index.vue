@@ -28,6 +28,10 @@ onMounted(() => {
     linkEmbyConfigRef.value?.showDialog()
   }
 })
+
+onBeforeUnmount(() => {
+  embyPosterStore.clearData()
+})
 </script>
 
 <style scoped lang="scss">

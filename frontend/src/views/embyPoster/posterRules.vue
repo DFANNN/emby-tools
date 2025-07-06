@@ -28,25 +28,6 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="封面图模版" prop="posterTemplate">
-          <div class="poster-template-grid">
-            <div
-              v-for="item in templateList"
-              :key="item.value"
-              :class="{ 'template-card': true, active: embyPosterStore.ruleForm.posterTemplate === item.value }"
-              @click="embyPosterStore.ruleForm.posterTemplate = item.value"
-            >
-              <img :src="item.img" :alt="item.label" />
-              <div class="template-label">{{ item.label }}</div>
-            </div>
-          </div>
-        </el-form-item>
-        <el-form-item label="图片来源" required prop="pictureSource">
-          <el-radio-group v-model="embyPosterStore.ruleForm.pictureSource">
-            <el-radio value="local">本地媒体库</el-radio>
-            <el-radio value="tmdb">TMDB</el-radio>
-          </el-radio-group>
-        </el-form-item>
       </el-form>
     </div>
 
@@ -61,9 +42,6 @@
 import { useEmbyPosterStore } from '@/stores/embyPoster'
 import { Link } from '@element-plus/icons-vue'
 import LinkEmbyConfig from '@/views/embyPoster/linkEmbyConfig.vue'
-import posterOneImg from '@/assets/poster_one.png'
-import posterTwoImg from '@/assets/poster_two.png'
-import posterThreeImg from '@/assets/poster_three.png'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 const embyPosterStore = useEmbyPosterStore()
@@ -97,12 +75,6 @@ const generatePoster = async () => {
 const rules = ref<FormRules>({
   ids: [{ required: true, message: '请选择媒体库', trigger: 'blur' }]
 })
-
-const templateList = [
-  { value: '1', label: '模版一', img: posterOneImg },
-  { value: '2', label: '模版二', img: posterTwoImg },
-  { value: '3', label: '模版三', img: posterThreeImg }
-]
 </script>
 
 <style scoped lang="scss">
@@ -127,40 +99,6 @@ const templateList = [
   .poster-rule-wrap {
     height: calc(100vh - 59px - 40px - 48px - 29px - 24px - 32px - 1px);
     overflow-y: auto;
-    .poster-template-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      width: 100%;
-      .template-card {
-        cursor: pointer;
-        &.active {
-          img {
-            border-color: var(--el-color-primary);
-            box-shadow: 0 4px 16px rgba(64, 158, 255, 0.18);
-          }
-          .template-label {
-            color: var(--el-color-primary);
-          }
-        }
-        img {
-          width: 100%;
-          aspect-ratio: 16/9;
-          object-fit: cover;
-          display: block;
-          border-radius: 4px;
-          border: 2px solid transparent;
-          transition: border-color 0.2s;
-        }
-        .template-label {
-          text-align: center;
-          font-size: var(--el-radio-font-size);
-          color: var(--el-text-color-regular);
-          font-weight: 500;
-          transition: color 0.2s;
-        }
-      }
-    }
   }
 
   .generate-btn {
