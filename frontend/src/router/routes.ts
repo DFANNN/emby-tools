@@ -18,13 +18,19 @@ export const groupMap: Record<string, any> = {
 const routes = [
   {
     path: '/',
-    redirect: '/layouts/embyPoster'
+    redirect: '/layouts/home'
   },
   {
     path: '/layouts',
     name: 'layouts',
     component: () => import('@/layouts/index.vue'),
     children: [
+      {
+        path: 'home',
+        name: 'home',
+        component: () => import('@/views/home/index.vue'),
+        meta: { title: '首页', icon: 'Guide', isMenu: true }
+      },
       {
         path: 'embyPoster',
         name: 'embyPoster',

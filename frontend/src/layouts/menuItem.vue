@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { VideoCamera, DocumentCopy, DocumentRemove, Picture, EditPen } from '@element-plus/icons-vue'
+import { VideoCamera, DocumentCopy, DocumentRemove, Picture, EditPen, Guide } from '@element-plus/icons-vue'
 
 defineProps(['menuItem'])
 
@@ -23,6 +23,7 @@ const mapIcon: Record<string, any> = {
   DocumentCopy,
   DocumentRemove,
   Picture,
-  EditPen
+  EditPen,
+  Guide
 }
 </script>
