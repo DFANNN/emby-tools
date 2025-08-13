@@ -18,47 +18,46 @@
         <!-- 内容区域 -->
         <div class="content">
           <div class="content-wrapper">
-            <!-- 评分标签 -->
-            <div class="rating-badge">
-              <div class="rating-number">{{ item.vote_average?.toFixed(1) || '8.5' }}</div>
-              <div class="rating-label">评分</div>
+            <!-- 标题和评分 -->
+            <div class="header">
+              <h1 class="title">{{ item.title || item.name }}</h1>
+              <div class="rating">
+                <div class="rating-score">
+                  <span class="score">{{ item.vote_average?.toFixed(1) || '8.5' }}</span>
+                  <span class="max-score">/10</span>
+                </div>
+                <div class="rating-stars">
+                  <span
+                    v-for="star in 5"
+                    :key="star"
+                    class="star"
+                    :class="{ filled: star <= Math.round((item.vote_average || 8.5) / 2) }"
+                  >
+                    ★
+                  </span>
+                </div>
+              </div>
             </div>
-
-            <!-- 标题 -->
-            <h1 class="title">{{ item.title || item.name }}</h1>
 
             <!-- 简介 -->
             <p class="overview">{{ item.overview || '暂无简介' }}</p>
 
-            <!-- 元信息 -->
-            <div class="meta-info">
-              <div class="meta-item">
-                <span class="meta-icon">🎬</span>
-                <span class="meta-text">{{ item.media_type === 'movie' ? '电影' : '剧集' }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-icon">📅</span>
-                <span class="meta-text">{{ item.release_date?.split('-')[0] || '2024' }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-icon">🏷️</span>
-                <span class="meta-text">{{ item.genre_ids?.[0] || '剧情' }}</span>
-              </div>
+            <!-- 标签信息 -->
+            <div class="tags">
+              <span class="tag">{{ item.media_type === 'movie' ? '电影' : '剧集' }}</span>
+              <span class="tag">{{ item.release_date?.split('-')[0] || '2024' }}</span>
+              <span class="tag">{{ item.genre_ids?.[0] || '剧情' }}</span>
             </div>
 
             <!-- 操作按钮 -->
             <div class="actions">
               <button class="btn btn-primary">
-                <div class="btn-content">
-                  <span class="btn-icon">▶</span>
-                  <span class="btn-text">立即观看</span>
-                </div>
+                <span class="btn-icon">▶</span>
+                立即观看
               </button>
               <button class="btn btn-secondary">
-                <div class="btn-content">
-                  <span class="btn-icon">❤</span>
-                  <span class="btn-text">收藏</span>
-                </div>
+                <span class="btn-icon">+</span>
+                收藏
               </button>
             </div>
           </div>
@@ -226,191 +225,137 @@ onUnmounted(() => {
   position: relative;
   z-index: 2;
   width: 100%;
-  height: 100%;
   padding: 0 8%;
-  display: flex;
-  align-items: center;
 }
 
 .content-wrapper {
-  max-width: 700px;
+  max-width: 600px;
   color: white;
-  position: relative;
 }
 
-.rating-badge {
-  position: absolute;
-  top: -80px;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(20px);
-  padding: 12px 20px;
-  border-radius: 25px;
+.header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 2;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.rating-number {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #ffd700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.rating-label {
-  font-size: 0.85rem;
-  opacity: 0.9;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 24px;
 }
 
 .title {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 3.5rem;
+  font-weight: 700;
   line-height: 1.1;
-  margin: 0 0 24px 0;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
+  margin: 0;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  flex: 1;
+}
+
+.rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+
+.rating-score {
+  display: flex;
+  align-items: baseline;
+}
+
+.score {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.max-score {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
+}
+
+.star.filled {
+  color: #ffd700;
 }
 
 .overview {
-  font-size: 1.3rem;
-  line-height: 1.7;
+  font-size: 1.2rem;
+  line-height: 1.6;
   margin-bottom: 32px;
-  opacity: 0.95;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  font-weight: 400;
-  max-width: 600px;
+  opacity: 0.9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.meta-info {
+.tags {
   display: flex;
-  gap: 24px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
 }
 
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.1);
+.tag {
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
-
-.meta-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.meta-icon {
-  font-size: 1.2rem;
-}
-
-.meta-text {
-  opacity: 0.95;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .actions {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 18px 36px;
+  gap: 8px;
+  padding: 16px 32px;
   border: none;
-  border-radius: 30px;
+  border-radius: 25px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
-  position: relative;
-  overflow: hidden;
-  min-width: 160px;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn:hover::before {
-  left: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+  background: linear-gradient(135deg, #007aff, #5856d6);
   color: white;
-  box-shadow: 0 12px 30px rgba(0, 122, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
 }
 
 .btn-primary:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 122, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 122, 255, 0.4);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-}
-
-.btn-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  z-index: 1;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-icon {
-  font-size: 1.3rem;
-  transition: transform 0.3s ease;
-}
-
-.btn:hover .btn-icon {
-  transform: scale(1.1);
-}
-
-.btn-text {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.2rem;
 }
 
 .indicators {
@@ -493,48 +438,20 @@ onUnmounted(() => {
     padding: 0 6%;
   }
 
-  .content-wrapper {
-    max-width: 100%;
-  }
-
-  .rating-badge {
-    top: -60px;
-    right: 0;
-    padding: 10px 16px;
-  }
-
-  .rating-number {
-    font-size: 1.5rem;
-  }
-
   .title {
-    font-size: 2.8rem;
-    margin-bottom: 20px;
+    font-size: 2.5rem;
   }
 
   .overview {
-    font-size: 1.1rem;
-    margin-bottom: 24px;
-  }
-
-  .meta-info {
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .meta-item {
-    padding: 6px 12px;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .actions {
     flex-direction: column;
-    gap: 16px;
   }
 
   .btn {
-    padding: 16px 28px;
-    min-width: 140px;
+    padding: 14px 24px;
   }
 
   .nav-btn {
@@ -548,40 +465,6 @@ onUnmounted(() => {
 
   .nav-next {
     right: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-carousel {
-    height: 60vh;
-    min-height: 400px;
-  }
-
-  .content {
-    padding: 0 4%;
-  }
-
-  .title {
-    font-size: 2.2rem;
-  }
-
-  .overview {
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .meta-info {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .rating-badge {
-    top: -50px;
-    padding: 8px 14px;
-  }
-
-  .rating-number {
-    font-size: 1.3rem;
   }
 }
 </style>
