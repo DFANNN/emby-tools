@@ -1,5 +1,5 @@
 <template>
-  <el-carousel :interval="10000" trigger="click" height="auto">
+  <el-carousel :interval="10000" trigger="click" height="70vh">
     <el-carousel-item v-for="item in homeStore.trendList" :key="item.id" class="carousel-item-wrapper">
       <div class="carousel-item">
         <div class="carousel-item-background">
@@ -44,9 +44,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.carousel-item-wrapper {
-  height: 70vh;
-}
 .carousel-item {
   position: relative;
   width: 100%;

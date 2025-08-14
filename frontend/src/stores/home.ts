@@ -57,7 +57,7 @@ export const useHomeStore = defineStore('home', () => {
 
     // 一次性并发请求所有 logo
     const trendWithLogos = await Promise.all(
-      res.results.slice(0, 20).map(async (item: any) => {
+      res.results.map(async (item: any) => {
         const logoPath = await getImages(item.media_type, item.id)
         return {
           ...item,
