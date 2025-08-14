@@ -27,4 +27,16 @@ const setEmbyUrl = (url: string, token: string) => {
   console.log(embyRequest.defaults.baseURL, embyRequest.defaults.headers['X-Emby-Token'])
 }
 
-export { request, embyRequest, setEmbyUrl }
+/**
+ * 访问TMDB的接口
+ */
+const tmdbRequest = axios.create({
+  baseURL: import.meta.env.VITE_TMDB_BASE_URL,
+  timeout: 10000,
+  headers: {
+    accept: 'application/json',
+    Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`
+  }
+})
+
+export { request, embyRequest, tmdbRequest, setEmbyUrl }
