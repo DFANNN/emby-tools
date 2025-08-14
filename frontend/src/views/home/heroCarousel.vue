@@ -1,37 +1,33 @@
 <template>
-  <el-carousel :interval="5000" trigger="click" height="550px">
-    <el-carousel-item v-for="item in carouselItems" :key="item.id">
+  <el-carousel :interval="10000" trigger="click" height="auto">
+    <el-carousel-item v-for="item in carouselItems" :key="item.id" class="carousel-item-wrapper">
       <div class="carousel-item">
-        <div class="carousel-item-img">
+        <div class="carousel-item-background">
           <img :src="item.backdrop_path" alt="backdrop" />
         </div>
         <div class="carousel-item-content">
           <div class="content-header">
             <div class="logo-container">
-              <img :src="item.logo_path" alt="logo" class="movie-logo" />
+              <img :src="item.logo_path" alt="" />
             </div>
           </div>
-
-          <div class="content-meta">
-            <div class="meta-info">
-              <span class="release-date">{{ item.release_date }}</span>
-              <span class="separator">•</span>
-              <span class="genres">
+          <div class="content-body">
+            <div class="movie-title">{{ `「 ${item.name}  」` }}</div>
+            <div class="movie-meta">
+              <div class="movie-release-date">{{ item.release_date }}</div>
+              <div class="separator">•</div>
+              <div class="movie-genres">
                 <span v-for="(id, index) in item.genre_ids" :key="id">
                   {{ genreMap[id] }}{{ index < item.genre_ids.length - 1 ? ' / ' : '' }}
                 </span>
-              </span>
-              <span class="separator">•</span>
-              <span class="rating-score">
+              </div>
+              <div class="separator">•</div>
+              <div class="movie-rating">
                 <span class="score-number">{{ item.vote_average.toFixed(1) }}</span>
-                <span class="score-number">⭐</span>
-              </span>
+                <span class="score-icon">⭐</span>
+              </div>
             </div>
-          </div>
-
-          <div class="content-details">
-            <span class="movie-title">{{ `「 ${item.name}  」` }}</span>
-            <span class="movie-overview">{{ item.overview }}</span>
+            <div class="movie-overview">{{ item.overview }}</div>
           </div>
         </div>
       </div>
@@ -40,8 +36,6 @@
 </template>
 
 <script setup lang="ts">
-const aaa = ref(8.5)
-
 const genreMap: Record<number, string> = {
   // movie
   28: '动作',
@@ -118,111 +112,251 @@ const carouselItems = ref([
 </script>
 
 <style scoped lang="scss">
+.carousel-item-wrapper {
+  height: 70vh;
+}
 .carousel-item {
   position: relative;
   width: 100%;
   height: 100%;
-  .carousel-item-img {
+
+  .carousel-item-background {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
   }
+
   .carousel-item-content {
     position: relative;
-    z-index: 1;
     height: 100%;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding: 24px;
+    justify-content: space-between;
     color: #fff;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.65) 100%);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0.85) 100%);
+    padding: 2rem 0;
+
     .content-header {
-      margin-bottom: 10px;
+      padding: 0 3rem;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+
       .logo-container {
-        width: 350px;
-        height: 120px;
-        margin-right: 40px;
+        width: 220px;
+        height: 110px;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+
         img {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
-        }
-      }
-      .rating-score {
-        display: inline-flex;
-        align-items: baseline;
-
-        .score-number {
-          font-size: 16px;
-          font-weight: 700;
-          color: #ffd700;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-          line-height: 1;
-        }
-
-        .score-max {
-          font-size: 14px;
-          color: rgba(255, 255, 255, 0.8);
-          font-weight: 500;
-          margin-left: 2px;
+          filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.9));
         }
       }
     }
-    .content-meta {
-      margin-bottom: 10px;
-      .meta-info {
-        font-size: 14px;
-        color: #fff;
-        .release-date {
-          font-weight: bold;
+
+    .content-body {
+      padding: 0 3rem 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      .movie-title {
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+        color: #ffffff;
+        font-smooth: never;
+      }
+
+      .movie-meta {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+
+        .movie-release-date {
+          font-weight: 600;
+          color: #f0f0f0;
         }
+
         .separator {
-          margin: 0 5px;
+          color: rgba(255, 255, 255, 0.7);
+          font-weight: 400;
+          font-size: 18px;
         }
-        .genres {
-          font-weight: bold;
+
+        .movie-genres {
+          font-weight: 500;
+          color: #e0e0e0;
+        }
+
+        .movie-rating {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 215, 0, 0.2);
+          padding: 8px 16px;
+          border-radius: 25px;
+          border: 1px solid rgba(255, 215, 0, 0.4);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(255, 215, 0, 0.25);
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+          }
+
+          .score-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+          }
+
+          .score-icon {
+            font-size: 16px;
+            color: #ffd700;
+          }
         }
       }
-    }
-    .content-details {
-      font-size: 16px;
-      line-height: 1.6;
-      color: #fff;
-      opacity: 0.9;
+
+      .movie-overview {
+        font-size: 17px;
+        line-height: 1.8;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        color: #f5f5f5;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        max-width: 600px;
+      }
     }
 
-    // 响应式设计
-    @media (max-width: 768px) {
-      padding: 30px 20px;
+    // 响应式设计 - 桌面端优化
+    @media (max-width: 1440px) {
+      padding: 1.8rem 0;
 
       .content-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+        padding: 0 2.5rem;
+
+        .logo-container {
+          width: 200px;
+          height: 100px;
+        }
+      }
+
+      .content-body {
+        padding: 0 2.5rem 1.8rem;
+
+        .movie-title {
+          font-size: 2.3rem;
+          margin-bottom: 1.1rem;
+        }
+
+        .movie-meta {
+          font-size: 15.5px;
+          gap: 11px;
+          margin-bottom: 1.3rem;
+        }
+
+        .movie-overview {
+          font-size: 16.5px;
+          max-width: 550px;
+        }
+      }
+    }
+
+    @media (max-width: 1200px) {
+      padding: 1.5rem 0;
+
+      .content-header {
+        padding: 0 2rem;
+
+        .logo-container {
+          width: 180px;
+          height: 90px;
+        }
+      }
+
+      .content-body {
+        padding: 0 2rem 1.5rem;
+
+        .movie-title {
+          font-size: 2.2rem;
+          margin-bottom: 1rem;
+        }
+
+        .movie-meta {
+          font-size: 15px;
+          gap: 10px;
+          margin-bottom: 1.2rem;
+        }
+
+        .movie-overview {
+          font-size: 16px;
+          max-width: 500px;
+        }
+      }
+    }
+
+    @media (min-width: 1921px) {
+      padding: 2.5rem 0;
+
+      .content-header {
+        padding: 0 4rem;
 
         .logo-container {
           width: 280px;
-          height: 90px;
-          margin-right: 0;
+          height: 140px;
+        }
+      }
+
+      .content-body {
+        padding: 0 4rem 2.5rem;
+
+        .movie-title {
+          font-size: 3rem;
+          margin-bottom: 1.5rem;
         }
 
-        .rating-score {
-          .score-number {
-            font-size: 14px;
-          }
+        .movie-meta {
+          font-size: 18px;
+          gap: 15px;
+          margin-bottom: 2rem;
+        }
 
-          .score-max {
-            font-size: 12px;
-          }
+        .movie-overview {
+          font-size: 19px;
+          line-height: 1.9;
+          max-width: 700px;
         }
       }
     }
