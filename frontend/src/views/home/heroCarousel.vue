@@ -96,7 +96,6 @@ onMounted(() => {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.9));
         }
       }
     }

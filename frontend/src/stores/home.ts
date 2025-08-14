@@ -45,6 +45,7 @@ export const useHomeStore = defineStore('home', () => {
     return (
       res.logos.filter((item: any) => item.iso_639_1 === 'zh')[0]?.file_path ||
       res.logos.filter((item: any) => item.iso_639_1 === 'en')[0]?.file_path ||
+      res.logos[0]?.file_path ||
       ''
     )
   }
