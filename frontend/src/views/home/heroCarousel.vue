@@ -27,7 +27,7 @@
                 <span class="score-icon">⭐</span>
               </div>
             </div>
-            <div class="movie-overview">{{ item.overview }}</div>
+            <div class="movie-overview">{{ item.overview.trim() }}</div>
           </div>
         </div>
       </div>
