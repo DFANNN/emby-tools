@@ -1,352 +1,757 @@
 <template>
-  <div>
-    <HeroCarousel />
-    <MediaSlider title="今日趋势" :mediaList="results" />
+  <div class="emby-dashboard">
+    <!-- 页面标题 -->
+    <div class="dashboard-header">
+      <h1>Emby 信息看板</h1>
+      <p>实时监控你的媒体库状态</p>
+      <div class="header-actions">
+        <el-button type="primary" @click="refreshData" :loading="loading">
+          <el-icon><Refresh /></el-icon>
+          刷新数据
+        </el-button>
+        <el-button @click="openEmbyWeb">
+          <el-icon><Link /></el-icon>
+          打开 Emby
+        </el-button>
+      </div>
+    </div>
+
+    <!-- 信息卡片网格 -->
+    <div class="dashboard-grid">
+      <!-- 基础数量统计 -->
+      <div class="info-card count-stats">
+        <div class="card-header">
+          <span class="card-icon">��</span>
+          <h3>媒体库概览</h3>
+          <el-tag type="success" size="small">实时</el-tag>
+        </div>
+        <div class="card-content">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">{{ libraryCounts.movies }}</div>
+              <div class="stat-label">电影</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ libraryCounts.tvShows }}</div>
+              <div class="stat-label">剧集</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ libraryCounts.music }}</div>
+              <div class="stat-label">音乐</div>
+            </div>
+            <div class="stat-item total">
+              <div class="stat-number">{{ libraryCounts.total }}</div>
+              <div class="stat-label">总计</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 存储空间统计 -->
+      <div class="info-card storage-stats">
+        <div class="card-header">
+          <span class="card-icon">��</span>
+          <h3>存储空间</h3>
+          <el-tag type="warning" size="small">监控中</el-tag>
+        </div>
+        <div class="card-content">
+          <div class="storage-overview">
+            <div class="storage-main">
+              <div class="storage-used">{{ storageInfo.totalUsed }}</div>
+              <div class="storage-total">/ {{ storageInfo.totalSpace }}</div>
+            </div>
+            <div class="storage-percentage">{{ storageInfo.usagePercentage }}%</div>
+          </div>
+
+          <el-progress
+            :percentage="storageInfo.usagePercentage"
+            :color="getStorageColor(storageInfo.usagePercentage)"
+            :stroke-width="8"
+          />
+
+          <div class="storage-details">
+            <div class="storage-item">
+              <span>剩余空间:</span>
+              <span class="storage-value">{{ storageInfo.freeSpace }}</span>
+            </div>
+            <div class="storage-item">
+              <span>电影占用:</span>
+              <span class="storage-value">{{ storageInfo.movies?.size || '0GB' }}</span>
+            </div>
+            <div class="storage-item">
+              <span>剧集占用:</span>
+              <span class="storage-value">{{ storageInfo.tvShows?.size || '0GB' }}</span>
+            </div>
+            <div class="storage-item">
+              <span>音乐占用:</span>
+              <span class="storage-value">{{ storageInfo.music?.size || '0GB' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最新添加 -->
+      <div class="info-card latest-added">
+        <div class="card-header">
+          <span class="card-icon">��</span>
+          <h3>最新添加</h3>
+          <el-tag type="info" size="small">{{ latestItems.length }}项</el-tag>
+        </div>
+        <div class="card-content">
+          <div class="latest-list">
+            <div
+              v-for="item in latestItems.slice(0, 5)"
+              :key="item.id"
+              class="latest-item"
+              @click="openItemDetail(item)"
+            >
+              <div class="item-poster">
+                <img :src="item.posterPath || '/placeholder-poster.jpg'" :alt="item.name" @error="handleImageError" />
+              </div>
+              <div class="item-info">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-meta">
+                  <span class="item-type">{{ getTypeLabel(item.type) }}</span>
+                  <span class="item-date">{{ formatDate(item.addedDate) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="latest-more" v-if="latestItems.length > 5">
+            <el-button text @click="showAllLatest"> 查看全部 ({{ latestItems.length }}) </el-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 观看统计 -->
+      <div class="info-card watch-stats">
+        <div class="card-header">
+          <span class="card-icon">⏱️</span>
+          <h3>观看统计</h3>
+          <el-tag type="primary" size="small">统计中</el-tag>
+        </div>
+        <div class="card-content">
+          <div class="watch-overview">
+            <div class="watch-main">
+              <div class="watch-total">{{ watchStats.totalWatchTime }}</div>
+              <div class="watch-label">总观看时长</div>
+            </div>
+            <div class="watch-count">{{ watchStats.totalWatchedItems }} 部已观看</div>
+          </div>
+
+          <div class="watch-categories">
+            <div class="category-item">
+              <span>电影</span>
+              <el-progress :percentage="watchStats.movies.percentage" :stroke-width="6" color="#1890ff" />
+              <span class="category-time">{{ watchStats.movies.watchTime }}</span>
+            </div>
+
+            <div class="category-item">
+              <span>剧集</span>
+              <el-progress :percentage="watchStats.tvShows.percentage" :stroke-width="6" color="#52c41a" />
+              <span class="category-time">{{ watchStats.tvShows.watchTime }}</span>
+            </div>
+
+            <div class="category-item">
+              <span>音乐</span>
+              <el-progress :percentage="watchStats.music.percentage" :stroke-width="6" color="#faad14" />
+              <span class="category-time">{{ watchStats.music.listenTime }}</span>
+            </div>
+          </div>
+
+          <div class="watch-time-stats">
+            <div class="time-item">
+              <span class="time-label">本月</span>
+              <span class="time-value">{{ watchStats.thisMonth }}</span>
+            </div>
+            <div class="time-item">
+              <span class="time-label">本周</span>
+              <span class="time-value">{{ watchStats.thisWeek }}</span>
+            </div>
+            <div class="time-item">
+              <span class="time-label">今日</span>
+              <span class="time-value">{{ watchStats.today }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 系统状态栏 -->
+    <div class="system-status">
+      <div class="status-item">
+        <span class="status-label">Emby 服务:</span>
+        <el-tag :type="systemStatus.emby.status" size="small">
+          {{ systemStatus.emby.message }}
+        </el-tag>
+      </div>
+      <div class="status-item">
+        <span class="status-label">磁盘健康:</span>
+        <el-tag :type="systemStatus.disk.status" size="small">
+          {{ systemStatus.disk.message }}
+        </el-tag>
+      </div>
+      <div class="status-item">
+        <span class="status-label">网络连接:</span>
+        <el-tag :type="systemStatus.network.status" size="small">
+          {{ systemStatus.network.message }}
+        </el-tag>
+      </div>
+      <div class="status-item">
+        <span class="status-label">最后更新:</span>
+        <span class="status-time">{{ lastUpdateTime }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import HeroCarousel from '@/views/home/heroCarousel.vue'
-import MediaSlider from '@/components/MediaSlider.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Refresh, Link } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
-const results = ref([
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/kqHypb4MdEBUFiphf49bK99T4cn.jpg',
-    genre_ids: [878, 53],
-    id: 755898,
-    original_language: 'en',
-    original_title: 'War of the Worlds',
-    overview:
-      '威尔·拉德福德是国土安全部的顶级网络安全分析师，他通过大规模监控项目追踪国家安全的潜在威胁。直到有一天，一个不明实体的攻击让他开始怀疑政府是否对他……以及世界其他地方隐瞒了什么。',
-    popularity: 1554.6094,
-    poster_path: 'https://image.tmdb.org/t/p/original/yvirUYrva23IudARHn3mMGVxWqM.jpg',
-    release_date: '2025-07-29',
-    title: '世界大战',
-    video: false,
-    vote_average: 4.167,
-    vote_count: 297
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/zNriRTr0kWwyaXPzdg1EIxf0BWk.jpg',
-    genre_ids: [878, 12, 28],
-    id: 1234821,
-    original_language: 'en',
-    original_title: 'Jurassic World Rebirth',
-    overview:
-      '地球生态已被证明广泛不适合恐龙生存，危在旦夕的恐龙族群生存于孤岛之上，但是它们中却隐藏着能够带来人类医药奇迹的关键基因，为获取神秘基因，一支精英小队潜入恐龙禁地，然而等待他们的却是无法预知的危机和惊天阴谋……',
-    popularity: 939.9753,
-    poster_path: 'https://image.tmdb.org/t/p/original/1TamJnLwes02dJTTvIwJcQRtRuQ.jpg',
-    release_date: '2025-07-01',
-    title: '侏罗纪世界：重生',
-    video: false,
-    vote_average: 6.39,
-    vote_count: 1483
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/bP6BqIljp4a3BqhxN7YPckcpKI.jpg',
-    genre_ids: [28, 18, 36],
-    id: 1195631,
-    original_language: 'en',
-    original_title: 'William Tell',
-    overview:
-      '威廉·退尔与他的中东妻子苏娜以及他们的儿子沃尔特生活在1307年的瑞士。奥地利人继续压迫瑞士人民，并肆意掠夺他们所占领的土地，满足其邪恶的欲望。当奥地利人袭击附近的一个村庄时，州长沃尔夫肖特强暴并杀害了农夫鲍姆加滕的妻子。作为报复，鲍姆加滕杀死了州长，但被迫逃亡。威廉·退尔出于善良的本性，帮助他逃脱，并将他带到自己的老朋友斯陶夫哈赫那里。斯陶夫哈赫是一位曾经的十字军战士，泰尔曾与他一同在耶路撒冷作战，他的妻子是格特鲁德。尽管威廉·退尔曾发誓不再诉诸暴力，但他和他的朋友们一致认为，必须阻止奥地利人的暴行。',
-    popularity: 490.2596,
-    poster_path: 'https://image.tmdb.org/t/p/original/8SdaetXSTPyQVDb5pTEPRLBSx15.jpg',
-    release_date: '2025-01-17',
-    title: '威廉·退尔',
-    video: false,
-    vote_average: 6.28,
-    vote_count: 91
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/y7tjLYcq2ZGy2DNG0ODhGX9Tm60.jpg',
-    genre_ids: [28, 35, 80],
-    id: 1106289,
-    original_language: 'en',
-    original_title: 'The Pickup',
-    overview:
-      '一次例行的现金押运任务突然变得危机四伏，各方面都迥异的装甲卡车司机罗塞尔 和特拉维斯 被冷酷无情的罪犯伏击，这些罪犯由精明的幕后主使佐伊 领导。随着混乱局面的爆发，这对本不合拍的搭档必须在危险和性格冲突中周旋应对，度过这状况不断失控的糟糕的一天。',
-    popularity: 400.0018,
-    poster_path: 'https://image.tmdb.org/t/p/original/wz43lNee1VWcaP3GA6bCTzzoFzp.jpg',
-    release_date: '2025-07-27',
-    title: '致命劫持',
-    video: false,
-    vote_average: 6.544,
-    vote_count: 215
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/7A3ru3bxmWtyF0ep0CJcLLzWT35.jpg',
-    genre_ids: [28, 18, 36],
-    id: 1185528,
-    original_language: 'zh',
-    original_title: '射雕英雄传：侠之大者',
-    overview:
-      '恩怨情仇的江湖，权势角力的战乱时代，郭靖（肖战 饰）童年离别家乡，逐渐炼就可改变局面和命运的庞大力量。虽受高人赏识和器重，得传天下绝世武功“九阴真经”和“降龙十八掌”，却惹来各方嫉忌，成为众矢之的。  　　郭靖，不亢不卑，怀赤子之心，与黄蓉（庄达菲 饰）在铁骑箭雨和硝烟旌旗中，力挽狂澜，保护南宋边关。  　　雕海苍穹，勇者无惧，侠之大者，力拔山河，成就武林传说。  　　本片主要改编自金庸同名原著第34至40章。',
-    popularity: 391.1223,
-    poster_path: 'https://image.tmdb.org/t/p/original/xZmUHiZlzuU3FuD9EE5wdZpNc95.jpg',
-    release_date: '2025-01-29',
-    title: '射雕英雄传：侠之大者',
-    video: false,
-    vote_average: 6.176,
-    vote_count: 34
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/1RgPyOhN4DRs225BGTlHJqCudII.jpg',
-    genre_ids: [16, 28, 14, 53],
-    id: 1311031,
-    original_language: 'ja',
-    original_title: '劇場版「鬼滅の刃」無限城編 第一章 猗窩座再来',
-    overview:
-      '当鬼杀队的成员和柱之人在为即将到来的与鬼的战斗做准备，完成共同的体能训练——柱之训练时，须佐能乎吉在宇治屋山庄出现。由于鬼杀队的主公处于危险之中，炭治郎和柱急忙赶往总部，但却被须佐能乎吉推入一个神秘的房间。炭治郎和鬼杀队的目标是鬼的堡垒——无限城。因此，鬼杀队和鬼之间的最终战斗的战场已经准备就绪。',
-    popularity: 303.7848,
-    poster_path: 'https://image.tmdb.org/t/p/original/ozfiVnEZUSGWhEl5VtdLdIe1nbt.jpg',
-    release_date: '2025-07-18',
-    title: '鬼灭之刃剧场版：无限城篇Part.1',
-    video: false,
-    vote_average: 7.065,
-    vote_count: 69
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/iZztGzckOMByRRQgsFh2yk3udkU.jpg',
-    genre_ids: [28, 27, 10749],
-    id: 986206,
-    original_language: 'en',
-    original_title: 'Night Carnage',
-    overview: '一个狼人博主遇到了一个迷人的花花公子，他隐藏着自己的神秘秘密。',
-    popularity: 258.5043,
-    poster_path: 'https://image.tmdb.org/t/p/original/w0wjPQKhlqisSbylf1sWZiNyc2h.jpg',
-    release_date: '2025-07-29',
-    title: '夜间屠杀',
-    video: false,
-    vote_average: 5.816,
-    vote_count: 38
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/Q2OajDi2kcO6yErb1IAyVDTKMs.jpg',
-    genre_ids: [27, 9648],
-    id: 1078605,
-    original_language: 'en',
-    original_title: 'Weapons',
-    overview:
-      '　　同一个班上除了一名孩子外，其余所有孩子在同一天晚上的同一时间神秘失踪，这让整个社区开始怀疑究竟是谁或什么导致了他们的失踪。',
-    popularity: 256.0851,
-    poster_path: 'https://image.tmdb.org/t/p/original/6gPW0QD0JncCqVJLLKJn3s8cDNC.jpg',
-    release_date: '2025-08-04',
-    title: '武器',
-    video: false,
-    vote_average: 7.7,
-    vote_count: 285
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/nZsKWhwhUL3Eg88SkIaJjuIZzpN.jpg',
-    genre_ids: [28, 35, 53],
-    id: 1319895,
-    original_language: 'en',
-    original_title: 'Hostile Takeover',
-    overview: '',
-    popularity: 277.0976,
-    poster_path: 'https://image.tmdb.org/t/p/original/vntwlS3CAKfoLTs90GaoK6lymBC.jpg',
-    release_date: '2025-08-08',
-    title: '暴力接管',
-    video: false,
-    vote_average: 8.2,
-    vote_count: 5
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/ySHUoK4utUOiSfCinw81H1TsV0E.jpg',
-    genre_ids: [878, 28, 27],
-    id: 1241470,
-    original_language: 'en',
-    original_title: 'Osiris',
-    overview:
-      '在这部电影中，一队特种部队突击队员在执行任务的过程中被一艘神秘的宇宙飞船绑架。当他们在飞船上醒来时，很快发现自己正在被一个无情的外星种族追捕。',
-    popularity: 367.4563,
-    poster_path: 'https://image.tmdb.org/t/p/original/9xqWda3KWuGWxNyoqlOlEzEzPmd.jpg',
-    release_date: '2025-07-25',
-    title: '太空杀路',
-    video: false,
-    vote_average: 6.411,
-    vote_count: 45
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/cEQMqB3ahd4mfeUN6VGC0ouVnZZ.jpg',
-    genre_ids: [28, 878, 53],
-    id: 1071585,
-    original_language: 'en',
-    original_title: 'M3GAN 2.0',
-    overview:
-      '　　第二部仍以女孩凯蒂和她的姨妈珍玛为主线，她们遭到了下一代机器人“艾米莉亚”的疯狂攻击，而本已沦为智能语音助手的梅根，似乎是帮助她们对抗艾米莉亚的绝佳选择。',
-    popularity: 201.9448,
-    poster_path: 'https://image.tmdb.org/t/p/original/lQXDRQUxfkoABXh03eadAr1C8H7.jpg',
-    release_date: '2025-06-25',
-    title: '梅根2.0',
-    video: false,
-    vote_average: 7.595,
-    vote_count: 678
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/A466i5iATrpbVjX30clP1Zyfp31.jpg',
-    genre_ids: [10749, 35, 18],
-    id: 1307078,
-    original_language: 'en',
-    original_title: 'My Oxford Year',
-    overview:
-      '当罗德奖学金的橄榄枝将Ella Durran送往牛津，她以为自己终将置身于羊皮纸与烛光构筑的学术圣殿。然而，一场政治新星的总统竞选邀约，将这位理想主义者的罗德之梦撕裂成两种轨迹——一边是牛津图书馆里闪耀的哲学星光，一边是政治办公室里燃烧的野心火焰。当她与本地青年Jamie Davenport的激情从牛津的初雪蔓延至泰晤士河畔的暮色时，一场更致命的诱惑悄然浮现：他袖口藏着的，是足以颠覆她人生选择的秘密。在毕业钟声回荡的石板路上，Ella必须抉择——是让政治的权杖刺穿爱情的玫瑰，还是任由牛津的月光将未竟的理想刻入永恒。',
-    popularity: 189.9382,
-    poster_path: 'https://image.tmdb.org/t/p/original/gzvmYHGD7Rn6IhyY6w89k9MF0bT.jpg',
-    release_date: '2025-07-31',
-    title: '爱在牛津的一年',
-    video: false,
-    vote_average: 7.188,
-    vote_count: 245
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/eU7IfdWq8KQy0oNd4kKXS0QUR08.jpg',
-    genre_ids: [878, 12, 28],
-    id: 1061474,
-    original_language: 'en',
-    original_title: 'Superman',
-    overview: '他是真理、正义、美国方式的代表，在这个把善良当做老派的世界，他是善良的化身。',
-    popularity: 172.7213,
-    poster_path: 'https://image.tmdb.org/t/p/original/ln6itpK8OifoGV0IAFDtD7NmPSs.jpg',
-    release_date: '2025-07-09',
-    title: '超人',
-    video: false,
-    vote_average: 7.7,
-    vote_count: 1674
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/r2u7GCYhxtpZbprKJIgdAkGQow3.jpg',
-    genre_ids: [27, 35],
-    id: 1225572,
-    original_language: 'en',
-    original_title: 'Screamboat',
-    overview:
-      '在纽约的午夜，一艘游船因为一只老鼠外形的杀手降临而变成了一个可怕的地狱，游船上的人能否在这个可怕的杀手面前幸存下来呢？',
-    popularity: 174.0057,
-    poster_path: 'https://image.tmdb.org/t/p/original/78xGAhQaKpgq9TI08XK40Ua2bGx.jpg',
-    release_date: '2025-03-20',
-    title: '泣船威利',
-    video: false,
-    vote_average: 5.447,
-    vote_count: 57
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/s94NjfKkcSczZ1FembwmQZwsuwY.jpg',
-    genre_ids: [878, 12],
-    id: 617126,
-    original_language: 'en',
-    original_title: 'The Fantastic 4: First Steps',
-    overview:
-      '　　故事设定在以1960年代为灵感的复古未来世界，“漫威第一家庭”惊奇先生（佩德罗·帕斯卡 Pedro Pascal 饰）、隐形女（凡妮莎·柯比 Vanessa Kirby 饰）、霹雳火（约瑟夫·奎恩 Joseph Quinn 饰）和石头人（艾邦·摩斯-巴克拉赫 Ebon Moss-Bachrach 饰）面临迄今为止最艰巨的挑战。他们必须在英雄角色和家庭关系之间取得平衡，同时保卫地球，抵御名为行星吞噬者（拉尔夫·伊内森 Ralph Ineson 饰）的贪婪宇宙神及其神秘的使者银影侠（朱莉娅·加纳 Julia Garner 饰）。而当行星吞噬者计划吞噬整个星球及所有人，没有人可以置身事外。',
-    popularity: 176.122,
-    poster_path: 'https://image.tmdb.org/t/p/original/t9mlOaf4ismhvKVMSXNJBTL3Wvh.jpg',
-    release_date: '2025-07-23',
-    title: '神奇四侠：初露锋芒',
-    video: false,
-    vote_average: 7.268,
-    vote_count: 964
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/7Q2CmqIVJuDAESPPp76rWIiA0AD.jpg',
-    genre_ids: [28, 12, 18],
-    id: 1011477,
-    original_language: 'en',
-    original_title: 'Karate Kid: Legends',
-    overview:
-      '　　功夫少年李峰（王班 饰）初入纽约，因帮朋友解围反遭当地空手道冠军“美式霸凌”，便决心参加空手道大赛赢回尊重。昔日恩师韩师傅（成龙 饰）远渡重洋携空手道大师丹尼尔（拉尔夫·马基奥 饰）出手相助，将纽约化成训练场对李峰开启宗师特训。在师傅们的教导下，李峰能否将两个武术流派融会贯通，用胜利赢得尊重并开辟属于自己的武学之道？',
-    popularity: 169.2135,
-    poster_path: 'https://image.tmdb.org/t/p/original/vLSMpla6S8pMtgOU201tya6tDtH.jpg',
-    release_date: '2025-05-08',
-    title: '功夫梦：融合之道',
-    video: false,
-    vote_average: 7.151,
-    vote_count: 654
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/oPgXVSdGR9dGwbmvIToOCMmsdc2.jpg',
-    genre_ids: [28, 53, 80],
-    id: 541671,
-    original_language: 'en',
-    original_title: 'Ballerina',
-    overview:
-      '父亲惨遭杀害，少女伊芙（安娜·德·阿玛斯 饰）被迫加入杀手组织，在这里她被培养成为一名芭蕾舞者，同时接受了长达12年的魔鬼训练成为了顶级杀手，开启了血刃仇人的杀戮之旅。她不仅要独自一人完成组织下达的死亡任务，还要暗中搜集杀父仇家的信息。随时丧命的极端危险、各方势力的联合围剿，让伊芙的复仇之路艰难无比。同时，她又被传说中的杀手约翰·威克（基努·里维斯 饰）锁定，新老杀神狭路相逢，伊芙必须在被约翰追到之前杀出血路完成复仇。危险的倒计时开始，一场致命厮杀即将拉开血色序幕……',
-    popularity: 134.4356,
-    poster_path: 'https://image.tmdb.org/t/p/original/zDlUIGVsRtDQKyIAPNIXZhpobnP.jpg',
-    release_date: '2025-06-04',
-    title: '疾速追杀：芭蕾杀姬',
-    video: false,
-    vote_average: 7.435,
-    vote_count: 1316
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/x5dVPttNDZaVRTvbk7pYrtGZoZN.jpg',
-    genre_ids: [35, 18],
-    id: 1263256,
-    original_language: 'en',
-    original_title: 'Happy Gilmore 2',
-    overview: '　　续集将讲述他从一名弃将变成高尔夫球手的故事，他参加了一场高级高尔夫巡回赛。',
-    popularity: 120.3965,
-    poster_path: 'https://image.tmdb.org/t/p/original/6dYAxnwRQNdXILx621xdX61fJJB.jpg',
-    release_date: '2025-07-25',
-    title: '高尔夫球也疯狂2',
-    video: false,
-    vote_average: 6.743,
-    vote_count: 551
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/kWm4HxanOhRWfW9PzigkUXulwdG.jpg',
-    genre_ids: [27],
-    id: 1339166,
-    original_language: 'es',
-    original_title: 'Shaman',
-    overview:
-      '一名传教士在偏远的厄瓜多尔火山地区皈依了一个土著部落，当她的儿子被黑暗势力附身时，她必须接受自己的信仰。',
-    popularity: 131.7801,
-    poster_path: 'https://image.tmdb.org/t/p/original/ltLqm9f9Ma3iCFmfXNHenzPEqda.jpg',
-    release_date: '2025-07-16',
-    title: '萨满',
-    video: false,
-    vote_average: 5.464,
-    vote_count: 14
-  },
-  {
-    adult: false,
-    backdrop_path: 'https://image.tmdb.org/t/p/original/b0yK9BHyTNHGS6fBFLXBFtLC9AW.jpg',
-    genre_ids: [27],
-    id: 1452176,
-    original_language: 'en',
-    original_title: "Abraham's Boys: A Dracula Story",
-    overview:
-      '剧情讲述了两个在过度保护的父亲亚伯拉罕的统治下挣扎的男孩马克思和鲁迪。在他们深入研究了亚伯拉罕与德古拉的历史后，马克斯和鲁迪的世界揭开了面纱，因为他们发现了他们在不知不觉中继承的历史和遗产。',
-    popularity: 98.6802,
-    poster_path: '/e10AbPwcJk5b7ja3MQUVr5wHEeq.jpg',
-    release_date: '2025-07-11',
-    title: '血肉至亲',
-    video: false,
-    vote_average: 5.2,
-    vote_count: 9
+// 响应式数据
+const loading = ref(false)
+const lastUpdateTime = ref('')
+
+// 媒体库数量统计
+const libraryCounts = ref({
+  movies: 0,
+  tvShows: 0,
+  music: 0,
+  total: 0
+})
+
+// 存储空间信息
+const storageInfo = ref({
+  totalUsed: '0GB',
+  totalSpace: '0GB',
+  freeSpace: '0GB',
+  usagePercentage: 0,
+  movies: { size: '0GB', percentage: 0 },
+  tvShows: { size: '0GB', percentage: 0 },
+  music: { size: '0GB', percentage: 0 }
+})
+
+// 最新添加项目
+const latestItems = ref([])
+
+// 观看统计
+const watchStats = ref({
+  totalWatchTime: '0小时',
+  totalWatchedItems: 0,
+  movies: { watchTime: '0小时', percentage: 0 },
+  tvShows: { watchTime: '0小时', percentage: 0 },
+  music: { listenTime: '0小时', percentage: 0 },
+  thisMonth: '0小时',
+  thisWeek: '0小时',
+  today: '0小时'
+})
+
+// 系统状态
+const systemStatus = ref({
+  emby: { status: 'success', message: '运行中' },
+  disk: { status: 'warning', message: '注意' },
+  network: { status: 'success', message: '正常' }
+})
+
+// 定时器
+let refreshTimer: NodeJS.Timeout | null = null
+
+// 获取存储空间颜色
+const getStorageColor = (percentage: number) => {
+  if (percentage < 70) return '#52c41a'
+  if (percentage < 90) return '#faad14'
+  return '#f5222d'
+}
+
+// 获取类型标签
+const getTypeLabel = (type: string) => {
+  const typeMap = {
+    Movie: '电影',
+    Series: '剧集',
+    Audio: '音乐'
   }
-])
+  return typeMap[type] || type
+}
+
+// 格式化日期
+const formatDate = (dateString: string) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = Math.abs(now.getTime() - date.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 1) return '昨天'
+  if (diffDays < 7) return `${diffDays}天前`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
+  return date.toLocaleDateString()
+}
+
+// 处理图片加载错误
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/placeholder-poster.jpg'
+}
+
+// 刷新数据
+const refreshData = async () => {
+  loading.value = true
+  try {
+    await fetchEmbyData()
+    lastUpdateTime.value = new Date().toLocaleString()
+    ElMessage.success('数据刷新成功')
+  } catch (error) {
+    ElMessage.error('数据刷新失败')
+    console.error('刷新数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取 Emby 数据
+const fetchEmbyData = async () => {
+  // 模拟 API 调用
+  await new Promise(resolve => setTimeout(resolve, 1000))
+
+  // 模拟数据
+  libraryCounts.value = {
+    movies: 1234,
+    tvShows: 567,
+    music: 89,
+    total: 1890
+  }
+
+  storageInfo.value = {
+    totalUsed: '2.5TB',
+    totalSpace: '4TB',
+    freeSpace: '1.5TB',
+    usagePercentage: 62.5,
+    movies: { size: '1.8TB', percentage: 45 },
+    tvShows: { size: '600GB', percentage: 15 },
+    music: { size: '100GB', percentage: 2.5 }
+  }
+
+  latestItems.value = [
+    {
+      id: '1',
+      name: '沙丘2',
+      type: 'Movie',
+      addedDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      posterPath: 'https://image.tmdb.org/t/p/original/kMa1TSDj76zTSleXE7xsuZ4s3i0.jpg'
+    },
+    {
+      id: '2',
+      name: '死侍与金刚狼',
+      type: 'Movie',
+      addedDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      posterPath: 'https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg'
+    },
+    {
+      id: '3',
+      name: '权力的游戏',
+      type: 'Series',
+      addedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      posterPath: 'https://image.tmdb.org/t/p/original/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg'
+    }
+  ]
+
+  watchStats.value = {
+    totalWatchTime: '156小时',
+    totalWatchedItems: 89,
+    movies: { watchTime: '45小时', percentage: 29 },
+    tvShows: { watchTime: '98小时', percentage: 63 },
+    music: { listenTime: '13小时', percentage: 8 },
+    thisMonth: '12小时',
+    thisWeek: '3小时',
+    today: '0.5小时'
+  }
+}
+
+// 打开 Emby Web
+const openEmbyWeb = () => {
+  window.open('http://localhost:8096', '_blank')
+}
+
+// 打开项目详情
+const openItemDetail = (item: any) => {
+  console.log('打开项目详情:', item)
+  // 这里可以跳转到 Emby 详情页
+}
+
+// 显示所有最新项目
+const showAllLatest = () => {
+  console.log('显示所有最新项目')
+  // 这里可以打开一个模态框显示所有项目
+}
+
+// 定时刷新
+const startAutoRefresh = () => {
+  refreshTimer = setInterval(() => {
+    refreshData()
+  }, 5 * 60 * 1000) // 5分钟刷新一次
+}
+
+// 停止定时刷新
+const stopAutoRefresh = () => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+}
+
+// 生命周期
+onMounted(() => {
+  refreshData()
+  startAutoRefresh()
+})
+
+onUnmounted(() => {
+  stopAutoRefresh()
+})
 </script>
 
-<style></style>
+<style scoped lang="scss">
+.emby-dashboard {
+  padding: 2rem;
+  background: #f5f7fa;
+  min-height: 100vh;
+
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    .info-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        .card-icon {
+          font-size: 1.5rem;
+          margin-right: 0.75rem;
+        }
+
+        h3 {
+          margin: 0;
+          color: #1a1a1a;
+          font-size: 1.25rem;
+          font-weight: 600;
+          flex: 1;
+        }
+      }
+
+      .card-content {
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+
+          .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+
+            &.total {
+              grid-column: span 2;
+              background: #e6f7ff;
+              border: 1px solid #91d5ff;
+            }
+
+            .stat-number {
+              font-size: 2rem;
+              font-weight: 700;
+              color: #1890ff;
+              margin-bottom: 0.5rem;
+            }
+
+            .stat-label {
+              font-size: 0.875rem;
+              color: #666;
+            }
+          }
+        }
+
+        .storage-overview {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+
+          .storage-main {
+            display: flex;
+            align-items: baseline;
+
+            .storage-used {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #1890ff;
+            }
+
+            .storage-total {
+              font-size: 1rem;
+              color: #666;
+              margin-left: 0.5rem;
+            }
+          }
+
+          .storage-percentage {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #52c41a;
+          }
+        }
+
+        .storage-details {
+          margin-top: 1rem;
+
+          .storage-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .storage-value {
+              font-weight: 600;
+              color: #1890ff;
+            }
+          }
+        }
+
+        .latest-list {
+          .latest-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background: #f5f5f5;
+            }
+
+            .item-poster {
+              width: 50px;
+              height: 75px;
+              margin-right: 1rem;
+              border-radius: 6px;
+              overflow: hidden;
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+
+            .item-info {
+              flex: 1;
+
+              .item-name {
+                font-weight: 600;
+                color: #1a1a1a;
+                margin-bottom: 0.25rem;
+                line-height: 1.3;
+              }
+
+              .item-meta {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.875rem;
+                color: #666;
+
+                .item-type {
+                  color: #1890ff;
+                }
+              }
+            }
+          }
+        }
+
+        .latest-more {
+          text-align: center;
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #f0f0f0;
+        }
+
+        .watch-overview {
+          text-align: center;
+          margin-bottom: 1.5rem;
+
+          .watch-main {
+            margin-bottom: 0.5rem;
+
+            .watch-total {
+              font-size: 2rem;
+              font-weight: 700;
+              color: #1890ff;
+            }
+
+            .watch-label {
+              font-size: 0.875rem;
+              color: #666;
+            }
+          }
+
+          .watch-count {
+            font-size: 0.875rem;
+            color: #52c41a;
+          }
+        }
+
+        .watch-categories {
+          margin-bottom: 1.5rem;
+
+          .category-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            span:first-child {
+              width: 40px;
+              font-size: 0.875rem;
+              color: #666;
+            }
+
+            .el-progress {
+              flex: 1;
+            }
+
+            .category-time {
+              width: 60px;
+              font-size: 0.875rem;
+              color: #1890ff;
+              text-align: right;
+            }
+          }
+        }
+
+        .watch-time-stats {
+          display: flex;
+          justify-content: space-around;
+
+          .time-item {
+            text-align: center;
+
+            .time-label {
+              display: block;
+              font-size: 0.75rem;
+              color: #666;
+              margin-bottom: 0.25rem;
+            }
+
+            .time-value {
+              font-size: 1rem;
+              font-weight: 600;
+              color: #1a1a1a;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .system-status {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .status-label {
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .status-time {
+        font-size: 0.875rem;
+        color: #1890ff;
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .emby-dashboard {
+    padding: 1rem;
+
+    .dashboard-header {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .system-status {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+}
+</style>
