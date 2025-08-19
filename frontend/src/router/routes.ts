@@ -32,6 +32,18 @@ const routes = [
         meta: { title: '首页', icon: 'Guide', isMenu: true }
       },
       {
+        path: 'dailyRecommendation',
+        name: 'dailyRecommendation',
+        component: () => import('@/views/dailyRecommendation/index.vue'),
+        meta: { title: '每日推荐', icon: 'Star', isMenu: true }
+      },
+      {
+        path: 'seriesTracker',
+        name: 'seriesTracker',
+        component: () => import('@/views/seriesTracker/index.vue'),
+        meta: { title: '追剧关注', icon: 'Bell', isMenu: true }
+      },
+      {
         path: 'embyPoster',
         name: 'embyPoster',
         component: () => import('@/views/embyPoster/index.vue'),

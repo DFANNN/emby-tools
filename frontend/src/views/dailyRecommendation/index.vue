@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import HeroCarousel from '@/views/home/heroCarousel.vue'
+import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
 import MediaSlider from '@/components/MediaSlider.vue'
 
 const results = ref([

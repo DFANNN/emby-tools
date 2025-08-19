@@ -66,7 +66,7 @@ interface LibraryCounts {
 
 #### 技术要求
 
-- 数据来源：Emby API + 文件系统扫描
+- 数据来源：Emby API
 - 空间单位：自动转换（B, KB, MB, GB, TB）
 - 精度要求：保留 2 位小数
 
