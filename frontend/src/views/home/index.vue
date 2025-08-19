@@ -1,18 +1,25 @@
 <template>
   <div class="emby-dashboard">
-    <!-- 页面标题 -->
-    <div class="dashboard-header">
-      <h1>Emby 信息看板</h1>
-      <p>实时监控你的媒体库状态</p>
-      <div class="header-actions">
-        <el-button type="primary" @click="refreshData" :loading="loading">
-          <el-icon><Refresh /></el-icon>
-          刷新数据
-        </el-button>
-        <el-button @click="openEmbyWeb">
-          <el-icon><Link /></el-icon>
-          打开 Emby
-        </el-button>
+    <!-- 页面标题（对齐 seriesTracker 样式） -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <div class="title-icon">📊</div>
+          <div class="title-text">
+            <h1>Emby 信息看板</h1>
+            <p>实时监控你的媒体库状态</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <el-button type="primary" @click="refreshData" :loading="loading">
+            <el-icon><Refresh /></el-icon>
+            刷新数据
+          </el-button>
+          <el-button @click="openEmbyWeb">
+            <el-icon><Link /></el-icon>
+            打开 Emby
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -211,6 +218,23 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Refresh, Link } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
+// 类型定义
+type TagType = 'success' | 'warning' | 'info' | 'primary' | 'danger'
+
+interface LatestItem {
+  id: string
+  name: string
+  type: 'Movie' | 'Series' | 'Audio'
+  addedDate: string
+  posterPath: string
+}
+
+interface SystemStatus {
+  emby: { status: TagType; message: string }
+  disk: { status: TagType; message: string }
+  network: { status: TagType; message: string }
+}
+
 // 响应式数据
 const loading = ref(false)
 const lastUpdateTime = ref('')
@@ -235,7 +259,7 @@ const storageInfo = ref({
 })
 
 // 最新添加项目
-const latestItems = ref([])
+const latestItems = ref<LatestItem[]>([])
 
 // 观看统计
 const watchStats = ref({
@@ -250,14 +274,14 @@ const watchStats = ref({
 })
 
 // 系统状态
-const systemStatus = ref({
+const systemStatus = ref<SystemStatus>({
   emby: { status: 'success', message: '运行中' },
   disk: { status: 'warning', message: '注意' },
   network: { status: 'success', message: '正常' }
 })
 
 // 定时器
-let refreshTimer: NodeJS.Timeout | null = null
+let refreshTimer: ReturnType<typeof setInterval> | null = null
 
 // 获取存储空间颜色
 const getStorageColor = (percentage: number) => {
@@ -267,8 +291,8 @@ const getStorageColor = (percentage: number) => {
 }
 
 // 获取类型标签
-const getTypeLabel = (type: string) => {
-  const typeMap = {
+const getTypeLabel = (type: LatestItem['type']) => {
+  const typeMap: Record<LatestItem['type'], string> = {
     Movie: '电影',
     Series: '剧集',
     Audio: '音乐'
@@ -419,27 +443,61 @@ onUnmounted(() => {
   background: #f5f7fa;
   min-height: 100vh;
 
-  .dashboard-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 0.8rem 0;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-    h1 {
-      font-size: 2.5rem;
-      color: #1a1a1a;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      gap: 1rem;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: #666;
-      margin-bottom: 1.5rem;
+    .title-section {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+
+      .title-icon {
+        font-size: 2rem;
+        color: #409eff;
+      }
+
+      .title-text {
+        h1 {
+          font-size: 1.6rem;
+          color: #1a1a1a;
+          margin: 0;
+          font-weight: 700;
+        }
+
+        p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.875rem;
+          color: #666;
+        }
+      }
     }
 
     .header-actions {
       display: flex;
-      justify-content: center;
-      gap: 1rem;
+      gap: 0.6rem;
+      flex-shrink: 0;
+
+      .el-button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
     }
   }
 
@@ -731,14 +789,27 @@ onUnmounted(() => {
   .emby-dashboard {
     padding: 1rem;
 
-    .dashboard-header {
-      h1 {
-        font-size: 2rem;
+    .page-header {
+      padding: 0.8rem;
+
+      .header-content {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+      }
+
+      .title-section {
+        justify-content: center;
+        text-align: center;
       }
 
       .header-actions {
+        align-self: center;
         flex-direction: column;
-        align-items: center;
+      }
+
+      h1 {
+        font-size: 1.4rem;
       }
     }
 
