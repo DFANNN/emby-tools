@@ -1,0 +1,79 @@
+<template>
+  <div class="header-container">
+    <div class="title-section">
+      <div class="title-icon">📊</div>
+      <div class="title-text">
+        <h1>Emby 信息看板</h1>
+        <p>实时监控你的媒体库状态</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <el-button type="primary" @click="refreshData" :loading="loading">
+        <el-icon><Refresh /></el-icon>
+        刷新数据
+      </el-button>
+      <el-button @click="openEmbyWeb">
+        <el-icon><Link /></el-icon>
+        打开 Emby
+      </el-button>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Refresh, Link } from '@element-plus/icons-vue'
+
+const loading = ref(false)
+
+const refreshData = () => {}
+
+const openEmbyWeb = () => {}
+</script>
+
+<style scoped lang="scss">
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--el-border-radius-base);
+  padding: 1rem;
+  box-shadow: var(--el-box-shadow-lighter);
+  background: var(--el-bg-color-overlay);
+  transition: all 0.3s ease;
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    .title-icon {
+      font-size: 2rem;
+    }
+    .title-text {
+      h1 {
+        font-size: 1.6rem;
+        color: var(--el-text-color-primary);
+        margin: 0;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+        color: var(--el-text-color-secondary);
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--el-box-shadow-light);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+</style>
