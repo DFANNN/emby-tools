@@ -1,6 +1,10 @@
 <template>
   <div class="index-container">
     <HeaderComponent />
+    <div class="content">
+      <CountsComponents />
+      <StorageComponents />
+    </div>
     <FooterComponent />
   </div>
 </template>
@@ -8,6 +12,8 @@
 <script setup lang="ts">
 import HeaderComponent from '@/views/home/header.vue'
 import FooterComponent from '@/views/home/footer.vue'
+import CountsComponents from '@/views/home/counts.vue'
+import StorageComponents from '@/views/home/storage.vue'
 </script>
 
 <style scoped lang="scss">
@@ -15,6 +21,20 @@ import FooterComponent from '@/views/home/footer.vue'
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  .content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+}
+@media (max-width: 768px) {
+  .index-container {
+    gap: 1rem;
+    .content {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
 }
 </style>
