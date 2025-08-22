@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { responseHandler } from './middleware/response.js'
 import renameRoutes from './routes/rename.js'
+import embyRoutes from './routes/emby.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -17,6 +18,7 @@ app.use(express.json())
 
 // 路由
 app.use('/rename', renameRoutes)
+app.use('/emby', embyRoutes)
 
 // 根据环境判断是否托管前端静态文件
 const isProduction = process.env.NODE_ENV === 'production'
