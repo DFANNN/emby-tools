@@ -19,6 +19,7 @@
     "systeminformation": "^5.27.1"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.4",
     "cross-env": "^10.0.0"
   }
 }
