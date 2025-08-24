@@ -4,6 +4,8 @@
     <div class="content">
       <CountsComponents />
       <StorageComponents />
+      <LatestAdd />
+      <WatchStats />
     </div>
     <FooterComponent />
   </div>
@@ -14,6 +16,8 @@ import HeaderComponent from '@/views/home/header.vue'
 import FooterComponent from '@/views/home/footer.vue'
 import CountsComponents from '@/views/home/counts.vue'
 import StorageComponents from '@/views/home/storage.vue'
+import LatestAdd from '@/views/home/latestAdd.vue'
+import WatchStats from '@/views/home/watchStats.vue'
 </script>
 
 <style scoped lang="scss">
@@ -24,7 +28,7 @@ import StorageComponents from '@/views/home/storage.vue'
   gap: 1.5rem;
   .content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: 2rem;
   }
 }
