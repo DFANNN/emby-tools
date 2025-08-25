@@ -91,127 +91,25 @@ router.get('/storage', async (req, res) => {
         return total + (item.Size || 0)
       }, 0)
       const totalSizeInGB = (totalSizeInBytes / (1024 * 1024 * 1024)).toFixed(2)
-      return {
-        totalSizeInBytes,
-        totalSizeInGB: parseFloat(totalSizeInGB),
-        itemCount: Items.length
-      }
+      return parseFloat(totalSizeInGB)
     }
 
-    const movieSize = calculateSize(movieResponse)
-    const episodeSize = calculateSize(episodeResponse)
-    const audioSize = calculateSize(audioResponse)
-
-    // 计算总大小
-    const totalSizeInBytes = movieSize.totalSizeInBytes + episodeSize.totalSizeInBytes + audioSize.totalSizeInBytes
-    const totalSizeInGB = (totalSizeInBytes / (1024 * 1024 * 1024)).toFixed(2)
+    // 电影大小
+    const MovieSize = calculateSize(movieResponse)
+    // 剧集大小
+    const EpisodeSize = calculateSize(episodeResponse)
+    // 音乐大小
+    const AudioSize = calculateSize(audioResponse)
 
     // 获取磁盘信息
-    const getDiskInfo = () => {
-      try {
-        // 获取当前工作目录的磁盘信息
-        const stats = fs.statSync('.')
-        const path = require('path')
-        const diskPath = path.resolve('.')
-
-        // 在Windows上，我们需要使用不同的方法
-        if (process.platform === 'win32') {
-          try {
-            // 获取磁盘使用情况
-            const output = execSync('wmic logicaldisk get size,freespace,caption', { encoding: 'utf8' })
-            const lines = output.trim().split('\n').slice(1) // 跳过标题行
-
-            const diskInfo = lines
-              .map(line => {
-                const parts = line.trim().split(/\s+/)
-                if (parts.length >= 3) {
-                  const caption = parts[0]
-                  const freeSpace = parseInt(parts[1]) || 0
-                  const totalSize = parseInt(parts[2]) || 0
-                  const usedSpace = totalSize - freeSpace
-
-                  return {
-                    drive: caption,
-                    totalSizeInBytes: totalSize,
-                    totalSizeInGB: (totalSize / (1024 * 1024 * 1024)).toFixed(2),
-                    freeSpaceInBytes: freeSpace,
-                    freeSpaceInGB: (freeSpace / (1024 * 1024 * 1024)).toFixed(2),
-                    usedSpaceInBytes: usedSpace,
-                    usedSpaceInGB: (usedSpace / (1024 * 1024 * 1024)).toFixed(2),
-                    usagePercentage: totalSize > 0 ? ((usedSpace / totalSize) * 100).toFixed(1) : 0
-                  }
-                }
-                return null
-              })
-              .filter(Boolean)
-
-            return diskInfo
-          } catch (error) {
-            console.error('获取磁盘信息失败:', error)
-            return []
-          }
-        } else {
-          // Linux/Mac 系统
-          try {
-            const output = execSync('df -h', { encoding: 'utf8' })
-            const lines = output.trim().split('\n').slice(1)
-
-            const diskInfo = lines
-              .map(line => {
-                const parts = line.trim().split(/\s+/)
-                if (parts.length >= 6) {
-                  const filesystem = parts[0]
-                  const totalSize = parts[1]
-                  const usedSize = parts[2]
-                  const availableSize = parts[3]
-                  const usagePercentage = parts[4]
-                  const mountedOn = parts[5]
-
-                  return {
-                    filesystem,
-                    totalSize,
-                    usedSize,
-                    availableSize,
-                    usagePercentage,
-                    mountedOn
-                  }
-                }
-                return null
-              })
-              .filter(Boolean)
-
-            return diskInfo
-          } catch (error) {
-            console.error('获取磁盘信息失败:', error)
-            return []
-          }
-        }
-      } catch (error) {
-        console.error('获取磁盘信息失败:', error)
-        return []
-      }
-    }
-
-    const diskInfo = getDiskInfo()
-
-    console.log('电影大小:', movieSize.totalSizeInGB, 'GB')
-    console.log('剧集大小:', episodeSize.totalSizeInGB, 'GB')
-    console.log('音乐大小:', audioSize.totalSizeInGB, 'GB')
-    console.log('总大小:', totalSizeInGB, 'GB')
-    console.log('磁盘信息:', diskInfo)
 
     return res.success({
-      movie: movieSize,
-      episode: episodeSize,
-      audio: audioSize,
-      total: {
-        totalSizeInBytes,
-        totalSizeInGB: parseFloat(totalSizeInGB),
-        itemCount: movieSize.itemCount + episodeSize.itemCount + audioSize.itemCount
-      },
-      diskInfo
+      MovieSize,
+      EpisodeSize,
+      AudioSize
     })
   } catch (error) {
+    console.log('error', error)
     return res.error(error)
   }
 })
