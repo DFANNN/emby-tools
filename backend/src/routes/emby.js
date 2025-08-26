@@ -1,7 +1,5 @@
 import express from 'express'
-import fs from 'fs'
-import path from 'path'
-import { execSync } from 'child_process'
+import si from 'systeminformation'
 import embyStore from '../store/embyStore.js'
 import { embyUserInfo, embyMediaCount, embyLatestAdd, embyStorage } from '../services/embyService.js'
 
@@ -74,6 +72,18 @@ router.get('/latestAdd', async (req, res) => {
   }
 })
 
+// 获取磁盘信息
+const getDiskInfo = async () => {
+  const disks = await si.diskLayout()
+  let totalSizeBytes = 0
+
+  disks.forEach((disk, i) => {
+    totalSizeBytes += disk.size || 0 // 累加磁盘大小
+  })
+
+  return Number((totalSizeBytes / 1_000_000_000).toFixed(2))
+}
+
 // emby获取存储占用空间
 router.get('/storage', async (req, res) => {
   try {
@@ -100,16 +110,16 @@ router.get('/storage', async (req, res) => {
     const EpisodeSize = calculateSize(episodeResponse)
     // 音乐大小
     const AudioSize = calculateSize(audioResponse)
-
-    // 获取磁盘信息
+    // 磁盘大小
+    const DiskSize = await getDiskInfo()
 
     return res.success({
       MovieSize,
       EpisodeSize,
-      AudioSize
+      AudioSize,
+      DiskSize
     })
   } catch (error) {
-    console.log('error', error)
     return res.error(error)
   }
 })
