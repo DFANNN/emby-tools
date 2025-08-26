@@ -47,3 +47,16 @@ export function embyStorage(type) {
     }
   })
 }
+
+/**
+ * emby获取播放时间
+ * @param {*} type 类型：Movie（电影）、Episode（剧集分集）、Audio（音乐）
+ */
+export function embyPlayTime(type) {
+  const url = `${embyStore.url}/Users/${embyStore.user.Id}/Items?IncludeItemTypes=${type}&Recursive=true&Fields=RunTimeTicks,UserData,DateLastPlayed&Limit`
+  return axios.get(url, {
+    headers: {
+      'X-Emby-Token': embyStore.accessToken
+    }
+  })
+}

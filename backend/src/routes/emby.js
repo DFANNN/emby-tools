@@ -1,7 +1,7 @@
 import express from 'express'
 import si from 'systeminformation'
 import embyStore from '../store/embyStore.js'
-import { embyUserInfo, embyMediaCount, embyLatestAdd, embyStorage } from '../services/embyService.js'
+import { embyUserInfo, embyMediaCount, embyLatestAdd, embyStorage, embyPlayTime } from '../services/embyService.js'
 
 const router = express.Router()
 
@@ -120,6 +120,53 @@ router.get('/storage', async (req, res) => {
       DiskSize
     })
   } catch (error) {
+    return res.error(error)
+  }
+})
+
+// emby获取播放时间
+router.get('/playTime', async (req, res) => {
+  try {
+    const [movieResponse, episodeResponse, audioResponse] = await Promise.all([
+      embyPlayTime('Movie'),
+      embyPlayTime('Episode'),
+      embyPlayTime('Audio')
+    ])
+
+    // 计算时长函数
+    const calculateTime = response => {
+      const { Items } = response.data
+
+      const totalTicks = Items.reduce((total, { RunTimeTicks = 0, UserData = {} }) => {
+        const { PlayCount = 0, PlaybackPositionTicks = 0, Played = false } = UserData
+
+        if (PlaybackPositionTicks > 0) {
+          return total + PlaybackPositionTicks
+        }
+        if (PlaybackPositionTicks === 0 && Played === true) {
+          return total + (RunTimeTicks ? RunTimeTicks : 0)
+        }
+        return total
+
+        // return total + RunTimeTicks * PlayCount + PlaybackPositionTicks
+      }, 0)
+
+      // 换算成小时
+      const totalHours = totalTicks / 10_000_000 / 3600
+
+      return Number(totalHours.toFixed(2)) // 保留两位小数
+    }
+
+    console.log('movieResponse', calculateTime(movieResponse))
+
+    const MovieTime = calculateTime(movieResponse)
+    const EpisodeTime = calculateTime(episodeResponse)
+    const AudioTime = calculateTime(audioResponse)
+    const totalTime = Number((MovieTime + EpisodeTime + AudioTime).toFixed(2))
+
+    return res.success({ MovieTime, EpisodeTime, AudioTime, totalTime })
+  } catch (error) {
+    console.log(error)
     return res.error(error)
   }
 })
