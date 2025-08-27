@@ -25,7 +25,7 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     // TODO: 优化具体错误信息
     console.error('登录失败:', error.response?.data || error.message)
-    return res.error('登录失败，请检查用户名和密码', 401)
+    return res.error('登录失败，请检查用户名和密码')
   }
 })
 

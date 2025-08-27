@@ -9,6 +9,13 @@
       </div>
     </div>
     <div class="header-right">
+      <div class="icon-wrapper" @click="openEmbyConfig">
+        <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
+          <el-icon>
+            <EmbyIcon />
+          </el-icon>
+        </el-badge>
+      </div>
       <div class="icon-wrapper" @click="layoutStore.toggleTheme">
         <el-icon>
           <DarkModeIcon v-if="layoutStore.themeMode === 'dark'" />
@@ -21,6 +28,7 @@
           <GithubIcon />
         </el-icon>
       </div>
+      <LinkEmbyConfig ref="linkEmbyConfigRef" />
     </div>
   </div>
 </template>
@@ -31,8 +39,16 @@ import GithubIcon from '@/components/icon/GithubIcon.vue'
 import LightModeIcon from '@/components/icon/LightModeIcon.vue'
 import DarkModeIcon from '@/components/icon/DarkModeIcon.vue'
 import AutoModeIcon from '@/components/icon/AutoModeIcon.vue'
+import LinkEmbyConfig from '@/components/linkEmbyConfig.vue'
+import EmbyIcon from '@/components/icon/EmbyIcon.vue'
 
 const layoutStore = useLayoutStore()
+
+const linkEmbyConfigRef = useTemplateRef('linkEmbyConfigRef')
+const openEmbyConfig = () => {
+  // 预加载现有配置，弹出设置对话框
+  linkEmbyConfigRef.value?.showDialog()
+}
 
 const goToGithub = () => {
   window.open('https://github.com/DFANNN/emby-tools')
@@ -47,7 +63,7 @@ const goToGithub = () => {
   align-items: center;
   justify-content: space-between;
   .icon-wrapper {
-    padding: 4px 8px;
+    padding: 4px 8px 0;
     border-radius: 4px;
     font-size: 20px;
     cursor: pointer;

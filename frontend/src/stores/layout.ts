@@ -1,5 +1,8 @@
 // 存储布局参数的store
 import { defineStore } from 'pinia'
+import { loginEmby } from '@/api/layout'
+import { ElMessage } from 'element-plus'
+import type { LinkEmbyConfigFormType } from '@/types/layout'
 
 export const useLayoutStore = defineStore('layout', () => {
   // 控制菜单折叠
@@ -40,9 +43,43 @@ export const useLayoutStore = defineStore('layout', () => {
     }
   }
 
+  // 连接emby设置的form
+  const linkEmbyConfigForm = ref<LinkEmbyConfigFormType>({
+    protocol: 'http',
+    ip: '',
+    port: '8096',
+    Username: '',
+    Pw: ''
+  })
+
+  // Emby连接状态
+  const linkEmbyStatus = ref(false)
+
+  // 存储Emby连接配置信息
+  const storageEmbyConfigInfo = async () => {
+    localStorage.setItem('embyConfigInfo', JSON.stringify(linkEmbyConfigForm.value))
+  }
+
+  // 连接Emby
+  const connectToEmby = async () => {
+    const { data: res } = await loginEmby(linkEmbyConfigForm.value)
+    if (res.code === 200) {
+      linkEmbyStatus.value = true
+      ElMessage.success('连接Emby成功')
+      storageEmbyConfigInfo()
+    } else {
+      linkEmbyStatus.value = false
+      ElMessage.error(`连接Emby失败,${res.message}`)
+    }
+    return res.code
+  }
+
   return {
     isCollapse,
     themeMode,
-    toggleTheme
+    toggleTheme,
+    linkEmbyConfigForm,
+    linkEmbyStatus,
+    connectToEmby
   }
 })
