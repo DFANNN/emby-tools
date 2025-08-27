@@ -3,18 +3,19 @@
     <div class="header">
       <span class="header-icon">⏱️</span>
       <h3>最近添加</h3>
-      <el-tag type="info" size="small">{{ recentList.length }}项</el-tag>
+      <el-tag type="info" size="small">{{ props.recentList.length }}项</el-tag>
     </div>
     <div class="content">
-      <div v-for="item in recentList.slice(0, 5)" :key="item.id" class="latest-item" @click="openItemDetail(item)">
+      <div v-for="item in props.recentList" :key="item.Id" class="latest-item" @click="openItemDetail(item)">
         <div class="item-poster">
-          <img :src="item.posterPath || '/placeholder-poster.jpg'" :alt="item.name" />
+          <img :src="item.Primary || '/placeholder-poster.jpg'" alt="" />
         </div>
         <div class="item-info">
-          <div class="item-name">{{ item.name }}</div>
+          <div class="item-name">{{ item.Name }}</div>
           <div class="item-meta">
-            <span class="item-type">电影</span>
-            <span class="item-date">剧集</span>
+            <span class="item-type" v-if="item.Type === 'Movie'">电影</span>
+            <span class="item-date" v-if="item.Type === 'Episode'">剧集</span>
+            <span class="item-date" v-if="item.Type === 'Audio'">音乐</span>
           </div>
         </div>
       </div>
@@ -23,29 +24,38 @@
 </template>
 
 <script setup lang="ts">
-const recentList = ref([
-  {
-    id: '1',
-    name: '沙丘2',
-    type: 'Movie',
-    addedDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    posterPath: 'https://image.tmdb.org/t/p/original/kMa1TSDj76zTSleXE7xsuZ4s3i0.jpg'
-  },
-  {
-    id: '2',
-    name: '死侍与金刚狼',
-    type: 'Movie',
-    addedDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    posterPath: 'https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg'
-  },
-  {
-    id: '3',
-    name: '权力的游戏',
-    type: 'Series',
-    addedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    posterPath: 'https://image.tmdb.org/t/p/original/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg'
+import type { EmbyLatestAddItemType } from '@/types/home'
+
+const props = defineProps({
+  recentList: {
+    required: true,
+    type: Array as PropType<EmbyLatestAddItemType[]>
   }
-])
+})
+
+// const recentList = ref([
+//   {
+//     id: '1',
+//     name: '沙丘2',
+//     type: 'Movie',
+//     addedDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+//     posterPath: 'https://image.tmdb.org/t/p/original/kMa1TSDj76zTSleXE7xsuZ4s3i0.jpg'
+//   },
+//   {
+//     id: '2',
+//     name: '死侍与金刚狼',
+//     type: 'Movie',
+//     addedDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+//     posterPath: 'https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg'
+//   },
+//   {
+//     id: '3',
+//     name: '权力的游戏',
+//     type: 'Series',
+//     addedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+//     posterPath: 'https://image.tmdb.org/t/p/original/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg'
+//   }
+// ])
 
 // 打开项目详情
 const openItemDetail = (item: any) => {

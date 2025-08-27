@@ -7,36 +7,51 @@
     </div>
     <div class="storage-overview">
       <div class="storage-main">
-        <div class="storage-used">2.5TB</div>
-        <div class="storage-total">/ 4TB</div>
+        <div class="storage-used">{{ props.storageInfo.TotalSize }}GB</div>
+        <div class="storage-total">/ {{ props.storageInfo.DiskSize }}GB</div>
       </div>
-      <div class="storage-percentage">62.5%</div>
+      <div class="storage-percentage">{{ storagePercent }}%</div>
     </div>
 
-    <el-progress :percentage="62.5" :color="getStorageColor(62.5)" :stroke-width="8" />
+    <el-progress :percentage="storagePercent" :color="getStorageColor(storagePercent)" :stroke-width="8" />
 
     <div class="storage-details">
-      <div class="storage-item">
+      <!-- <div class="storage-item">
         <span>剩余空间:</span>
         <span class="storage-value">1.5TB</span>
-      </div>
+      </div> -->
       <div class="storage-item">
         <span>电影占用:</span>
-        <span class="storage-value">1.8TB</span>
+        <span class="storage-value">{{ props.storageInfo.MovieSize }}GB</span>
       </div>
       <div class="storage-item">
         <span>剧集占用:</span>
-        <span class="storage-value">700GB</span>
+        <span class="storage-value">{{ props.storageInfo.EpisodeSize }}GB</span>
       </div>
       <div class="storage-item">
         <span>音乐占用:</span>
-        <span class="storage-value">100GB</span>
+        <span class="storage-value">{{ props.storageInfo.AudioSize }}GB</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { PropType } from 'vue'
+import type { EmbyStorageInfoType } from '@/types/home'
+
+const storagePercent = computed(() => {
+  if (!props.storageInfo.TotalSize || !props.storageInfo.DiskSize) return 0
+  return Number(((props.storageInfo.TotalSize / props.storageInfo.DiskSize) * 100).toFixed(2))
+})
+
+const props = defineProps({
+  storageInfo: {
+    required: true,
+    type: Object as PropType<EmbyStorageInfoType>
+  }
+})
+
 // 获取存储空间颜色
 const getStorageColor = (percentage: number) => {
   if (percentage < 70) return '#52c41a'

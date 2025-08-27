@@ -34,7 +34,8 @@ router.get('/mediaCount', async (req, res) => {
   try {
     const { data: response } = await embyMediaCount()
     const { MovieCount, SeriesCount, SongCount } = response
-    return res.success({ MovieCount, SeriesCount, SongCount })
+    const TotalCount = MovieCount + SeriesCount + SongCount
+    return res.success({ MovieCount, SeriesCount, SongCount, TotalCount })
   } catch (error) {
     return res.error(error)
   }
@@ -57,7 +58,7 @@ router.get('/latestAdd', async (req, res) => {
         Name: item.Name,
         Id: item.Id,
         DateCreated: formatDate,
-        MediaType: item.MediaType,
+        Type: item.Type,
         Primary: item.ImageTags?.Primary
           ? `${embyStore.url}/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}&quality=90`
           : '',
@@ -110,6 +111,8 @@ router.get('/storage', async (req, res) => {
     const EpisodeSize = calculateSize(episodeResponse)
     // 音乐大小
     const AudioSize = calculateSize(audioResponse)
+    // 总计大小
+    const TotalSize = MovieSize + EpisodeSize + AudioSize
     // 磁盘大小
     const DiskSize = await getDiskInfo()
 
@@ -117,6 +120,7 @@ router.get('/storage', async (req, res) => {
       MovieSize,
       EpisodeSize,
       AudioSize,
+      TotalSize,
       DiskSize
     })
   } catch (error) {
@@ -162,9 +166,9 @@ router.get('/playTime', async (req, res) => {
     const MovieTime = calculateTime(movieResponse)
     const EpisodeTime = calculateTime(episodeResponse)
     const AudioTime = calculateTime(audioResponse)
-    const totalTime = Number((MovieTime + EpisodeTime + AudioTime).toFixed(2))
+    const TotalTime = Number((MovieTime + EpisodeTime + AudioTime).toFixed(2))
 
-    return res.success({ MovieTime, EpisodeTime, AudioTime, totalTime })
+    return res.success({ MovieTime, EpisodeTime, AudioTime, TotalTime })
   } catch (error) {
     console.log(error)
     return res.error(error)

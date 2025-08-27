@@ -6,21 +6,35 @@
       <el-tag type="success" size="small">实时</el-tag>
     </div>
     <div class="content">
-      <div v-for="item in countList" :class="{ 'count-item': true, total: item.title === '总计' }">
-        <div class="count-number">{{ item.count }}</div>
-        <div class="count-label">{{ item.title }}</div>
+      <div class="count-item">
+        <div class="count-number">{{ props.countsInfo.MovieCount }}</div>
+        <div class="count-label">电影</div>
+      </div>
+      <div class="count-item">
+        <div class="count-number">{{ props.countsInfo.SeriesCount }}</div>
+        <div class="count-label">剧集</div>
+      </div>
+      <div class="count-item">
+        <div class="count-number">{{ props.countsInfo.SongCount }}</div>
+        <div class="count-label">音乐</div>
+      </div>
+      <div class="count-item total">
+        <div class="count-number">{{ props.countsInfo.TotalCount }}</div>
+        <div class="count-label">总计</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const countList = ref([
-  { count: 1234, title: '电影' },
-  { count: 567, title: '剧集' },
-  { count: 89, title: '音乐' },
-  { count: 1890, title: '总计' }
-])
+import type { MediaCountInfoType } from '@/types/home'
+
+const props = defineProps({
+  countsInfo: {
+    required: true,
+    type: Object as PropType<MediaCountInfoType>
+  }
+})
 </script>
 
 <style scoped lang="scss">

@@ -7,27 +7,27 @@
     </div>
     <div class="content">
       <div class="watch-overview">
-        <div class="watch-total">156小时</div>
+        <div class="watch-total">{{ props.watchInfo.TotalTime }}小时</div>
         <div class="watch-label">总观看时长</div>
-        <div class="watch-count">89部已观看</div>
+        <!-- <div class="watch-count">89部已观看</div> -->
       </div>
       <div class="watch-categories">
         <div class="category-item">
           <span>电影</span>
-          <el-progress :percentage="watchStats.movies.percentage" :stroke-width="6" color="#1890ff" />
-          <span class="category-time">{{ watchStats.movies.watchTime }}</span>
+          <el-progress :percentage="moviePlayTimePercent" :stroke-width="6" color="#1890ff" />
+          <span class="category-time">{{ props.watchInfo.MovieTime }}小时</span>
         </div>
 
         <div class="category-item">
           <span>剧集</span>
-          <el-progress :percentage="watchStats.tvShows.percentage" :stroke-width="6" color="#52c41a" />
-          <span class="category-time">{{ watchStats.tvShows.watchTime }}</span>
+          <el-progress :percentage="episodePlayTimePercent" :stroke-width="6" color="#52c41a" />
+          <span class="category-time">{{ props.watchInfo.EpisodeTime }}小时</span>
         </div>
 
         <div class="category-item">
           <span>音乐</span>
-          <el-progress :percentage="watchStats.music.percentage" :stroke-width="6" color="#faad14" />
-          <span class="category-time">{{ watchStats.music.listenTime }}</span>
+          <el-progress :percentage="audioPlayTimePercent" :stroke-width="6" color="#faad14" />
+          <span class="category-time">{{ props.watchInfo.AudioTime }}小时</span>
         </div>
       </div>
     </div>
@@ -35,15 +35,27 @@
 </template>
 
 <script setup lang="ts">
-const watchStats = ref({
-  totalWatchTime: '156小时',
-  totalWatchedItems: 89,
-  movies: { watchTime: '45小时', percentage: 29 },
-  tvShows: { watchTime: '98小时', percentage: 63 },
-  music: { listenTime: '13小时', percentage: 8 },
-  thisMonth: '12小时',
-  thisWeek: '3小时',
-  today: '0.5小时'
+import type { PropType } from 'vue'
+import type { EmbyPlayTimeInfoType } from '@/types/home'
+
+const moviePlayTimePercent = computed(() => {
+  if (!props.watchInfo.MovieTime) return 0
+  return Number(((props.watchInfo.MovieTime / props.watchInfo.TotalTime) * 100).toFixed(2))
+})
+const episodePlayTimePercent = computed(() => {
+  if (!props.watchInfo.EpisodeTime) return 0
+  return Number(((props.watchInfo.EpisodeTime / props.watchInfo.TotalTime) * 100).toFixed(2))
+})
+const audioPlayTimePercent = computed(() => {
+  if (!props.watchInfo.AudioTime) return 0
+  return Number(((props.watchInfo.AudioTime / props.watchInfo.TotalTime) * 100).toFixed(2))
+})
+
+const props = defineProps({
+  watchInfo: {
+    required: true,
+    type: Object as PropType<EmbyPlayTimeInfoType>
+  }
 })
 </script>
 
