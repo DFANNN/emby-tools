@@ -13,6 +13,7 @@
         <div class="item-info">
           <div class="item-name">{{ item.Name }}</div>
           <div class="series-name" v-if="item.Type === 'Episode' && item.SeriesName">{{ item.SeriesName }}</div>
+          <div class="series-name" v-if="item.Type === 'Audio' && item.Artists">{{ item.Artists.join('&') }}</div>
           <div class="item-meta">
             <span class="item-type type-movie" v-if="item.Type === 'Movie'">电影</span>
             <span class="item-type type-episode" v-if="item.Type === 'Episode'">剧集</span>

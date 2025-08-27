@@ -128,7 +128,7 @@ const props = defineProps({
         }
 
         .category-time {
-          width: 60px;
+          width: 100px;
           font-size: 0.875rem;
           color: var(--el-color-primary);
           text-align: right;

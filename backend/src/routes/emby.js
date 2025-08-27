@@ -61,7 +61,7 @@ router.get('/latestAdd', async (req, res) => {
         Type: item.Type,
         Primary: item.ImageTags?.Primary
           ? `${embyStore.url}/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}&quality=90`
-          : '',
+          : `${embyStore.url}/Items/${item.ParentBackdropItemId}/Images/Primary?tag=${item.SeriesPrimaryImageTag}&quality=90`,
         Artists: item.Artists ? item.Artists : [],
         SeriesName: item.SeriesName ? item.SeriesName : ''
       }
