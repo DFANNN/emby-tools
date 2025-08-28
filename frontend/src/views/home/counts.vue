@@ -3,7 +3,9 @@
     <div class="header">
       <span class="header-icon">⏱️</span>
       <h3>媒体库概览</h3>
-      <el-tag type="success" size="small">实时</el-tag>
+      <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
+        layoutStore.linkEmbyStatus ? '监控中' : '未连接'
+      }}</el-tag>
     </div>
     <div class="content">
       <div class="count-item">
@@ -28,6 +30,8 @@
 
 <script setup lang="ts">
 import type { MediaCountInfoType } from '@/types/home'
+
+const layoutStore = useLayoutStore()
 
 const props = defineProps({
   countsInfo: {

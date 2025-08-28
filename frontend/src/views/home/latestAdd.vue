@@ -3,7 +3,9 @@
     <div class="header">
       <span class="header-icon">⏱️</span>
       <h3>最近添加</h3>
-      <el-tag type="info" size="small">{{ props.recentList.length }}项</el-tag>
+      <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
+        layoutStore.linkEmbyStatus ? `${props.recentList.length}项` : '未连接'
+      }}</el-tag>
     </div>
     <div class="content">
       <div v-for="item in props.recentList" :key="item.Id" class="latest-item" @click="openItemDetail(item)">
@@ -27,6 +29,8 @@
 
 <script setup lang="ts">
 import type { EmbyLatestAddItemType } from '@/types/home'
+
+const layoutStore = useLayoutStore()
 
 const props = defineProps({
   recentList: {

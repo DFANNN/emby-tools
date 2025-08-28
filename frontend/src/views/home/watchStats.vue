@@ -3,7 +3,9 @@
     <div class="header">
       <span class="header-icon">⏱️</span>
       <h3>观看统计</h3>
-      <el-tag type="success" size="small">统计中</el-tag>
+      <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
+        layoutStore.linkEmbyStatus ? '统计中' : '未连接'
+      }}</el-tag>
     </div>
     <div class="content">
       <div class="watch-overview">
@@ -37,6 +39,8 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import type { EmbyPlayTimeInfoType } from '@/types/home'
+
+const layoutStore = useLayoutStore()
 
 const moviePlayTimePercent = computed(() => {
   if (!props.watchInfo.MovieTime) return 0

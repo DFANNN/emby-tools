@@ -3,7 +3,9 @@
     <div class="header">
       <span class="header-icon">⏱️</span>
       <h3>存储空间</h3>
-      <el-tag type="warning" size="small">监控中</el-tag>
+      <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
+        layoutStore.linkEmbyStatus ? '监控中' : '未连接'
+      }}</el-tag>
     </div>
     <div class="storage-overview">
       <div class="storage-main">
@@ -39,6 +41,8 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import type { EmbyStorageInfoType } from '@/types/home'
+
+const layoutStore = useLayoutStore()
 
 const storagePercent = computed(() => {
   if (!props.storageInfo.TotalSize || !props.storageInfo.DiskSize) return 0

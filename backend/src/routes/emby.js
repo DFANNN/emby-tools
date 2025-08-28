@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
     embyStore.accessToken = AccessToken
     embyStore.user = params
 
-    return res.success(params, '登录成功')
+    return res.success({ ...params, EmbyAddress: embyStore.url }, '登录成功')
   } catch (error) {
     // TODO: 优化具体错误信息
     console.error('登录失败:', error.response?.data || error.message)

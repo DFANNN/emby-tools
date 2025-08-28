@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { loginEmby } from '@/api/layout'
 import { ElMessage } from 'element-plus'
-import type { LinkEmbyConfigFormType } from '@/types/layout'
+import type { LinkEmbyConfigFormType, IEmbyUserInfoType } from '@/types/layout'
 
 export const useLayoutStore = defineStore('layout', () => {
   // 控制菜单折叠
@@ -52,6 +52,9 @@ export const useLayoutStore = defineStore('layout', () => {
     Pw: ''
   })
 
+  // emby用户的基本信息
+  const embyUserInfo = ref<IEmbyUserInfoType>({} as IEmbyUserInfoType)
+
   // Emby连接状态
   const linkEmbyStatus = ref(false)
 
@@ -65,6 +68,7 @@ export const useLayoutStore = defineStore('layout', () => {
     const { data: res } = await loginEmby(linkEmbyConfigForm.value)
     if (res.code === 200) {
       linkEmbyStatus.value = true
+      embyUserInfo.value = res.data
       ElMessage.success('连接Emby成功')
       storageEmbyConfigInfo()
     } else {
@@ -78,6 +82,7 @@ export const useLayoutStore = defineStore('layout', () => {
     isCollapse,
     themeMode,
     toggleTheme,
+    embyUserInfo,
     linkEmbyConfigForm,
     linkEmbyStatus,
     connectToEmby

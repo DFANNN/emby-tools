@@ -4,11 +4,14 @@
       <div class="title-icon">📊</div>
       <div class="title-text">
         <h1>Emby 信息看板</h1>
-        <p>实时监控你的媒体库状态</p>
+        <p>
+          <span>实时监控你的媒体库状态,</span>
+          <span>最后更新时间：2022-12-14 15:11:12</span>
+        </p>
       </div>
     </div>
     <div class="header-actions">
-      <el-button type="primary" @click="refreshData" :loading="loading">
+      <el-button type="primary" @click="homeStore.getEmbyAllInfo()">
         <el-icon><Refresh /></el-icon>
         刷新数据
       </el-button>
@@ -23,11 +26,14 @@
 <script setup lang="ts">
 import { Refresh, Link } from '@element-plus/icons-vue'
 
-const loading = ref(false)
+const homeStore = useHomeStore()
+const layoutStore = useLayoutStore()
 
 const refreshData = () => {}
 
-const openEmbyWeb = () => {}
+const openEmbyWeb = () => {
+  window.open(layoutStore.embyUserInfo.EmbyAddress)
+}
 </script>
 
 <style scoped lang="scss">

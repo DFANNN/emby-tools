@@ -37,6 +37,7 @@
 import type { FormInstance, FormRules } from 'element-plus'
 
 const layoutStore = useLayoutStore()
+const homeStore = useHomeStore()
 
 // ref
 const linkEmbyConfigFormRef = useTemplateRef<FormInstance>('linkEmbyConfigFormRef')
@@ -48,7 +49,10 @@ const visible = ref(false)
 const connectToEmby = async () => {
   await linkEmbyConfigFormRef.value?.validate()
   const code = await layoutStore.connectToEmby()
-  if (code === 200) cancel()
+  if (code === 200) {
+    homeStore.getEmbyAllInfo()
+    cancel()
+  }
 }
 
 // 取消
@@ -74,11 +78,12 @@ const showDialog = () => {
   visible.value = true
 }
 
-onMounted(() => {
+onMounted(async () => {
   const embyConfigInfo = localStorage.getItem('embyConfigInfo')
   if (embyConfigInfo) {
     layoutStore.linkEmbyConfigForm = JSON.parse(embyConfigInfo)
-    layoutStore.connectToEmby()
+    await layoutStore.connectToEmby()
+    await homeStore.getEmbyAllInfo()
   } else {
     visible.value = true
   }
