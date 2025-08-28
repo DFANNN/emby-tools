@@ -5,13 +5,24 @@
       <div class="title-text">
         <h1>Emby 信息看板</h1>
         <p>
-          <span>实时监控你的媒体库状态,</span>
-          <span>最后更新时间：2022-12-14 15:11:12</span>
+          <p v-if="layoutStore.linkEmbyStatus">
+            <el-tag type="success" size="small">Emby 已连接</el-tag>
+            <span style="margin-left: 8px" v-if="homeStore.isLoading">正在刷新数据…</span>
+            <span style="margin-left: 8px" v-else>最后更新时间：{{ homeStore.lastUpdated }}</span>
+          </p>
+          <p v-else>
+            <el-tag type="info" size="small">Emby 未连接</el-tag>
+          </p>
         </p>
       </div>
     </div>
     <div class="header-actions">
-      <el-button type="primary" @click="homeStore.getEmbyAllInfo()">
+      <el-button
+        type="primary"
+        :loading="homeStore.isLoading"
+        :disabled="homeStore.isLoading || !layoutStore.linkEmbyStatus"
+        @click="homeStore.getEmbyAllInfo()"
+      >
         <el-icon><Refresh /></el-icon>
         刷新数据
       </el-button>
@@ -25,13 +36,16 @@
 
 <script setup lang="ts">
 import { Refresh, Link } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const homeStore = useHomeStore()
 const layoutStore = useLayoutStore()
 
-const refreshData = () => {}
-
 const openEmbyWeb = () => {
+  if (!layoutStore.linkEmbyStatus) {
+    ElMessage.warning('未连接 Emby，请先在设置中完成连接配置')
+    return
+  }
   window.open(layoutStore.embyUserInfo.EmbyAddress)
 }
 </script>

@@ -5,6 +5,8 @@ import type { ITrendItem } from '@/types/home'
 import type { MediaCountInfoType, EmbyStorageInfoType, EmbyPlayTimeInfoType, EmbyLatestAddItemType } from '@/types/home'
 
 export const useHomeStore = defineStore('home', () => {
+  const isLoading = ref(false)
+  const lastUpdated = ref<string>('')
   const mediaCountInfo = ref<MediaCountInfoType>({
     MovieCount: 0,
     SeriesCount: 0,
@@ -54,11 +56,14 @@ export const useHomeStore = defineStore('home', () => {
   }
 
   // 获取Emby所有的信息看板
-  const getEmbyAllInfo = () => {
-    getMediaCount()
-    getEmbyStorage()
-    getEmbyPlayTime()
-    getEmbyLatestAdd()
+  const getEmbyAllInfo = async () => {
+    try {
+      isLoading.value = true
+      await Promise.all([getMediaCount(), getEmbyStorage(), getEmbyPlayTime(), getEmbyLatestAdd()])
+      lastUpdated.value = new Date().toLocaleString()
+    } finally {
+      isLoading.value = false
+    }
   }
 
   //  ------------------------- 下面的代码要搬迁 ----------------------------
@@ -137,6 +142,8 @@ export const useHomeStore = defineStore('home', () => {
     embyStorageInfo,
     embyLatestAddList,
     embyPlayTimeInfo,
+    isLoading,
+    lastUpdated,
     getTrendList,
     getEmbyAllInfo
   }
