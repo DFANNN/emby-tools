@@ -1,0 +1,19 @@
+import axios from 'axios'
+
+const service = axios.create({
+  baseURL: 'https://api.themoviedb.org',
+  timeout: 10000,
+  headers: {
+    accept: 'application/json',
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0YWNkMDQ1NGM5ODMxOTA1ZDFiMDk1ZDNlZDg3NWQ0NCIsIm5iZiI6MTczOTQ0MDM0NS42NDQsInN1YiI6IjY3YWRjMGQ5NTMzNTNmOWJiYTM2ZWVmMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.AqO9jtKsKdb0w3sSmkBlkyztT1U4l1VmmntRXfpbGfI`
+  }
+})
+
+/**
+ * 获取TMDB所有趋势的接口
+ * @param {获取TMDB所有趋势的接口} time 'day' | 'week'
+ * @returns
+ */
+export function trending(time) {
+  return service.get(`/3/trending/all/${time}?language=zh-CN`)
+}
