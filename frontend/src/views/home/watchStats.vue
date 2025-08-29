@@ -1,7 +1,7 @@
 <template>
   <div class="watch-stats-container">
     <div class="header">
-      <span class="header-icon">⏱️</span>
+      <span class="header-icon">📺</span>
       <h3>观看统计</h3>
       <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
         layoutStore.linkEmbyStatus ? '统计中' : '未连接'

@@ -1,7 +1,7 @@
 <template>
   <div class="counts-container">
     <div class="header">
-      <span class="header-icon">⏱️</span>
+      <span class="header-icon">🎬</span>
       <h3>媒体库概览</h3>
       <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
         layoutStore.linkEmbyStatus ? '监控中' : '未连接'

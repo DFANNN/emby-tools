@@ -1,7 +1,7 @@
 <template>
   <div class="recent-add-container">
     <div class="header">
-      <span class="header-icon">⏱️</span>
+      <span class="header-icon">⭐</span>
       <h3>最近添加</h3>
       <el-tag :type="layoutStore.linkEmbyStatus ? 'success' : 'info'" size="small">{{
         layoutStore.linkEmbyStatus ? `${props.recentList.length}项` : '未连接'
