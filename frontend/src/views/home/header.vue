@@ -26,28 +26,16 @@
         <el-icon><Refresh /></el-icon>
         刷新数据
       </el-button>
-      <el-button @click="openEmbyWeb">
-        <el-icon><Link /></el-icon>
-        打开 Emby
-      </el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Refresh, Link } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { Refresh } from '@element-plus/icons-vue'
 
 const homeStore = useHomeStore()
 const layoutStore = useLayoutStore()
 
-const openEmbyWeb = () => {
-  if (!layoutStore.linkEmbyStatus) {
-    ElMessage.warning('未连接 Emby，请先在设置中完成连接配置')
-    return
-  }
-  window.open(layoutStore.embyUserInfo.EmbyAddress)
-}
 </script>
 
 <style scoped lang="scss">

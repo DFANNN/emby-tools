@@ -12,9 +12,14 @@
       <div class="icon-wrapper" @click="openEmbyConfig">
         <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
           <el-icon>
-            <EmbyIcon />
+            <ConfigIcon />
           </el-icon>
         </el-badge>
+      </div>
+      <div class="icon-wrapper" @click="openEmbyWeb">
+        <el-icon>
+          <EmbyIcon />
+        </el-icon>
       </div>
       <div class="icon-wrapper" @click="layoutStore.toggleTheme">
         <el-icon>
@@ -41,6 +46,8 @@ import DarkModeIcon from '@/components/icon/DarkModeIcon.vue'
 import AutoModeIcon from '@/components/icon/AutoModeIcon.vue'
 import LinkEmbyConfig from '@/components/linkEmbyConfig.vue'
 import EmbyIcon from '@/components/icon/EmbyIcon.vue'
+import ConfigIcon from '@/components/icon/ConfigIcon.vue'
+import { ElMessage } from 'element-plus'
 
 const layoutStore = useLayoutStore()
 
@@ -48,6 +55,15 @@ const linkEmbyConfigRef = useTemplateRef('linkEmbyConfigRef')
 const openEmbyConfig = () => {
   // 预加载现有配置，弹出设置对话框
   linkEmbyConfigRef.value?.showDialog()
+}
+
+// 跳转到emby
+const openEmbyWeb = () => {
+  if (!layoutStore.linkEmbyStatus) {
+    ElMessage.warning('未连接 Emby，请先在设置中完成连接配置')
+    return
+  }
+  window.open(layoutStore.embyUserInfo.EmbyAddress)
 }
 
 const goToGithub = () => {
