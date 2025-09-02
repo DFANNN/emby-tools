@@ -1,5 +1,5 @@
 import express from 'express'
-import { trending, movieTvImages } from '../services/theMovieDBService.js'
+import { trending, movieTvImages, movieNowPlaying } from '../services/theMovieDBService.js'
 
 const router = express.Router()
 
@@ -37,6 +37,44 @@ router.get('/todayTrending', async (req, res) => {
       })
     )
     return res.success(trendList)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 本周趋势
+router.get('/weekTrending', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await trending('week')
+    const { results } = response
+    const trendList = results.map(item => {
+      return {
+        ...item,
+        backdrop_path: `${baseUrl}${item.backdrop_path}`,
+        poster_path: `${baseUrl}${item.poster_path}`
+      }
+    })
+    return res.success(trendList)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 正在上映
+router.get('/movieNowPlaying', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await movieNowPlaying()
+    const { results } = response
+    const nowPlayingList = results.map(item => {
+      return {
+        ...item,
+        backdrop_path: `${baseUrl}${item.backdrop_path}`,
+        poster_path: `${baseUrl}${item.poster_path}`
+      }
+    })
+    return res.success(nowPlayingList)
   } catch (error) {
     return res.error(error)
   }

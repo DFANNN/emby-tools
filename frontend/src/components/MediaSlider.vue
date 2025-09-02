@@ -2,13 +2,13 @@
   <div class="media-slider">
     <!-- 标题区域 -->
     <div class="slider-header">
-      <h3 class="slider-title">{{ title }}</h3>
+      <h3 class="slider-title">{{ props.title }}</h3>
     </div>
 
     <!-- 使用 el-scrollbar 实现滑动 -->
     <el-scrollbar class="slider-scrollbar">
       <div class="media-list">
-        <div v-for="item in mediaList" :key="item.id" class="media-card" @click="handleCardClick(item)">
+        <div v-for="item in props.mediaList" :key="item.id" class="media-card" @click="handleCardClick(item)">
           <!-- 海报图片 -->
           <div class="media-poster">
             <img :src="item.poster_path" :alt="item.name || item.title" @error="handleImageError" />
@@ -18,7 +18,7 @@
           <div class="media-info">
             <h4 class="media-name">{{ item.name || item.title || item.original_name }}</h4>
             <div class="media-date" v-if="item.release_date || item.first_air_date">
-              {{ formatDate(item.release_date || item.first_air_date) }}
+              {{ item.release_date || item.first_air_date }}
             </div>
           </div>
         </div>
@@ -28,38 +28,28 @@
 </template>
 
 <script setup lang="ts">
-import type { ITrendItem } from '@/types/home'
+import type { ITrendItem } from '@/types/dailyRecommendation'
 
-interface Props {
-  /** 标题 */
-  title: string
-  /** 媒体列表 */
-  mediaList: ITrendItem[]
-}
-
-interface Emits {
-  (e: 'card-click', item: ITrendItem): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps({
+  // 媒体列表
+  mediaList: {
+    required: true,
+    type: Array as PropType<ITrendItem[]>
+  },
+  // 标题
+  title: {
+    required: true,
+    type: String
+  }
+})
 
 // 卡片点击
-const handleCardClick = (item: ITrendItem) => {
-  emit('card-click', item)
-}
+const handleCardClick = (item: ITrendItem) => {}
 
 // 图片加载失败处理
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = '/placeholder-movie.jpg'
-}
-
-// 格式化日期
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.getFullYear().toString()
 }
 </script>
 

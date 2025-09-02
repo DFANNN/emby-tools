@@ -27,3 +27,8 @@ export function trending(time) {
 export function movieTvImages(type, id) {
   return service.get(`/3/${type}/${id}/images`)
 }
+
+// 获取TMDB正在上映的电影
+export function movieNowPlaying() {
+  return service.get('/3/movie/now_playing?language=zh-CN')
+}

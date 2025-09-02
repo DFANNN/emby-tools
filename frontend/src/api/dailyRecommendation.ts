@@ -5,3 +5,13 @@ import { request } from '@/utils/request'
 export const todayTrend = () => {
   return request.get('/theMovieDB/todayTrending')
 }
+
+// 本周趋势
+export const weekTrend = () => {
+  return request.get('/theMovieDB/weekTrending')
+}
+
+// 影院上映中
+export const nowPlaying = () => {
+  return request.get('/theMovieDB/movieNowPlaying')
+}
