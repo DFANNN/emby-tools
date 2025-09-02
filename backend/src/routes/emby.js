@@ -24,7 +24,6 @@ router.post('/login', async (req, res) => {
     return res.success({ ...params, EmbyAddress: embyStore.url }, '登录成功')
   } catch (error) {
     // TODO: 优化具体错误信息
-    console.error('登录失败:', error.response?.data || error.message)
     return res.error('登录失败，请检查用户名和密码')
   }
 })
@@ -66,7 +65,6 @@ router.get('/latestAdd', async (req, res) => {
         SeriesName: item.SeriesName ? item.SeriesName : ''
       }
     })
-    console.log(latestAddList)
     return res.success(latestAddList)
   } catch (error) {
     return res.error(error)
@@ -161,8 +159,6 @@ router.get('/playTime', async (req, res) => {
       return Number(totalHours.toFixed(2)) // 保留两位小数
     }
 
-    console.log('movieResponse', calculateTime(movieResponse))
-
     const MovieTime = calculateTime(movieResponse)
     const EpisodeTime = calculateTime(episodeResponse)
     const AudioTime = calculateTime(audioResponse)
@@ -170,7 +166,6 @@ router.get('/playTime', async (req, res) => {
 
     return res.success({ MovieTime, EpisodeTime, AudioTime, TotalTime })
   } catch (error) {
-    console.log(error)
     return res.error(error)
   }
 })

@@ -1,6 +1,6 @@
 <template>
   <el-carousel :interval="10000" trigger="click" height="70vh">
-    <el-carousel-item v-for="item in homeStore.trendList" :key="item.id" class="carousel-item-wrapper">
+    <el-carousel-item v-for="item in trendList" :key="item.id" class="carousel-item-wrapper">
       <div class="carousel-item">
         <div class="carousel-item-background">
           <img :src="item.backdrop_path" alt="backdrop" />
@@ -18,7 +18,7 @@
               <div class="separator">•</div>
               <div class="movie-genres">
                 <span v-for="(id, index) in item.genre_ids" :key="id">
-                  {{ homeStore.genreMap[id] }}{{ index < item.genre_ids.length - 1 ? ' / ' : '' }}
+                  {{ genreMap[id] }}{{ index < item.genre_ids.length - 1 ? ' / ' : '' }}
                 </span>
               </div>
               <div class="separator">•</div>
@@ -36,10 +36,54 @@
 </template>
 
 <script setup lang="ts">
-const homeStore = useHomeStore()
+import { todayTrend } from '@/api/dailyRecommendation'
+import type { ITrendItem } from '@/types/dailyRecommendation'
+
+const trendList = ref<ITrendItem[]>([])
+
+// 电影/电视剧类型
+const genreMap: Record<number, string> = {
+  // movie
+  28: '动作',
+  12: '冒险',
+  16: '动画',
+  35: '喜剧',
+  80: '犯罪',
+  99: '纪录',
+  18: '剧情',
+  10751: '家庭',
+  14: '奇幻',
+  36: '历史',
+  27: '恐怖',
+  10402: '音乐',
+  9648: '悬疑',
+  10749: '爱情',
+  878: '科幻',
+  10770: '电视电影',
+  53: '惊悚',
+  10752: '战争',
+  37: '西部',
+
+  // tv
+  10759: '动作冒险',
+  10762: '儿童',
+  10763: '新闻',
+  10764: '真人秀',
+  10765: '科幻 & 奇幻',
+  10766: '肥皂剧',
+  10767: '脱口秀',
+  10768: '战争与政治'
+}
+
+const getTrendList = async () => {
+  const { data: res } = await todayTrend()
+  if (res.code === 200) {
+    trendList.value = res.data
+  }
+}
 
 onMounted(() => {
-  homeStore.getTrendList()
+  getTrendList()
 })
 </script>
 

@@ -17,3 +17,13 @@ const service = axios.create({
 export function trending(time) {
   return service.get(`/3/trending/all/${time}?language=zh-CN`)
 }
+
+/**
+ * 获取TMDB当前电影/电视剧的图片（主要用于logo）
+ * @param {*} type 电影/电视剧类型
+ * @param {*} id 电影/电视剧的id
+ * @returns
+ */
+export function movieTvImages(type, id) {
+  return service.get(`/3/${type}/${id}/images`)
+}
