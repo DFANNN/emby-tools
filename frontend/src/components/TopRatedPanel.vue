@@ -1,5 +1,5 @@
 <template>
-  <div class="top-rated-panel">
+  <div class="top-rated-panel" :class="themeComputed">
     <div class="panel-header" :style="headerStyle">
       <h3 class="panel-title">{{ title }}</h3>
       <el-button v-if="layoutComputed !== 'ranked'" link type="primary" class="more-btn" @click="$emit('more')"
@@ -71,9 +71,11 @@ const props = defineProps<{
   title: string
   list: ITrendItem[]
   layout?: 'grid' | 'ranked'
+  theme?: 'light' | 'dark'
 }>()
 
 const layoutComputed = computed(() => props.layout ?? 'ranked')
+const themeComputed = computed(() => props.theme ?? 'dark')
 
 const previewList = computed(() =>
   layoutComputed.value === 'ranked' ? props.list.slice(0, 6) : props.list.slice(0, 5)
@@ -84,8 +86,13 @@ const rankedList = computed(() => (layoutComputed.value === 'ranked' ? previewLi
 
 const headerStyle = computed(() => {
   const bg = previewList.value[0]?.poster_path || ''
+  if (!bg) return {}
+  const isLight = themeComputed.value === 'light'
+  const overlay = isLight
+    ? 'linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.75))'
+    : 'linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.45))'
   return {
-    backgroundImage: bg ? `linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.45)), url(${bg})` : undefined
+    backgroundImage: `${overlay}, url(${bg})`
   }
 })
 
@@ -101,7 +108,26 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: #fff;
+  color: var(--text-color);
+
+  /* 主题变量 */
+  &.dark {
+    --panel-bg: #0e0e0e;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-bg-hover: rgba(255, 255, 255, 0.08);
+    --text-color: #ffffff;
+    --text-secondary: #eaeaea;
+    --muted: #dddddd;
+  }
+
+  &.light {
+    --panel-bg: #ffffff;
+    --card-bg: rgba(0, 0, 0, 0.035);
+    --card-bg-hover: rgba(0, 0, 0, 0.065);
+    --text-color: #111111;
+    --text-secondary: #444444;
+    --muted: #666666;
+  }
 
   .panel-header {
     position: relative;
@@ -121,7 +147,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
       right: 0;
       bottom: -1px;
       height: 48px;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #0e0e0e 100%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--panel-bg) 100%);
       pointer-events: none;
     }
 
@@ -140,7 +166,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
   }
 
   .panel-content {
-    background: #0e0e0e;
+    background: var(--panel-bg);
     padding: 12px 16px 16px;
     flex: 1;
     display: flex;
@@ -154,7 +180,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
       align-content: start;
 
       .card {
-        background: rgba(255, 255, 255, 0.04);
+        background: var(--card-bg);
         border-radius: 10px;
         overflow: hidden;
         cursor: pointer;
@@ -164,8 +190,8 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
 
         &:hover {
           transform: translateY(-3px);
-          background: rgba(255, 255, 255, 0.08);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+          background: var(--card-bg-hover);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
         }
 
         .poster {
@@ -200,7 +226,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            color: #ddd;
+            color: var(--muted);
 
             .score {
               color: #ffd700;
@@ -227,7 +253,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    background: #111;
+    background: var(--card-bg);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -270,7 +296,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
 
       .hero-meta {
         font-size: 12px;
-        color: #ddd;
+        color: var(--muted);
 
         .dot {
           margin: 0 6px;
@@ -285,7 +311,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
 
       .hero-overview {
         font-size: 12px;
-        color: #eaeaea;
+        color: var(--text-secondary);
         opacity: 0.9;
         line-height: 1.55;
         max-height: 3.1em;
@@ -311,13 +337,13 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
       align-items: center;
       padding: 8px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--card-bg);
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease;
 
       &:hover {
         transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--card-bg-hover);
       }
 
       .rank-num {
@@ -360,7 +386,7 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
           display: flex;
           gap: 10px;
           font-size: 12px;
-          color: #ddd;
+          color: var(--muted);
 
           .score {
             color: #ffd700;

@@ -2,10 +2,10 @@
   <div>
     <HeroCarousel />
     <div class="top-rated-row">
-      <TopRatedPanel title="热门电影" :list="moviePopularList" @more="movieDialogVisible = true" />
-      <TopRatedPanel title="热门剧集" :list="tvPopularList" @more="tvDialogVisible = true" />
-      <TopRatedPanel title="高分电影" :list="movieTopRatedList" @more="movieDialogVisible = true" />
-      <TopRatedPanel title="高分剧集" :list="tvTopRatedList" @more="tvDialogVisible = true" />
+      <TopRatedPanel title="热门电影" :list="moviePopularList" @more="movieDialogVisible = true" theme="light" />
+      <TopRatedPanel title="热门剧集" :list="tvPopularList" @more="tvDialogVisible = true" theme="light" />
+      <TopRatedPanel title="高分电影" :list="movieTopRatedList" @more="movieDialogVisible = true" theme="light" />
+      <TopRatedPanel title="高分剧集" :list="tvTopRatedList" @more="tvDialogVisible = true" theme="light" />
     </div>
 
     <el-dialog v-model="movieDialogVisible" title="高分电影" width="80%">
