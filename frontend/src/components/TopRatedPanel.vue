@@ -2,7 +2,9 @@
   <div class="top-rated-panel">
     <div class="panel-header" :style="headerStyle">
       <h3 class="panel-title">{{ title }}</h3>
-      <el-button link type="primary" class="more-btn" @click="$emit('more')">查看更多</el-button>
+      <el-button v-if="layoutComputed !== 'ranked'" link type="primary" class="more-btn" @click="$emit('more')"
+        >查看更多</el-button
+      >
     </div>
 
     <!-- ranked 布局：左侧焦点大卡 + 右侧排行榜 -->
@@ -34,6 +36,9 @@
               <span class="score">⭐ {{ displayScore(item) }}</span>
             </div>
           </div>
+        </div>
+        <div class="rank-more">
+          <el-button link type="primary" @click="$emit('more')">查看更多</el-button>
         </div>
       </div>
     </div>
@@ -363,6 +368,12 @@ const displayScore = (item: ITrendItem) => ((item.vote_average || 0) as number).
           }
         }
       }
+    }
+
+    .rank-more {
+      display: flex;
+      justify-content: center;
+      padding: 6px 0 2px;
     }
   }
 }
