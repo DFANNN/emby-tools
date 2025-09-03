@@ -1,6 +1,7 @@
 <template>
   <div>
     <HeroCarousel />
+    <TopChartsPanel title="热门电影" :top-chart-list="moviePopularList" />
     <div class="top-rated-row">
       <TopRatedPanel title="热门电影" :list="moviePopularList" @more="movieDialogVisible = true" theme="light" />
       <TopRatedPanel title="热门剧集" :list="tvPopularList" @more="tvDialogVisible = true" theme="light" />
@@ -22,6 +23,7 @@ import { topRated as topRatedMovies, topRatedTV, moviePopular, tvPopular } from 
 import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
 import TopRatedPanel from '@/components/TopRatedPanel.vue'
 import TopRatedList from '@/components/TopRatedList.vue'
+import TopChartsPanel from '@/components/TopChartsPanel.vue'
 import type { ITrendItem } from '@/types/dailyRecommendation'
 
 const movieTopRatedList = ref<ITrendItem[]>([])
