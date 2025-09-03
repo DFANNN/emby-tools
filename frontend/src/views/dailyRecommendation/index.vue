@@ -1,36 +1,79 @@
 <template>
   <div>
     <HeroCarousel />
-    <MediaSlider title="影院上映中" :mediaList="nowPlayingList" />
-    <MediaSlider title="本周趋势" :mediaList="weekTrendList" />
+    <div class="top-rated-row">
+      <TopRatedPanel title="热门电影" :list="moviePopularList" @more="movieDialogVisible = true" />
+      <TopRatedPanel title="热门剧集" :list="tvPopularList" @more="tvDialogVisible = true" />
+      <TopRatedPanel title="高分电影" :list="movieTopRatedList" @more="movieDialogVisible = true" />
+      <TopRatedPanel title="高分剧集" :list="tvTopRatedList" @more="tvDialogVisible = true" />
+    </div>
+
+    <el-dialog v-model="movieDialogVisible" title="高分电影" width="80%">
+      <TopRatedList :list="movieTopRatedList" />
+    </el-dialog>
+    <el-dialog v-model="tvDialogVisible" title="高分剧集" width="80%">
+      <TopRatedList :list="tvTopRatedList" />
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { weekTrend, nowPlaying } from '@/api/dailyRecommendation'
+import { topRated as topRatedMovies, topRatedTV, moviePopular, tvPopular } from '@/api/dailyRecommendation'
 import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
-import MediaSlider from '@/components/MediaSlider.vue'
+import TopRatedPanel from '@/components/TopRatedPanel.vue'
+import TopRatedList from '@/components/TopRatedList.vue'
 import type { ITrendItem } from '@/types/dailyRecommendation'
 
-const weekTrendList = ref<ITrendItem[]>([])
-const nowPlayingList = ref<ITrendItem[]>([])
+const movieTopRatedList = ref<ITrendItem[]>([])
+const tvTopRatedList = ref<ITrendItem[]>([])
+const moviePopularList = ref<ITrendItem[]>([])
+const tvPopularList = ref<ITrendItem[]>([])
+const movieDialogVisible = ref(false)
+const tvDialogVisible = ref(false)
 
-// 获取本周趋势
-const getWeekTrend = async () => {
-  const { data: res } = await weekTrend()
-  if (res.code === 200) weekTrendList.value = res.data
+// 获取热门电影
+const getMoviePopular = async () => {
+  const { data: res } = await moviePopular()
+  if (res.code === 200) moviePopularList.value = res.data
 }
 
-// 获取影院上映中
-const getNowPlaying = async () => {
-  const { data: res } = await nowPlaying()
-  if (res.code === 200) nowPlayingList.value = res.data
+// 获取热门电影
+const getTvPopular = async () => {
+  const { data: res } = await tvPopular()
+  if (res.code === 200) tvPopularList.value = res.data
+}
+
+// 获取高分电影
+const getMovieTopRated = async () => {
+  const { data: res } = await topRatedMovies()
+  if (res.code === 200) movieTopRatedList.value = res.data
+}
+
+// 获取高分剧集
+const getTvTopRated = async () => {
+  const { data: res } = await topRatedTV()
+  if (res.code === 200) tvTopRatedList.value = res.data
 }
 
 onMounted(() => {
-  getWeekTrend()
-  getNowPlaying()
+  getMoviePopular()
+  getTvPopular()
+  getMovieTopRated()
+  getTvTopRated()
 })
 </script>
 
-<style></style>
+<style scoped lang="scss">
+.top-rated-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 1200px) {
+  .top-rated-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

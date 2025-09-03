@@ -1,5 +1,13 @@
 import express from 'express'
-import { trending, movieTvImages, movieNowPlaying } from '../services/theMovieDBService.js'
+import {
+  trending,
+  movieTvImages,
+  movieNowPlaying,
+  movieTopRated,
+  tvTopRated,
+  moviePopular,
+  tvPopular
+} from '../services/theMovieDBService.js'
 
 const router = express.Router()
 
@@ -75,6 +83,74 @@ router.get('/movieNowPlaying', async (req, res) => {
       }
     })
     return res.success(nowPlayingList)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 热门电影
+router.get('/moviePopular', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await moviePopular()
+    const { results } = response
+    const list = results.map(item => ({
+      ...item,
+      backdrop_path: `${baseUrl}${item.backdrop_path}`,
+      poster_path: `${baseUrl}${item.poster_path}`
+    }))
+    return res.success(list)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 热门剧集
+router.get('/tvPopular', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await tvPopular()
+    const { results } = response
+    const list = results.map(item => ({
+      ...item,
+      backdrop_path: `${baseUrl}${item.backdrop_path}`,
+      poster_path: `${baseUrl}${item.poster_path}`
+    }))
+    return res.success(list)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 高分电影（Top Rated）
+router.get('/movieTopRated', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await movieTopRated()
+    const { results } = response
+    const list = results.map(item => ({
+      ...item,
+      backdrop_path: `${baseUrl}${item.backdrop_path}`,
+      poster_path: `${baseUrl}${item.poster_path}`
+    }))
+    return res.success(list)
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// 高分剧集（Top Rated TV）
+router.get('/tvTopRated', async (req, res) => {
+  try {
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const { data: response } = await tvTopRated()
+    const { results } = response
+    const list = results.map(item => ({
+      ...item,
+      backdrop_path: `${baseUrl}${item.backdrop_path}`,
+      poster_path: `${baseUrl}${item.poster_path}`
+    }))
+    return res.success(list)
   } catch (error) {
     return res.error(error)
   }

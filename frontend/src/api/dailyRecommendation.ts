@@ -15,3 +15,23 @@ export const weekTrend = () => {
 export const nowPlaying = () => {
   return request.get('/theMovieDB/movieNowPlaying')
 }
+
+// 热门电影
+export const moviePopular = () => {
+  return request.get('/theMovieDB/moviePopular')
+}
+
+// 热门电影
+export const tvPopular = () => {
+  return request.get('/theMovieDB/tvPopular')
+}
+
+// 高分电影（Top Rated）
+export const topRated = () => {
+  return request.get('/theMovieDB/movieTopRated')
+}
+
+// 高分剧集（Top Rated TV）
+export const topRatedTV = () => {
+  return request.get('/theMovieDB/tvTopRated')
+}

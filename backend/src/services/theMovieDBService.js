@@ -32,3 +32,23 @@ export function movieTvImages(type, id) {
 export function movieNowPlaying() {
   return service.get('/3/movie/now_playing?language=zh-CN')
 }
+
+// 获取TMDB热门电影
+export function moviePopular() {
+  return service.get('/3/movie/popular?language=zh-CN')
+}
+
+// 获取TMDB热门剧集
+export function tvPopular() {
+  return service.get('/3/tv/popular?language=zh-CN')
+}
+
+// 获取TMDB高分电影（Top Rated）
+export function movieTopRated() {
+  return service.get('/3/movie/top_rated?language=zh-CN')
+}
+
+// 获取TMDB高分剧集（Top Rated TV）
+export function tvTopRated() {
+  return service.get('/3/tv/top_rated?language=zh-CN')
+}
