@@ -3,7 +3,14 @@
     <div class="preview-header">
       <h2 class="header-name">预览重命名结果</h2>
       <div class="preview-operations">
-        <el-button type="danger" @click="batchDelete" :disabled="!selectedFiles.length"> 批量删除 </el-button>
+        <el-button type="warning" @click="batchDelete" :disabled="!selectedFiles.length"> 批量移除 </el-button>
+        <el-button
+          type="danger"
+          @click="batchDeleteFile(selectedFiles.map(item => item.fullPath))"
+          :disabled="!selectedFiles.length"
+        >
+          批量删除
+        </el-button>
         <el-button type="success" @click="executeRename" :disabled="!renameStore.renameFileList.length">
           执行重命名
         </el-button>
@@ -59,15 +66,20 @@
         :filters="renameStore.fileTypeList"
         :filter-method="filterType"
       />
-      <el-table-column align="center" fixed="right" label="操作" width="100">
+      <el-table-column align="center" fixed="right" label="操作" width="120">
         <template #default="{ row }">
           <el-tooltip content="编辑" placement="top">
             <el-button type="primary" link @click="editFileName(row)">
               <el-icon><Edit /></el-icon>
             </el-button>
           </el-tooltip>
+          <el-tooltip content="移除" placement="top">
+            <el-button type="warning" link @click="deleteFile(row)">
+              <el-icon><Remove /></el-icon>
+            </el-button>
+          </el-tooltip>
           <el-tooltip content="删除" placement="top">
-            <el-button type="danger" link @click="deleteFile(row)">
+            <el-button type="danger" link @click="batchDeleteFile([row.fullPath])">
               <el-icon><Delete /></el-icon>
             </el-button>
           </el-tooltip>
@@ -96,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { Delete, Edit, Warning, CircleClose, CircleCheck } from '@element-plus/icons-vue'
+import { Delete, Edit, Warning, CircleClose, CircleCheck, Remove } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { IRenameFileItem } from '@/types/rename'
@@ -122,27 +134,40 @@ const handleSelectionChange = (newSelection: IRenameFileItem[]) => {
   selectedFiles.value = newSelection.sort((a, b) => a.id - b.id)
 }
 
-// 批量删除
+// 批量移除
 const batchDelete = () => {
-  ElMessageBox.confirm('确认删除选中的文件吗？', '提示', {
+  ElMessageBox.confirm('确定从表格中移除选中文件吗？移除后仍可在数据源中找到。', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
     renameStore.batchDeleteFiles(selectedFiles.value)
-    ElMessage.success('删除成功')
+    ElMessage.success('移除成功')
+    selectedFiles.value = []
   })
 }
 
-// 删除单个文件
+// 移除单个文件
 const deleteFile = (file: IRenameFileItem) => {
-  ElMessageBox.confirm('确认删除该文件吗？', '提示', {
+  ElMessageBox.confirm('确定从表格中移除该文件吗？移除后仍可在数据源中找到。', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
     renameStore.deleteFile(file)
-    ElMessage.success('删除成功')
+    ElMessage.success('移除成功')
+  })
+}
+
+// 批量删除文件
+const batchDeleteFile = (fullPathList: string[]) => {
+  ElMessageBox.confirm('确定要删除选中文件吗？此操作会从系统中彻底移除文件，请谨慎操作。', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const res = await renameStore.deleteFileBatch(fullPathList)
+    if (res) selectedFiles.value = []
   })
 }
 

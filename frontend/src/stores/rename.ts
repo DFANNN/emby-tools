@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { folderContent, batchRename } from '@/api/rename'
+import { folderContent, batchRename, batchDeleteFile } from '@/api/rename'
 import { getSeriesNameFromPath } from '@/utils/utils'
 import { ElMessage } from 'element-plus'
 import type { IDiskFolderItem, IRenameFileItem, IParseResult } from '@/types/rename'
@@ -203,7 +203,7 @@ export const useRenameStore = defineStore('rename', () => {
     })
   }
 
-  // 删除单个文件
+  // 移除单个文件
   const deleteFile = (file: IRenameFileItem) => {
     const index = renameFileList.value.findIndex(f => f.id === file.id)
     if (index !== -1) {
@@ -211,10 +211,24 @@ export const useRenameStore = defineStore('rename', () => {
     }
   }
 
-  // 批量删除文件
+  // 批量移除文件
   const batchDeleteFiles = (files: IRenameFileItem[]) => {
     const ids = new Set(files.map(f => f.id))
     renameFileList.value = renameFileList.value.filter(f => !ids.has(f.id))
+  }
+
+  // 批量删除文件
+  const deleteFileBatch = async (fullPathList: string[]) => {
+    const { data: res } = await batchDeleteFile(fullPathList)
+    if (res.code === 200) {
+      let message = ''
+      if (res.data.success) message += `删除成功${res.data.success}个`
+      if (res.data.failed) message += ` 删除失败${res.data.failed}个`
+      ElMessage.success(message)
+      getRenameFileList()
+      return true
+    }
+    return false
   }
 
   // 替换模式预览
@@ -291,6 +305,7 @@ export const useRenameStore = defineStore('rename', () => {
     batchDeleteFiles,
     executeRename,
     previewReplace,
-    previewInsert
+    previewInsert,
+    deleteFileBatch
   }
 })

@@ -99,4 +99,33 @@ router.post('/batch-rename', async (req, res) => {
   return res.success(results, '批量重命名完成')
 })
 
+// 批量删除接口（仅支持文件，目录将判为失败；仅接受 fullPath 字符串数组）
+router.post('/batch-delete', async (req, res) => {
+  const deleteList = req.body
+  if (!Array.isArray(deleteList)) {
+    return res.error('请求体必须为数组')
+  }
+  let success = 0
+  let failed = 0
+  for (const fullPath of deleteList) {
+    if (typeof fullPath !== 'string' || !fullPath) {
+      failed++
+      continue
+    }
+    try {
+      const stat = fs.statSync(fullPath)
+      if (stat.isDirectory()) {
+        // 不支持删除文件夹
+        failed++
+        continue
+      }
+      fs.unlinkSync(fullPath)
+      success++
+    } catch (err) {
+      failed++
+    }
+  }
+  return res.success({ success, failed }, '批量删除完成')
+})
+
 export default router

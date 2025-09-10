@@ -9,3 +9,8 @@ export const folderContent = (path: string) => {
 export const batchRename = (data: any) => {
   return request.post('/rename/batch-rename', data)
 }
+
+// 删除文件接口
+export const batchDeleteFile = (data: any) => {
+  return request.post('/rename/batch-delete', data)
+}
