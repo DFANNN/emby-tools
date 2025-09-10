@@ -23,6 +23,7 @@ export const useRenameStore = defineStore('rename', () => {
     model: 'tv', // 更名模式
     newFileName: '', // 新文件名
     seasonNumber: undefined, // 季号
+    startEpisode: 1, // 顺序模式起始集数（可为负数/0，默认1）
     targetName: '', // 查找文本
     replaceName: '', // 替换文本
     insertText: '', // 插入文本
@@ -57,6 +58,29 @@ export const useRenameStore = defineStore('rename', () => {
   const getFolderContent = async (path: string = '') => {
     const { data: res } = await folderContent(path)
     if (res.code === 200) diskFolderList.value = res.data
+  }
+
+  // 顺序模式：按当前列表顺序生成文件名
+  const generateNewNamesBySequence = () => {
+    if (ruleForm.value.seasonNumber === undefined || ruleForm.value.seasonNumber === null) {
+      ElMessage.warning('顺序模式需设置季号')
+      return
+    }
+    const season = ruleForm.value.seasonNumber
+    let currentEpisode = Number(ruleForm.value.startEpisode ?? 1)
+    renameFileList.value = renameFileList.value.map(file => {
+      const ext = file.name.split('.').pop()
+      const seasonPart = `S${String(season).padStart(2, '0')}`
+      const episodePart = `E${String(currentEpisode).padStart(2, '0')}`
+      const newName = `${ruleForm.value.newFileName} ${seasonPart}${episodePart}.${ext}`
+      currentEpisode += 1
+      return {
+        ...file,
+        newName,
+        status: 'success',
+        statusText: '准备重命名'
+      }
+    })
   }
 
   // 展示对话框
@@ -316,6 +340,7 @@ export const useRenameStore = defineStore('rename', () => {
     executeRename,
     previewReplace,
     previewInsert,
-    deleteFileBatch
+    deleteFileBatch,
+    generateNewNamesBySequence
   }
 })

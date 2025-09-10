@@ -19,6 +19,12 @@
                   <el-icon><QuestionFilled /></el-icon>
                 </el-tooltip>
               </el-radio>
+              <el-radio value="sequence">
+                顺序模式
+                <el-tooltip :content="sequenceTooltip" placement="top">
+                  <el-icon><QuestionFilled /></el-icon>
+                </el-tooltip>
+              </el-radio>
               <el-radio value="replace">替换文本</el-radio>
               <el-radio value="insert">插入文本</el-radio>
             </el-radio-group>
@@ -36,6 +42,29 @@
                 class="number-input"
               />
               <div class="form-tip">留空时自动解析，填写后将优先生效并覆盖文件名中的季数。</div>
+            </el-form-item>
+          </div>
+
+          <div v-if="renameStore.ruleForm.model === 'sequence'">
+            <el-form-item label="剧集名称" prop="newFileName">
+              <el-input v-model="renameStore.ruleForm.newFileName" clearable placeholder="请输入剧集名称" />
+            </el-form-item>
+            <el-form-item label="季号（必填）" prop="seasonNumber">
+              <el-input-number
+                v-model="renameStore.ruleForm.seasonNumber"
+                placeholder="请输入季号"
+                class="number-input"
+              />
+              <div class="form-tip">顺序模式下必须设置季号。</div>
+            </el-form-item>
+            <el-form-item label="起始集数（默认1，可为0或负数）" prop="startEpisode">
+              <el-input-number
+                v-model="renameStore.ruleForm.startEpisode"
+                :min="Number.NEGATIVE_INFINITY"
+                placeholder="默认从 1 开始"
+                class="number-input"
+              />
+              <div class="form-tip">不做范围限制，可为 0 或负数。</div>
             </el-form-item>
           </div>
 
@@ -81,6 +110,9 @@ const ruleFormRef = ref<FormInstance>()
 const tvModelTooltip =
   '该模式适用于批量重命名电视剧集文件。会自动识别文件名中的季、集信息，并按统一格式进行规范化重命名，适合整理 Emby、Jellyfin 等媒体库的剧集文件。'
 
+const sequenceTooltip =
+  '顺序模式：无需解析文件名，按当前列表顺序依次编号生成 SxxExx。必须设置季号，起始集数默认 1（可为 0 或负数）。适合综艺/杂乱文件名场景。'
+
 const searchPath = () => {
   // 截取文件路径中的名字
   renameStore.ruleForm.newFileName = getSeriesNameFromPath(renameStore.path) || ''
@@ -97,6 +129,7 @@ const previewRename = async () => {
   await ruleFormRef.value?.validate()
   await renameStore.getRenameFileList()
   if (renameStore.ruleForm.model === 'tv') renameStore.reanalyzeFiles()
+  if (renameStore.ruleForm.model === 'sequence') renameStore.generateNewNamesBySequence()
   if (renameStore.ruleForm.model === 'replace') renameStore.previewReplace()
   if (renameStore.ruleForm.model === 'insert') renameStore.previewInsert()
 }
