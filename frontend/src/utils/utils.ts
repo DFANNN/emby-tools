@@ -1,3 +1,5 @@
+import type { ITrendItem } from '@/types/dailyRecommendation'
+
 export function getSeriesNameFromPath(path: string): string {
   if (!path) return ''
   const cleanPath = path.replace(/[\\/]+$/, '')
@@ -16,4 +18,24 @@ export function getSeriesNameFromPath(path: string): string {
   // 去除结尾的年份，如 "三体 2023" => "三体"
   name = name.replace(/\s*\d{4}$/, '').trim()
   return name
+}
+
+// 判断媒体类型
+export const resolveMediaType = (item: ITrendItem): 'movie' | 'tv' => {
+  const mt = (item.media_type || '').toLowerCase()
+  if (mt === 'movie' || mt === 'tv') return mt as 'movie' | 'tv'
+  // 兜底：根据日期字段推断
+  if (item.first_air_date && !item.release_date) return 'tv'
+  if (item.release_date && !item.first_air_date) return 'movie'
+  // 再兜底：title 倾向 movie，name 倾向 tv
+  if (item.title && !item.name) return 'movie'
+  return 'tv'
+}
+
+// 根据媒体类型打开详情页
+export const openTmdb = (item: ITrendItem) => {
+  const type = resolveMediaType(item)
+  const url = `https://www.themoviedb.org/${type}/${item.id}`
+  const win = window.open(url, '_blank', 'noopener,noreferrer')
+  if (win) win.opener = null
 }

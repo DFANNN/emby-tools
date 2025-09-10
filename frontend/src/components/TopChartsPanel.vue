@@ -7,7 +7,7 @@
       <EarRightIcon class="ear-icon" />
     </div>
     <div class="panel-content">
-      <div class="content-left">
+      <div class="content-left" @click="openTmdb(topItem)">
         <div class="hero-media">
           <img :src="topItem?.backdrop_path || topItem?.poster_path" alt="" />
         </div>
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="content-right">
-        <div v-for="(item, index) in topTwoToSixList" :key="item.id" class="rank-item">
+        <div v-for="(item, index) in topTwoToSixList" :key="item.id" class="rank-item" @click="openTmdb(item)">
           <div class="rank-num" :class="{ hot: index < 3 }">{{ index + 2 }}</div>
           <img class="thumb" :src="item.poster_path" alt="" />
           <div class="rank-info">
@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { openTmdb } from '@/utils/utils'
 import EarLeftIcon from '@/components/icon/EarLeftIcon.vue'
 import EarRightIcon from '@/components/icon/EarRightIcon.vue'
 import TopChartList from '@/components/TopChartList.vue'
@@ -149,6 +150,7 @@ const checkMore = () => {
     .content-left {
       border-radius: 12px;
       overflow: hidden;
+      cursor: pointer;
       .hero-media {
         width: 100%;
         aspect-ratio: 16 / 9;

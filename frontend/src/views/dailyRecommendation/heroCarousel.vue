@@ -1,6 +1,6 @@
 <template>
   <el-carousel :interval="10000" trigger="click" height="70vh">
-    <el-carousel-item v-for="item in trendList" :key="item.id" class="carousel-item-wrapper">
+    <el-carousel-item v-for="item in trendList" :key="item.id" @click="openTmdb(item)" class="carousel-item-wrapper">
       <div class="carousel-item">
         <div class="carousel-item-background">
           <img :src="item.backdrop_path" alt="backdrop" />
@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { openTmdb } from '@/utils/utils'
 import { todayTrend } from '@/api/dailyRecommendation'
 import type { ITrendItem } from '@/types/dailyRecommendation'
 
@@ -88,6 +89,9 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.carousel-item-wrapper {
+  cursor: pointer;
+}
 .carousel-item {
   position: relative;
   width: 100%;
