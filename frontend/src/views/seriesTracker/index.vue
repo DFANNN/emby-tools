@@ -193,7 +193,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Plus, Refresh, Search, Calendar, Collection } from '@element-plus/icons-vue'
+import { Plus, Refresh } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 // 类型定义
@@ -339,15 +339,6 @@ const getStatusLabel = (status: Show['status']) => {
   return statusMap[status]
 }
 
-const getPriorityLabel = (priority: Show['priority']) => {
-  const priorityMap: Record<Show['priority'], string> = {
-    high: '高',
-    medium: '中',
-    low: '低'
-  }
-  return priorityMap[priority]
-}
-
 const getUpdateStatusClass = (embyEpisodes: number, tmdbEpisodes: number) => {
   if (embyEpisodes === tmdbEpisodes) return 'status-up-to-date'
   if (embyEpisodes < tmdbEpisodes) return 'status-needs-update'
@@ -358,16 +349,6 @@ const getUpdateStatusText = (embyEpisodes: number, tmdbEpisodes: number) => {
   if (embyEpisodes === tmdbEpisodes) return '已同步'
   if (embyEpisodes < tmdbEpisodes) return `需更新 ${tmdbEpisodes - embyEpisodes}集`
   return '领先更新'
-}
-
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString()
-}
-
-const formatTime = (date: Date) => {
-  return date.toLocaleTimeString()
 }
 
 const handleImageError = (event: Event) => {
