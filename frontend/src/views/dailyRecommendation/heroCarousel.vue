@@ -23,8 +23,8 @@
               </div>
               <div class="separator">•</div>
               <div class="movie-rating">
-                <span class="score-number">{{ item.vote_average.toFixed(1) }}</span>
                 <span class="score-icon">⭐</span>
+                <span class="score-number">{{ item.vote_average.toFixed(1) }}</span>
               </div>
             </div>
             <div class="movie-overview">{{ item.overview.trim() }}</div>

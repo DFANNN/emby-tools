@@ -27,7 +27,7 @@ export const tvPopular = (page: number) => {
 }
 
 // 高分电影（Top Rated）
-export const topRated = (page: number) => {
+export const topRatedMovies = (page: number) => {
   return request.get(`/theMovieDB/movieTopRated?page=${page}`)
 }
 

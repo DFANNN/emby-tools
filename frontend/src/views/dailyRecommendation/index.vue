@@ -2,10 +2,10 @@
   <div>
     <HeroCarousel />
     <div class="top-rated-row">
-      <TopChartsPanel title="热门电影" :top-chart-list="moviePopularList" />
-      <TopChartsPanel title="热门剧集" :top-chart-list="tvPopularList" />
-      <TopChartsPanel title="高分电影" :top-chart-list="movieTopRatedList" />
-      <TopChartsPanel title="高分剧集" :top-chart-list="tvTopRatedList" />
+      <TopChartsPanel title="热门电影" type="moviePopular" :top-chart-list="moviePopularList" />
+      <TopChartsPanel title="热门剧集" type="tvPopular" :top-chart-list="tvPopularList" />
+      <TopChartsPanel title="高分电影" type="topRatedMovies" :top-chart-list="movieTopRatedList" />
+      <TopChartsPanel title="高分剧集" type="topRatedTV" :top-chart-list="tvTopRatedList" />
     </div>
     <el-dialog v-model="movieDialogVisible" title="高分电影" width="80%">
       <TopRatedList :list="movieTopRatedList" />
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { topRated as topRatedMovies, topRatedTV, moviePopular, tvPopular } from '@/api/dailyRecommendation'
+import { topRatedMovies, topRatedTV, moviePopular, tvPopular } from '@/api/dailyRecommendation'
 import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
 import TopRatedList from '@/components/TopRatedList.vue'
 import TopChartsPanel from '@/components/TopChartsPanel.vue'

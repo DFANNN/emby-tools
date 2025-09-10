@@ -17,7 +17,7 @@
           <div class="hero-meta">
             <span>{{ displayReleaseDate(topItem) }}</span>
             <span class="dot">·</span>
-            <span class="score">{{ displayScore(topItem) }} ⭐</span>
+            <span class="score">⭐ {{ displayScore(topItem) }}</span>
           </div>
           <div class="hero-overview">{{ topItem?.overview }}</div>
         </div>
@@ -30,7 +30,7 @@
             <div class="name">{{ displayName(item) }}</div>
             <div class="meta">
               <span class="date">{{ displayReleaseDate(item) }}</span>
-              <span class="score">{{ displayScore(item) }} ⭐</span>
+              <span class="score">⭐ {{ displayScore(item) }}</span>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <TopChartList :title="props.title" ref="topChartListRef" />
+    <TopChartList :title="props.title" :type="props.type" ref="topChartListRef" />
   </div>
 </template>
 
@@ -58,6 +58,10 @@ const props = defineProps({
   topChartList: {
     required: true,
     type: Array as PropType<ITrendItem[]>
+  },
+  type: {
+    required: true,
+    type: String
   }
 })
 
