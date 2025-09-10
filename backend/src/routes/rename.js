@@ -47,6 +47,13 @@ router.get('/folder-content', async (req, res) => {
       })
     }
 
+    // 统一排序：文件夹优先，其次按名称自然排序（数字顺序、忽略大小写、兼容中文）
+    const collator = new Intl.Collator('zh', { numeric: true, sensitivity: 'base' })
+    data.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'folder' ? -1 : 1
+      return collator.compare(a.name, b.name)
+    })
+
     return res.success(data, '获取文件夹内容成功')
   } catch (error) {
     return res.error('获取文件夹内容失败', error)

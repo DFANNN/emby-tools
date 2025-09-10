@@ -21,7 +21,8 @@ import previewPoster from '@/views/rename/previewRename.vue'
   display: flex;
   gap: 1rem;
   .left {
-    width: 400px;
+    width: 25%;
+    min-width: 400px;
     flex-shrink: 0; // 防止left被压缩
   }
   .right {

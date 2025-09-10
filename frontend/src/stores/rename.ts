@@ -10,6 +10,7 @@ const EPISODE_PATTERNS = [
   /(\d{1,2})x(\d{1,2})/, // 1x02
   /[第](\d{1,2})[季集].*?(\d{1,2})/, // 第1季第2集
   /[Ee][Pp]\.?(\d{1,2})/, // EP02
+  /第(\d{1,2})期/, // 第12期（综艺/期数）
   /[\[\(](\d{1,2})[\]\)]/, // [02] 或 (02)
   /\b(\d{1,2})\b/ // 单纯数字（最后匹配）
 ]
@@ -121,9 +122,13 @@ export const useRenameStore = defineStore('rename', () => {
 
     // 移除扩展名
     const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
+    // 预清洗：移除日期（避免把月份或日误识别为集数），如 2025.09.27、2025-09-27、2025_09_27
+    const cleanedName = nameWithoutExt
+      .replace(/\b\d{4}[._-]\d{1,2}[._-]\d{1,2}\b/g, ' ')
+      .replace(/\b\d{4}年\d{1,2}月\d{1,2}日\b/g, ' ')
 
     for (const pattern of EPISODE_PATTERNS) {
-      const match = nameWithoutExt.match(pattern)
+      const match = cleanedName.match(pattern)
       if (match) {
         if (match.length === 3) {
           result.season = parseInt(match[1])
@@ -131,7 +136,12 @@ export const useRenameStore = defineStore('rename', () => {
           result.confidence = 0.9
         } else if (match.length === 2) {
           result.episode = parseInt(match[1])
-          result.confidence = 0.7
+          // 第xx期的置信度比纯数字更高
+          if (/第(\d{1,2})期/.test(pattern.source)) {
+            result.confidence = 0.85
+          } else {
+            result.confidence = 0.7
+          }
         }
         break
       }
