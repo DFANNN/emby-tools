@@ -91,8 +91,9 @@ router.get('/movieNowPlaying', async (req, res) => {
 // 热门电影
 router.get('/moviePopular', async (req, res) => {
   try {
+    const { page } = req.query
     const baseUrl = 'https://image.tmdb.org/t/p/original'
-    const { data: response } = await moviePopular()
+    const { data: response } = await moviePopular(page)
     const { results } = response
     const list = results.map(item => ({
       ...item,
@@ -108,8 +109,9 @@ router.get('/moviePopular', async (req, res) => {
 // 热门剧集
 router.get('/tvPopular', async (req, res) => {
   try {
+    const { page } = req.query
     const baseUrl = 'https://image.tmdb.org/t/p/original'
-    const { data: response } = await tvPopular()
+    const { data: response } = await tvPopular(page)
     const { results } = response
     const list = results.map(item => ({
       ...item,
@@ -125,8 +127,9 @@ router.get('/tvPopular', async (req, res) => {
 // 高分电影（Top Rated）
 router.get('/movieTopRated', async (req, res) => {
   try {
+    const { page } = req.query
     const baseUrl = 'https://image.tmdb.org/t/p/original'
-    const { data: response } = await movieTopRated()
+    const { data: response } = await movieTopRated(page)
     const { results } = response
     const list = results.map(item => ({
       ...item,
@@ -142,8 +145,9 @@ router.get('/movieTopRated', async (req, res) => {
 // 高分剧集（Top Rated TV）
 router.get('/tvTopRated', async (req, res) => {
   try {
+    const { page } = req.query
     const baseUrl = 'https://image.tmdb.org/t/p/original'
-    const { data: response } = await tvTopRated()
+    const { data: response } = await tvTopRated(page)
     const { results } = response
     const list = results.map(item => ({
       ...item,

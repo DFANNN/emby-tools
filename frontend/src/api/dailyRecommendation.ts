@@ -17,21 +17,21 @@ export const nowPlaying = () => {
 }
 
 // 热门电影
-export const moviePopular = () => {
-  return request.get('/theMovieDB/moviePopular')
+export const moviePopular = (page: number) => {
+  return request.get(`/theMovieDB/moviePopular?page=${page}`)
 }
 
 // 热门电影
-export const tvPopular = () => {
-  return request.get('/theMovieDB/tvPopular')
+export const tvPopular = (page: number) => {
+  return request.get(`/theMovieDB/tvPopular?page=${page}`)
 }
 
 // 高分电影（Top Rated）
-export const topRated = () => {
-  return request.get('/theMovieDB/movieTopRated')
+export const topRated = (page: number) => {
+  return request.get(`/theMovieDB/movieTopRated?page=${page}`)
 }
 
 // 高分剧集（Top Rated TV）
-export const topRatedTV = () => {
-  return request.get('/theMovieDB/tvTopRated')
+export const topRatedTV = (page: number) => {
+  return request.get(`/theMovieDB/tvTopRated?page=${page}`)
 }

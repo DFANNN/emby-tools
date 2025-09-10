@@ -34,21 +34,21 @@ export function movieNowPlaying() {
 }
 
 // 获取TMDB热门电影
-export function moviePopular() {
-  return service.get('/3/movie/popular?language=zh-CN')
+export function moviePopular(page) {
+  return service.get(`/3/movie/popular?language=zh-CN&page=${page}`)
 }
 
 // 获取TMDB热门剧集
-export function tvPopular() {
-  return service.get('/3/tv/popular?language=zh-CN')
+export function tvPopular(page) {
+  return service.get(`/3/tv/popular?language=zh-CN&page=${page}`)
 }
 
 // 获取TMDB高分电影（Top Rated）
-export function movieTopRated() {
-  return service.get('/3/movie/top_rated?language=zh-CN')
+export function movieTopRated(page) {
+  return service.get(`/3/movie/top_rated?language=zh-CN&page=${page}`)
 }
 
 // 获取TMDB高分剧集（Top Rated TV）
-export function tvTopRated() {
-  return service.get('/3/tv/top_rated?language=zh-CN')
+export function tvTopRated(page) {
+  return service.get(`/3/tv/top_rated?language=zh-CN&page=${page}`)
 }
