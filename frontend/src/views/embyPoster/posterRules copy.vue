@@ -2,6 +2,17 @@
   <div class="poster-rules-container">
     <div class="module-header">
       <h2>封面生成规则</h2>
+      <div>
+        <el-tooltip content="Emby连接设置" placement="top">
+          <el-button size="small" type="success" text @click="linkEmbyConfigRef?.showDialog()">
+            <el-icon style="font-size: 16px"><Link /></el-icon>
+          </el-button>
+        </el-tooltip>
+
+        <el-tag :type="embyPosterStore.connectionStatus ? 'success' : 'info'">
+          {{ embyPosterStore.connectionStatus ? 'Emby已连接' : 'Emby未连接' }}
+        </el-tag>
+      </div>
     </div>
 
     <!-- 生成封面图规则-->
@@ -22,22 +33,29 @@
 
     <!-- 生成按钮 -->
     <el-button type="primary" @click="generatePoster" class="generate-btn"> 生成封面 </el-button>
+
+    <LinkEmbyConfig ref="linkEmbyConfigRef" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useEmbyPosterStore } from '@/stores/embyPoster'
+import { Link } from '@element-plus/icons-vue'
+import LinkEmbyConfig from '@/views/embyPoster/linkEmbyConfig.vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 const embyPosterStore = useEmbyPosterStore()
-const layoutStore = useLayoutStore()
 
 // ref
+const linkEmbyConfigRef = useTemplateRef('linkEmbyConfigRef')
 const ruleFormRef = useTemplateRef<FormInstance>('ruleFormRef')
 
 // 生成封面
 const generatePoster = async () => {
-  if (!layoutStore.linkEmbyStatus) {
+  // 验证表单
+  await ruleFormRef.value?.validate()
+  // 验证emby连接状态
+  if (!embyPosterStore.connectionStatus) {
     ElMessage.warning('请先连接Emby')
     return
   }

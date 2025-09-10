@@ -7,29 +7,31 @@
       <PreviewPoster />
     </div>
   </div>
+  <LinkEmbyConfig ref="linkEmbyConfigRef" />
 </template>
 
 <script setup lang="ts">
-import { embyMediaLibraryList } from '@/api/embyPoster'
+import LinkEmbyConfig from '@/views/embyPoster/linkEmbyConfig.vue'
 import PreviewPoster from '@/views/embyPoster/previewPoster.vue'
 import PosterRules from '@/views/embyPoster/posterRules.vue'
 
 const embyPosterStore = useEmbyPosterStore()
 
-const getEmbyMediaLibraryList = async () => {
-  const { data: res } = await embyMediaLibraryList()
-  if (res.code === 200) {
-    embyPosterStore.embyMediaLibraryList = res.data
-    embyPosterStore.ruleForm.ids = res.data.map((item: any) => item.Id)
-    embyPosterStore.showPreviewPoster = false
-  }
-}
+// ref
+const linkEmbyConfigRef = useTemplateRef('linkEmbyConfigRef')
 
 onMounted(() => {
-  getEmbyMediaLibraryList()
+  embyPosterStore.getEmbyUrlAndApiKey()
+  if (embyPosterStore.connectionForm.ip && embyPosterStore.connectionForm.apiKey) {
+    embyPosterStore.connectToEmby()
+  } else {
+    linkEmbyConfigRef.value?.showDialog()
+  }
 })
 
-onBeforeUnmount(() => {})
+onBeforeUnmount(() => {
+  embyPosterStore.clearData()
+})
 </script>
 
 <style scoped lang="scss">

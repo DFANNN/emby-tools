@@ -27,7 +27,6 @@ export function embyMediaCount() {
 // emby获取最近添加
 export function embyLatestAdd() {
   const url = `${embyStore.url}/Users/${embyStore.user.Id}/Items?IncludeItemTypes=Episode,Movie,Audio&SortBy=DateCreated&Recursive=true&Limit=10&SortOrder=Descending&Fields=DateCreated,DateLastMediaAdded`
-  console.log('url', url)
   return axios.get(url, {
     headers: {
       'X-Emby-Token': embyStore.accessToken
@@ -54,6 +53,26 @@ export function embyStorage(type) {
  */
 export function embyPlayTime(type) {
   const url = `${embyStore.url}/Users/${embyStore.user.Id}/Items?IncludeItemTypes=${type}&Recursive=true&Fields=RunTimeTicks,UserData,DateLastPlayed&Limit`
+  return axios.get(url, {
+    headers: {
+      'X-Emby-Token': embyStore.accessToken
+    }
+  })
+}
+
+// emby获取媒体库列表
+export function embyMediaLibraryList() {
+  const url = `${embyStore.url}/Library/MediaFolders`
+  return axios.get(url, {
+    headers: {
+      'X-Emby-Token': embyStore.accessToken
+    }
+  })
+}
+
+// emby获取媒体库下的媒体信息
+export function embyMediaLibraryItems(id) {
+  const url = `${embyStore.url}/Items?ParentId=${id}`
   return axios.get(url, {
     headers: {
       'X-Emby-Token': embyStore.accessToken

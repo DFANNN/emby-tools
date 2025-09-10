@@ -1,7 +1,14 @@
 import express from 'express'
 import si from 'systeminformation'
 import embyStore from '../store/embyStore.js'
-import { embyUserInfo, embyMediaCount, embyLatestAdd, embyStorage, embyPlayTime } from '../services/embyService.js'
+import {
+  embyUserInfo,
+  embyMediaCount,
+  embyLatestAdd,
+  embyStorage,
+  embyPlayTime,
+  embyMediaLibraryList
+} from '../services/embyService.js'
 
 const router = express.Router()
 
@@ -165,6 +172,25 @@ router.get('/playTime', async (req, res) => {
     const TotalTime = Number((MovieTime + EpisodeTime + AudioTime).toFixed(2))
 
     return res.success({ MovieTime, EpisodeTime, AudioTime, TotalTime })
+  } catch (error) {
+    return res.error(error)
+  }
+})
+
+// emby获取媒体库列表
+router.get('/mediaLibraryList', async (req, res) => {
+  try {
+    const { data: response } = await embyMediaLibraryList()
+    const { Items } = response
+    const mediaLibraryList = Items.map(item => {
+      return {
+        Id: item.Id,
+        Name: item.Name,
+        CollectionType: item.CollectionType,
+        ImageUrl: `${embyStore.url}/Items/${item.Id}/Images/Primary`
+      }
+    }).filter(item => item.CollectionType === 'tvshows' || item.CollectionType === 'movies')
+    return res.success(mediaLibraryList)
   } catch (error) {
     return res.error(error)
   }

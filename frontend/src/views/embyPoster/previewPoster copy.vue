@@ -9,7 +9,7 @@
       <div class="poster-grid">
         <!-- 原始海报 -->
         <div
-          v-for="item in embyPosterStore.embyMediaLibraryList"
+          v-for="item in embyPosterStore.needGeneratePosterMediaLibraryList"
           :key="item.Id"
           class="poster-item"
           v-if="!embyPosterStore.showPreviewPoster"
@@ -18,7 +18,7 @@
           <div class="poster-title">{{ item.Name }}</div>
         </div>
         <!-- 预览海报一 -->
-        <!-- <div
+        <div
           v-for="(poster, index) in embyPosterStore.needGeneratePosterMediaLibraryList"
           :key="index"
           class="poster-item"
@@ -26,7 +26,7 @@
         >
           <PosterOne :poster="poster" :media-id="poster.Id" class="poster-jpg" />
           <div class="poster-title">{{ poster.Name }}</div>
-        </div> -->
+        </div>
       </div>
     </div>
   </div>
