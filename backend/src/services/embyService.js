@@ -70,11 +70,31 @@ export function embyMediaLibraryList() {
   })
 }
 
-// emby获取媒体库下的媒体信息
-export function embyMediaLibraryItems(id) {
-  const url = `${embyStore.url}/Items?ParentId=${id}`
+/**
+ * emby获取媒体库下的媒体信息
+ * @param {*} MediaId  媒体库id
+ * @returns
+ */
+export function embyMediaLibraryItems(MediaId) {
+  const url = `${embyStore.url}/Items?ParentId=${MediaId}`
   return axios.get(url, {
     headers: {
+      'X-Emby-Token': embyStore.accessToken
+    }
+  })
+}
+
+/**
+ * emby替换媒体库封面图
+ * @param {*} MediaId 媒体库id
+ * @param {*} posterBase64 base64封面图
+ * @returns
+ */
+export function embyReplacePoster(MediaId, posterBase64) {
+  const url = `${embyStore.url}/Items/${MediaId}/Images/Primary`
+  return axios.post(url, posterBase64, {
+    headers: {
+      'Content-Type': 'image/png',
       'X-Emby-Token': embyStore.accessToken
     }
   })

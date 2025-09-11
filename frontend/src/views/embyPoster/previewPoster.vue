@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import domtoimage from 'dom-to-image'
-import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
+// import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
 import PosterOne from '@/views/embyPoster/posterLayout/posterOne.vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
@@ -77,7 +77,7 @@ const uploadPoster = async () => {
           }
         })
         const base64Image = domImage.replace('data:image/png;base64,', '')
-        await embyReplaceMediaLibraryPoster(mediaId!, base64Image)
+        await embyPosterStore.replacePoster({ mediaId: mediaId as string, posterBase64: base64Image })
       } catch (error) {
         ElMessage.error('上传封面失败')
         embyPosterStore.loading = false

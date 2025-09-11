@@ -21,3 +21,9 @@ export interface IEmbyMediaLibraryItem {
   imageUrls?: string[] // 图片地址列表(用于预览)
   backgroundGradient?: string // 背景渐变色(用于预览)
 }
+
+// 替换媒体库封面参数
+export interface IReplacePosterData {
+  mediaId: string
+  posterBase64: string
+}

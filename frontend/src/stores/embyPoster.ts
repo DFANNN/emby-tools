@@ -1,8 +1,8 @@
 // embyPoster的仓库
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { radomPoster } from '@/api/embyPoster'
-import type { IRuleForm, IEmbyMediaLibraryItem, IConnectionForm } from '@/types/embyPoster'
+import { radomPoster, embyReplacePoster } from '@/api/embyPoster'
+import type { IRuleForm, IEmbyMediaLibraryItem, IReplacePosterData } from '@/types/embyPoster'
 
 export const useEmbyPosterStore = defineStore('embyPoster', () => {
   // loading
@@ -147,6 +147,11 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
       return res.data
     }
     return []
+  }
+
+  // 替换emby媒体库封面图
+  const replacePoster = async (data: IReplacePosterData) => {
+    return embyReplacePoster(data)
   }
 
   // ------------------------ 旧数据 ------------------------
@@ -376,6 +381,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     showPreviewPoster,
     needGeneratePosterMediaLibraryList,
     getRandomGradient,
-    getRadomPoster
+    getRadomPoster,
+    replacePoster
   }
 })

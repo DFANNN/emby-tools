@@ -8,7 +8,8 @@ import {
   embyStorage,
   embyPlayTime,
   embyMediaLibraryList,
-  embyMediaLibraryItems
+  embyMediaLibraryItems,
+  embyReplacePoster
 } from '../services/embyService.js'
 
 const router = express.Router()
@@ -240,6 +241,34 @@ router.get('/radomEmbyPosterList', async (req, res) => {
   } catch (error) {
     console.log(error)
     res.error(error)
+  }
+})
+
+// 替换媒体库封面
+router.post('/embyReplacePoster', async (req, res) => {
+  try {
+    const { mediaId, posterBase64 } = req.body
+    console.log({ mediaId, posterBase64 })
+
+    // 验证数据格式
+    if (!mediaId || !posterBase64) {
+      return res.error('媒体数据格式错误，缺少mediaId或posterBase64')
+    }
+
+    // 替换单个媒体封面
+    const response = await embyReplacePoster(mediaId, posterBase64)
+
+    return res.success(
+      {
+        mediaId: mediaId,
+        success: true,
+        response: response.data
+      },
+      '封面替换成功'
+    )
+  } catch (error) {
+    console.log(error)
+    return res.error('替换封面失败')
   }
 })
 
