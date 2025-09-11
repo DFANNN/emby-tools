@@ -4,6 +4,7 @@ import { responseHandler } from './middleware/response.js'
 import renameRoutes from './routes/rename.js'
 import embyRoutes from './routes/emby.js'
 import theMovieDB from './routes/theMovieDB.js'
+import proxyRoutes from './routes/proxy.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -21,6 +22,7 @@ app.use(express.json({ limit: '50mb' }))
 app.use('/rename', renameRoutes)
 app.use('/emby', embyRoutes)
 app.use('/theMovieDB', theMovieDB)
+app.use('/proxy', proxyRoutes)
 
 // 根据环境判断是否托管前端静态文件
 const isProduction = process.env.NODE_ENV === 'production'
