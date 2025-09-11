@@ -63,7 +63,6 @@ router.get('/folder-content', async (req, res) => {
 // 批量重命名接口
 router.post('/batch-rename', async (req, res) => {
   const renameList = req.body
-  console.log(renameList)
   if (!Array.isArray(renameList)) {
     return res.error('请求体必须为数组')
   }

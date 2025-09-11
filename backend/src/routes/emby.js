@@ -239,7 +239,6 @@ router.get('/radomEmbyPosterList', async (req, res) => {
 
     res.success(result)
   } catch (error) {
-    console.log(error)
     res.error(error)
   }
 })
@@ -248,7 +247,6 @@ router.get('/radomEmbyPosterList', async (req, res) => {
 router.post('/embyReplacePoster', async (req, res) => {
   try {
     const { mediaId, posterBase64 } = req.body
-    console.log({ mediaId, posterBase64 })
 
     // 验证数据格式
     if (!mediaId || !posterBase64) {
@@ -267,7 +265,6 @@ router.post('/embyReplacePoster', async (req, res) => {
       '封面替换成功'
     )
   } catch (error) {
-    console.log(error)
     return res.error('替换封面失败')
   }
 })

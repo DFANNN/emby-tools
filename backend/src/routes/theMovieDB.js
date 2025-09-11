@@ -24,7 +24,6 @@ const getMovieTvImages = async (type, id) => {
       ''
     )
   } catch (error) {
-    console.error(error)
     return ''
   }
 }
