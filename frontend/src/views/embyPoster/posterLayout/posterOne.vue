@@ -18,14 +18,15 @@
 defineProps(['poster'])
 
 // 將 TMDB 圖片通過後端代理，避免跨域導致 canvas 汙染
-const apiBase = import.meta.env.VITE_API_BASE_URL
+const apiBase = import.meta.env.VITE_API_BASE_URL || ''
 const proxiedUrl = (url: string) => {
   try {
     const u = new URL(url)
     // 僅代理 TMDB 靜態圖；其餘直連
     if (u.host === 'image.tmdb.org') {
       const q = encodeURIComponent(url)
-      return `${apiBase}/proxy/image?url=${q}`
+      // 允許同源（空 base）時走相對路徑
+      return apiBase ? `${apiBase}/proxy/image?url=${q}` : `/proxy/image?url=${q}`
     }
     return url
   } catch (e) {
