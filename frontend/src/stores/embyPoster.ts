@@ -1,5 +1,6 @@
 // embyPoster的仓库
 import { defineStore } from 'pinia'
+import { tmdbDiscover } from '@/api/theMovieDB'
 import { radomPoster, embyReplacePoster, embyMediaLibrary } from '@/api/embyPoster'
 import type { IRuleForm, IEmbyMediaLibraryItem, IReplacePosterData } from '@/types/embyPoster'
 
@@ -287,6 +288,20 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     return []
   }
 
+  // 获取TMDB随机图片
+  const getTmdbDiscover = async (mediaType: string, withGenres: string) => {
+    const { data: res } = await tmdbDiscover({
+      media_type: mediaType as any,
+      with_genres: withGenres,
+      page: 'random',
+      randomNum: posterOneRadomNum.value
+    })
+    if (res.code === 200) {
+      return res.data
+    }
+    return []
+  }
+
   // 替换emby媒体库封面图
   const replacePoster = async (data: IReplacePosterData) => {
     return embyReplacePoster(data)
@@ -311,6 +326,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     getRandomGradient,
     getRadomPoster,
     replacePoster,
-    getEmbyMediaLibraryList
+    getEmbyMediaLibraryList,
+    getTmdbDiscover
   }
 })

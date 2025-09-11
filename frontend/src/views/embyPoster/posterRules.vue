@@ -39,6 +39,25 @@
             <el-option label="三色" :value="3" />
           </el-select>
         </el-form-item>
+
+        <el-divider>图片来源</el-divider>
+        <el-form-item label="来源">
+          <el-select v-model="embyPosterStore.ruleForm.imageSource" clearable placeholder="默认 Emby 随机">
+            <el-option label="Emby 随机海报" value="emby" />
+            <el-option label="TMDB 发现（按题材）" value="tmdb" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="embyPosterStore.ruleForm.imageSource === 'tmdb'" label="TMDB 类型">
+          <el-select v-model="embyPosterStore.ruleForm.tmdbMediaType" clearable placeholder="电影或剧集">
+            <el-option label="电影" value="movie" />
+            <el-option label="剧集" value="tv" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="embyPosterStore.ruleForm.imageSource === 'tmdb'" label="TMDB 题材（可多选）">
+          <el-select v-model="embyPosterStore.ruleForm.tmdbGenres" multiple clearable placeholder="不选为全部题材">
+            <el-option v-for="g in tmdbGenreOptions" :key="g.value" :label="g.label" :value="g.value" />
+          </el-select>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -67,6 +86,30 @@ const paletteOptions = [
   { label: '随机', value: 'random' }
 ]
 const layoutStore = useLayoutStore()
+const tmdbGenreOptions = [
+  // 电影/剧集常用题材并集，按中文显示
+  { label: '纪录片', value: 99 },
+  { label: '真人秀/综艺', value: 10764 },
+  { label: '新闻', value: 10763 },
+  { label: '脱口秀', value: 10767 },
+  { label: '家庭', value: 10751 },
+  { label: '儿童', value: 10762 },
+  { label: '动画', value: 16 },
+  { label: '喜剧', value: 35 },
+  { label: '犯罪', value: 80 },
+  { label: '剧情', value: 18 },
+  { label: '奇幻', value: 14 },
+  { label: '恐怖', value: 27 },
+  { label: '科幻', value: 878 },
+  { label: '悬疑', value: 9648 },
+  { label: '历史', value: 36 },
+  { label: '战争', value: 10752 },
+  { label: '音乐', value: 10402 },
+  { label: '冒险', value: 12 },
+  { label: '爱情', value: 10749 },
+  { label: '西部', value: 37 },
+  { label: '电视电影', value: 10770 }
+] as const
 
 // ref
 const ruleFormRef = useTemplateRef<FormInstance>('ruleFormRef')
@@ -83,7 +126,14 @@ const generatePoster = async () => {
   })
   // 整理需要生成封面的数据
   for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
-    item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
+    // 选择图片来源
+    if (embyPosterStore.ruleForm.imageSource === 'tmdb') {
+      const mediaType = embyPosterStore.ruleForm.tmdbMediaType || (item.CollectionType === 'movies' ? 'movie' : 'tv')
+      const withGenres = (embyPosterStore.ruleForm.tmdbGenres || []).join(',')
+      item.imageUrls = await embyPosterStore.getTmdbDiscover(mediaType, withGenres)
+    } else {
+      item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
+    }
     item.backgroundGradient = embyPosterStore.getRandomGradient({
       palette: embyPosterStore.ruleForm.palette?.length ? embyPosterStore.ruleForm.palette : undefined,
       type: embyPosterStore.ruleForm.gradientType,

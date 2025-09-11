@@ -8,6 +8,10 @@ export interface IRuleForm {
   >
   gradientType?: 'auto' | 'linear' | 'radial' | 'diagonal' | undefined
   gradientStops?: 2 | 3 | undefined
+  // TMDB 图片来源配置
+  imageSource?: 'emby' | 'tmdb' | undefined
+  tmdbMediaType?: 'movie' | 'tv' | undefined
+  tmdbGenres?: number[] | undefined // TMDB genre ids
 }
 
 // 连接emby的表单

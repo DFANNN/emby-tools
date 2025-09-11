@@ -6,7 +6,9 @@ import {
   movieTopRated,
   tvTopRated,
   moviePopular,
-  tvPopular
+  tvPopular,
+  discoverMovie,
+  discoverTv
 } from '../services/theMovieDBService.js'
 
 const router = express.Router()
@@ -161,3 +163,47 @@ router.get('/tvTopRated', async (req, res) => {
 })
 
 export default router
+
+// 题材发现（支持电影/剧集，with_genres 可传中文标签将在前端映射）
+router.get('/discover', async (req, res) => {
+  try {
+    const {
+      media_type = 'movie',
+      page: pageParam,
+      with_genres = '',
+      sort_by = 'popularity.desc',
+      randomNum
+    } = req.query
+    const baseUrl = 'https://image.tmdb.org/t/p/original'
+    const svc = media_type === 'tv' ? discoverTv : discoverMovie
+
+    // 如果 page 未指定或为 'random'，先请求第一页获取总页数再随机选一页
+    let targetPage = Number(pageParam) || 1
+    if (!pageParam || pageParam === 'random') {
+      const { data: firstResp } = await svc({ page: 1, with_genres, sort_by })
+      const maxPages = Math.min(firstResp.total_pages || 1, 500)
+      targetPage = Math.floor(Math.random() * maxPages) + 1
+    }
+
+    const { data: response } = await svc({ page: targetPage, with_genres, sort_by })
+    const { results = [] } = response || {}
+
+    // 提取图片 URL，优先海报，其次背景，并过滤空
+    const urls = results
+      .map(item => item.poster_path || item.backdrop_path)
+      .filter(Boolean)
+      .map(p => `${baseUrl}${p}`)
+
+    // 打乱顺序
+    for (let i = urls.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[urls[i], urls[j]] = [urls[j], urls[i]]
+    }
+
+    const num = Math.max(1, Math.min(Number(randomNum) || 9, urls.length || 9))
+    const picked = urls.slice(0, num)
+    return res.success(picked)
+  } catch (error) {
+    return res.error(error)
+  }
+})

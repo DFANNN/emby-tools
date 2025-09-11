@@ -52,3 +52,16 @@ export function movieTopRated(page) {
 export function tvTopRated(page) {
   return service.get(`/3/tv/top_rated?language=zh-CN&page=${page}`)
 }
+
+// Discover 发现接口：按题材等筛选
+export function discoverMovie(params = {}) {
+  const { page = 1, with_genres = '', sort_by = 'popularity.desc', language = 'zh-CN' } = params
+  return service.get(
+    `/3/discover/movie?language=${language}&page=${page}&sort_by=${sort_by}&with_genres=${with_genres}`
+  )
+}
+
+export function discoverTv(params = {}) {
+  const { page = 1, with_genres = '', sort_by = 'popularity.desc', language = 'zh-CN' } = params
+  return service.get(`/3/discover/tv?language=${language}&page=${page}&sort_by=${sort_by}&with_genres=${with_genres}`)
+}
