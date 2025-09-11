@@ -17,6 +17,28 @@
             />
           </el-select>
         </el-form-item>
+
+        <el-form-item label="背景色系（可多选）">
+          <el-select v-model="embyPosterStore.ruleForm.palette" multiple clearable placeholder="不选为随机">
+            <el-option v-for="opt in paletteOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="渐变类型">
+          <el-select v-model="embyPosterStore.ruleForm.gradientType" clearable placeholder="不选为随机">
+            <el-option label="自动" value="auto" />
+            <el-option label="线性" value="linear" />
+            <el-option label="对角" value="diagonal" />
+            <el-option label="径向" value="radial" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="颜色止点">
+          <el-select v-model="embyPosterStore.ruleForm.gradientStops" clearable placeholder="不选为随机">
+            <el-option label="两色" :value="2" />
+            <el-option label="三色" :value="3" />
+          </el-select>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -30,6 +52,20 @@ import { useEmbyPosterStore } from '@/stores/embyPoster'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 const embyPosterStore = useEmbyPosterStore()
+const paletteOptions = [
+  { label: '冷色（蓝/青/紫）', value: 'cool' },
+  { label: '暖色（红/橙/金/粉）', value: 'warm' },
+  { label: '中性（灰/蓝灰/棕灰）', value: 'neutral' },
+  { label: '蓝色系', value: 'blue' },
+  { label: '紫色系', value: 'purple' },
+  { label: '青色系', value: 'teal' },
+  { label: '绿色系', value: 'green' },
+  { label: '金色系', value: 'gold' },
+  { label: '橙色系', value: 'orange' },
+  { label: '粉色系', value: 'pink' },
+  { label: '棕色系', value: 'brown' },
+  { label: '随机', value: 'random' }
+]
 const layoutStore = useLayoutStore()
 
 // ref
@@ -48,7 +84,11 @@ const generatePoster = async () => {
   // 整理需要生成封面的数据
   for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
     item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
-    item.backgroundGradient = embyPosterStore.getRandomGradient()
+    item.backgroundGradient = embyPosterStore.getRandomGradient({
+      palette: embyPosterStore.ruleForm.palette?.length ? embyPosterStore.ruleForm.palette : undefined,
+      type: embyPosterStore.ruleForm.gradientType,
+      stops: embyPosterStore.ruleForm.gradientStops
+    })
   }
   // 显示预览海报
   embyPosterStore.showPreviewPoster = true

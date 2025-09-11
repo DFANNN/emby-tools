@@ -2,6 +2,12 @@
 export interface IRuleForm {
   // 需要生成封面的媒体库id数组
   ids: string[]
+  // 背景渐变配置（可选）
+  palette?: Array<
+    'cool' | 'warm' | 'neutral' | 'blue' | 'purple' | 'teal' | 'green' | 'gold' | 'orange' | 'pink' | 'brown' | 'random'
+  >
+  gradientType?: 'auto' | 'linear' | 'radial' | 'diagonal' | undefined
+  gradientStops?: 2 | 3 | undefined
 }
 
 // 连接emby的表单

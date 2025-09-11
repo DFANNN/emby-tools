@@ -19,7 +19,10 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
 
   // 需要生成封面的媒体库id
   const ruleForm = ref<IRuleForm>({
-    ids: []
+    ids: [],
+    palette: [],
+    gradientType: undefined,
+    gradientStops: undefined
   })
 
   // 需要生成封面的媒体库列表
