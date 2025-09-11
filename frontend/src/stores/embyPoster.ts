@@ -1,6 +1,5 @@
 // embyPoster的仓库
 import { defineStore } from 'pinia'
-import { ElMessage } from 'element-plus'
 import { radomPoster, embyReplacePoster, embyMediaLibrary } from '@/api/embyPoster'
 import type { IRuleForm, IEmbyMediaLibraryItem, IReplacePosterData } from '@/types/embyPoster'
 
