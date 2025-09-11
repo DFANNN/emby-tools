@@ -1,4 +1,4 @@
-import { embyRequest, request } from '@/utils/request'
+import { request } from '@/utils/request'
 import type { IReplacePosterData } from '@/types/embyPoster'
 
 // 获取emby媒体库列表
