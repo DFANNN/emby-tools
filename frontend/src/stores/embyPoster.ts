@@ -1,12 +1,16 @@
 // embyPoster的仓库
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { radomPoster } from '@/api/embyPoster'
 import type { IRuleForm, IEmbyMediaLibraryItem, IConnectionForm } from '@/types/embyPoster'
 
 export const useEmbyPosterStore = defineStore('embyPoster', () => {
   // loading
   const loading = ref(false)
   const loadingText = ref('')
+
+  // 随机生成图片数
+  const posterOneRadomNum = ref(9)
 
   // 是否展示预览海报
   const showPreviewPoster = ref(false)
@@ -134,6 +138,15 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
   const getRandomGradient = () => {
     const idx = Math.floor(Math.random() * gradients.length)
     return gradients[idx]
+  }
+
+  // 获取emby随机图片
+  const getRadomPoster = async (mediaId: string) => {
+    const { data: res } = await radomPoster(mediaId, posterOneRadomNum.value)
+    if (res.code === 200) {
+      return res.data
+    }
+    return []
   }
 
   // ------------------------ 旧数据 ------------------------
@@ -362,6 +375,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     embyMediaLibraryList,
     showPreviewPoster,
     needGeneratePosterMediaLibraryList,
-    getRandomGradient
+    getRandomGradient,
+    getRadomPoster
   }
 })

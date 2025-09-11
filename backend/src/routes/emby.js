@@ -7,7 +7,8 @@ import {
   embyLatestAdd,
   embyStorage,
   embyPlayTime,
-  embyMediaLibraryList
+  embyMediaLibraryList,
+  embyMediaLibraryItems
 } from '../services/embyService.js'
 
 const router = express.Router()
@@ -193,6 +194,52 @@ router.get('/mediaLibraryList', async (req, res) => {
     return res.success(mediaLibraryList)
   } catch (error) {
     return res.error(error)
+  }
+})
+
+/**
+ * 随机生成emby封面图数组
+ */
+router.get('/radomEmbyPosterList', async (req, res) => {
+  try {
+    const { mediaId, radomNum } = req.query
+    const { data: response } = await embyMediaLibraryItems(mediaId)
+    const { Items } = response
+
+    if (!Items || !Array.isArray(Items)) {
+      return res.error('媒体库数据为空')
+    }
+
+    // 提取所有的封面图地址
+    const posterUrls = Items.map(
+      item =>
+        `${embyStore.url}/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}&maxWidth=500&maxHeight=750`
+    )
+
+    if (posterUrls.length === 0) {
+      return res.error('该媒体库下没有剧集封面图')
+    }
+
+    // 随机生成指定数量的图片地址数组
+    const targetNum = parseInt(radomNum) || 10
+    const result = []
+
+    if (posterUrls.length >= targetNum) {
+      // 媒体库数量足够，随机选择不重复
+      const shuffled = [...posterUrls].sort(() => Math.random() - 0.5)
+      result.push(...shuffled.slice(0, targetNum))
+    } else {
+      // 媒体库数量不足，允许重复
+      for (let i = 0; i < targetNum; i++) {
+        const randomIndex = Math.floor(Math.random() * posterUrls.length)
+        result.push(posterUrls[randomIndex])
+      }
+    }
+
+    res.success(result)
+  } catch (error) {
+    console.log(error)
+    res.error(error)
   }
 })
 

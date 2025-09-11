@@ -5,6 +5,11 @@ export const embyMediaLibraryList = () => {
   return request.get('/emby/mediaLibraryList')
 }
 
+// 随机获取当前媒体库下的emby封面图
+export const radomPoster = (mediaId: string, radomNum: number) => {
+  return request.get(`/emby/radomEmbyPosterList?mediaId=${mediaId}&radomNum=${radomNum}`)
+}
+
 export const linkEmby = () => {
   return embyRequest.get('/Library/MediaFolders')
 }

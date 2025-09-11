@@ -47,7 +47,7 @@ const generatePoster = async () => {
   })
   // 整理需要生成封面的数据
   for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
-    item.imageUrls = await embyPosterStore.generatePreviewImageUrls(item.Id)
+    item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
     item.backgroundGradient = embyPosterStore.getRandomGradient()
   }
   // 显示预览海报
