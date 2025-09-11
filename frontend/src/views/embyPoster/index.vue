@@ -10,23 +10,13 @@
 </template>
 
 <script setup lang="ts">
-import { embyMediaLibraryList } from '@/api/embyPoster'
 import PreviewPoster from '@/views/embyPoster/previewPoster.vue'
 import PosterRules from '@/views/embyPoster/posterRules.vue'
 
 const embyPosterStore = useEmbyPosterStore()
 
-const getEmbyMediaLibraryList = async () => {
-  const { data: res } = await embyMediaLibraryList()
-  if (res.code === 200) {
-    embyPosterStore.embyMediaLibraryList = res.data
-    embyPosterStore.ruleForm.ids = res.data.map((item: any) => item.Id)
-    embyPosterStore.showPreviewPoster = false
-  }
-}
-
 onMounted(() => {
-  getEmbyMediaLibraryList()
+  embyPosterStore.getEmbyMediaLibraryList()
 })
 
 onBeforeUnmount(() => {})

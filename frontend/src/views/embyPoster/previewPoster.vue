@@ -34,7 +34,6 @@
 
 <script setup lang="ts">
 import domtoimage from 'dom-to-image'
-// import { embyReplaceMediaLibraryPoster } from '@/api/embyPoster'
 import PosterOne from '@/views/embyPoster/posterLayout/posterOne.vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
