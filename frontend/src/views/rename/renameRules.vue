@@ -8,6 +8,7 @@
             <el-button :icon="FolderAdd" @click="renameStore.showDialog()" />
           </template>
         </el-input>
+        <el-button type="primary" class="read-folder-btn preview-btn" @click="searchPath">读取文件夹</el-button>
       </div>
       <div>
         <el-form :model="renameStore.ruleForm" :rules="rules" label-position="top" ref="ruleFormRef">
@@ -127,7 +128,6 @@ const previewRename = async () => {
   }
   // 验证表单
   await ruleFormRef.value?.validate()
-  await renameStore.getRenameFileList()
   if (renameStore.ruleForm.model === 'tv') renameStore.reanalyzeFiles()
   if (renameStore.ruleForm.model === 'sequence') renameStore.generateNewNamesBySequence()
   if (renameStore.ruleForm.model === 'replace') renameStore.previewReplace()
@@ -182,6 +182,9 @@ const rules = ref<FormRules>({
   .preview-btn {
     width: 100%;
     font-size: 14px;
+  }
+  .read-folder-btn {
+    margin-top: 1rem;
   }
 }
 </style>
