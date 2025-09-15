@@ -37,12 +37,12 @@ const routes = [
         component: () => import('@/views/dailyRecommendation/index.vue'),
         meta: { title: '每日推荐', icon: 'Star', isMenu: true }
       },
-      {
-        path: 'seriesTracker',
-        name: 'seriesTracker',
-        component: () => import('@/views/seriesTracker/index.vue'),
-        meta: { title: '追剧关注', icon: 'Bell', isMenu: true }
-      },
+      // {
+      //   path: 'seriesTracker',
+      //   name: 'seriesTracker',
+      //   component: () => import('@/views/seriesTracker/index.vue'),
+      //   meta: { title: '追剧关注', icon: 'Bell', isMenu: true }
+      // },
       {
         path: 'embyPoster',
         name: 'embyPoster',
