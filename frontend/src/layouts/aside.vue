@@ -55,10 +55,14 @@ onMounted(() => {
   height: 100vh;
   .logo-wrapper {
     height: 60px;
-    margin-left: -20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 12px;
+    margin-left: -12px;
     img {
-      width: 63px;
-      height: 63px;
+      width: 44px;
+      height: 44px;
     }
     .logo-text {
       font-size: 18px;
