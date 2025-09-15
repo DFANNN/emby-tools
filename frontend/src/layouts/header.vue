@@ -16,11 +16,6 @@
           </el-icon>
         </el-badge>
       </div>
-      <div class="icon-wrapper" @click="openEmbyWeb">
-        <el-icon>
-          <EmbyIcon />
-        </el-icon>
-      </div>
       <div class="icon-wrapper" @click="layoutStore.toggleTheme">
         <el-icon>
           <DarkModeIcon v-if="layoutStore.themeMode === 'dark'" />
@@ -32,6 +27,14 @@
         <el-icon>
           <GithubIcon />
         </el-icon>
+      </div>
+      <div class="icon-wrapper" @click="openEmbyWeb">
+        <el-icon>
+          <EmbyIcon />
+        </el-icon>
+      </div>
+      <div class="tmdb-wrapper" @click="openTmdb">
+        <img :src="TMDBLogo" alt="" />
       </div>
       <LinkEmbyConfig ref="linkEmbyConfigRef" />
     </div>
@@ -47,6 +50,7 @@ import AutoModeIcon from '@/components/icon/AutoModeIcon.vue'
 import LinkEmbyConfig from '@/components/linkEmbyConfig.vue'
 import EmbyIcon from '@/components/icon/EmbyIcon.vue'
 import ConfigIcon from '@/components/icon/ConfigIcon.vue'
+import TMDBLogo from '@/assets/tmdbLogo.svg'
 import { ElMessage } from 'element-plus'
 
 const layoutStore = useLayoutStore()
@@ -66,6 +70,11 @@ const openEmbyWeb = () => {
   window.open(layoutStore.embyUserInfo.EmbyAddress)
 }
 
+// 跳转到tmdb
+const openTmdb = () => {
+  window.open('https://www.themoviedb.org/')
+}
+
 const goToGithub = () => {
   window.open('https://github.com/DFANNN/emby-tools')
 }
@@ -83,6 +92,18 @@ const goToGithub = () => {
     border-radius: 4px;
     font-size: 20px;
     cursor: pointer;
+    &:hover {
+      background: #ccc;
+    }
+  }
+  .tmdb-wrapper {
+    padding: 4px 8px 0;
+    border-radius: 4px;
+    font-size: 20px;
+    cursor: pointer;
+    img {
+      width: 25px;
+    }
     &:hover {
       background: #ccc;
     }
