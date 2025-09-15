@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { useEmbyPosterStore } from '@/stores/embyPoster'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { nextTick } from 'vue'
 
 const embyPosterStore = useEmbyPosterStore()
 const paletteOptions = [
@@ -120,28 +121,69 @@ const generatePoster = async () => {
     ElMessage.warning('请先连接Emby')
     return
   }
-  // 整理需要生成封面的媒体库列表
-  embyPosterStore.needGeneratePosterMediaLibraryList = embyPosterStore.embyMediaLibraryList.filter(item => {
-    return embyPosterStore.ruleForm.ids.includes(item.Id)
-  })
-  // 整理需要生成封面的数据
-  for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
-    // 选择图片来源
-    if (embyPosterStore.ruleForm.imageSource === 'tmdb') {
-      const mediaType = embyPosterStore.ruleForm.tmdbMediaType || (item.CollectionType === 'movies' ? 'movie' : 'tv')
-      const withGenres = (embyPosterStore.ruleForm.tmdbGenres || []).join(',')
-      item.imageUrls = await embyPosterStore.getTmdbDiscover(mediaType, withGenres)
-    } else {
-      item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
-    }
-    item.backgroundGradient = embyPosterStore.getRandomGradient({
-      palette: embyPosterStore.ruleForm.palette?.length ? embyPosterStore.ruleForm.palette : undefined,
-      type: embyPosterStore.ruleForm.gradientType,
-      stops: embyPosterStore.ruleForm.gradientStops
+  try {
+    // 开启 loading（简化为单一提示即可）
+    embyPosterStore.loadingText = '正在获取图片…'
+    embyPosterStore.loading = true
+
+    // 整理需要生成封面的媒体库列表
+    embyPosterStore.needGeneratePosterMediaLibraryList = embyPosterStore.embyMediaLibraryList.filter(item => {
+      return embyPosterStore.ruleForm.ids.includes(item.Id)
     })
+
+    // 逐个媒体库拉取图片并生成背景
+    for (const item of embyPosterStore.needGeneratePosterMediaLibraryList) {
+      // 选择图片来源
+      if (embyPosterStore.ruleForm.imageSource === 'tmdb') {
+        const mediaType = embyPosterStore.ruleForm.tmdbMediaType || (item.CollectionType === 'movies' ? 'movie' : 'tv')
+        const withGenres = (embyPosterStore.ruleForm.tmdbGenres || []).join(',')
+        item.imageUrls = await embyPosterStore.getTmdbDiscover(mediaType, withGenres)
+      } else {
+        item.imageUrls = await embyPosterStore.getRadomPoster(item.Id)
+      }
+      item.backgroundGradient = embyPosterStore.getRandomGradient({
+        palette: embyPosterStore.ruleForm.palette?.length ? embyPosterStore.ruleForm.palette : undefined,
+        type: embyPosterStore.ruleForm.gradientType,
+        stops: embyPosterStore.ruleForm.gradientStops
+      })
+    }
+
+    // 显示预览海报
+    embyPosterStore.showPreviewPoster = true
+
+    // 在此等待预览区域内图片加载完成再关闭 loading
+    embyPosterStore.loadingText = '正在渲染预览…'
+    await nextTick()
+    await new Promise<void>(resolve => {
+      const container = document.querySelector('.preview-container')
+      if (!container) return resolve()
+      const imgs = container.querySelectorAll('.poster-jpg img')
+      if (!imgs.length) return resolve()
+
+      let done = 0
+      const total = imgs.length
+      const onOne = () => {
+        done++
+        if (done >= total) resolve()
+      }
+      const timeout = setTimeout(() => resolve(), 20000)
+      imgs.forEach(node => {
+        const img = node as HTMLImageElement
+        if (img.complete && img.naturalWidth > 0) onOne()
+        else {
+          img.addEventListener('load', onOne, { once: true })
+          img.addEventListener('error', onOne, { once: true })
+        }
+      })
+      const stopWhenResolved = () => clearTimeout(timeout)
+      // 轻量：当 resolve 被调用时，微任务后清理 timeout
+      Promise.resolve().then(stopWhenResolved)
+    })
+  } finally {
+    // 关闭 loading
+    embyPosterStore.loading = false
+    embyPosterStore.loadingText = ''
   }
-  // 显示预览海报
-  embyPosterStore.showPreviewPoster = true
 }
 
 const rules = ref<FormRules>({

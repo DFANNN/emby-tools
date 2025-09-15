@@ -7,37 +7,75 @@
       <EarRightIcon class="ear-icon" />
     </div>
     <div class="panel-content">
-      <div class="content-left" @click="openTmdb(topItem)">
-        <div class="hero-media">
-          <img :src="topItem?.backdrop_path || topItem?.poster_path" alt="" />
+      <!-- 加载中骨架屏 -->
+      <template v-if="props.loading">
+        <div class="content-left">
+          <el-skeleton animated :rows="4" class="skeleton-left" />
         </div>
-        <div class="hero-info">
-          <div class="rank-badge">TOP 1</div>
-          <div class="hero-title">{{ displayName(topItem) }}</div>
-          <div class="hero-meta">
-            <span>{{ displayReleaseDate(topItem) }}</span>
-            <span class="dot">·</span>
-            <span class="score">⭐ {{ displayScore(topItem) }}</span>
-          </div>
-          <div class="hero-overview">{{ topItem?.overview }}</div>
-        </div>
-      </div>
-      <div class="content-right">
-        <div v-for="(item, index) in topTwoToSixList" :key="item.id" class="rank-item" @click="openTmdb(item)">
-          <div class="rank-num" :class="{ hot: index < 3 }">{{ index + 2 }}</div>
-          <img class="thumb" :src="item.poster_path" alt="" />
-          <div class="rank-info">
-            <div class="name">{{ displayName(item) }}</div>
-            <div class="meta">
-              <span class="date">{{ displayReleaseDate(item) }}</span>
-              <span class="score">⭐ {{ displayScore(item) }}</span>
+        <div class="content-right">
+          <div v-for="i in 5" :key="i" class="rank-item">
+            <el-skeleton-item variant="text" style="width: 28px; height: 22px" />
+            <el-skeleton-item variant="image" style="width: 48px; height: 64px; border-radius: 6px" />
+            <div class="rank-info" style="width: 100%">
+              <el-skeleton-item variant="text" style="width: 70%" />
+              <el-skeleton-item variant="text" style="width: 40%" />
             </div>
           </div>
         </div>
-        <div class="rank-more">
-          <el-button link type="primary" @click="checkMore">查看更多</el-button>
+      </template>
+
+      <!-- 错误态 -->
+      <template v-else-if="props.error">
+        <div class="empty-state">
+          <div class="empty-title">加载失败</div>
+          <div class="empty-desc">{{ props.error }}</div>
+          <el-button type="primary" size="small" @click="handleRetry">重试</el-button>
         </div>
-      </div>
+      </template>
+
+      <!-- 空态 -->
+      <template v-else-if="!props.topChartList || props.topChartList.length === 0">
+        <div class="empty-state">
+          <div class="empty-title">暂无数据</div>
+          <div class="empty-desc">稍后再来看看，或点击重试</div>
+          <el-button type="primary" size="small" @click="handleRetry">重试</el-button>
+        </div>
+      </template>
+
+      <!-- 正常内容 -->
+      <template v-else>
+        <div class="content-left" @click="openTmdb(topItem)">
+          <div class="hero-media">
+            <img :src="topItem?.backdrop_path || topItem?.poster_path" alt="" />
+          </div>
+          <div class="hero-info">
+            <div class="rank-badge">TOP 1</div>
+            <div class="hero-title">{{ displayName(topItem) }}</div>
+            <div class="hero-meta">
+              <span>{{ displayReleaseDate(topItem) }}</span>
+              <span class="dot">·</span>
+              <span class="score">⭐ {{ displayScore(topItem) }}</span>
+            </div>
+            <div class="hero-overview">{{ topItem?.overview }}</div>
+          </div>
+        </div>
+        <div class="content-right">
+          <div v-for="(item, index) in topTwoToSixList" :key="item.id" class="rank-item" @click="openTmdb(item)">
+            <div class="rank-num" :class="{ hot: index < 3 }">{{ index + 2 }}</div>
+            <img class="thumb" :src="item.poster_path" alt="" />
+            <div class="rank-info">
+              <div class="name">{{ displayName(item) }}</div>
+              <div class="meta">
+                <span class="date">{{ displayReleaseDate(item) }}</span>
+                <span class="score">⭐ {{ displayScore(item) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="rank-more">
+            <el-button link type="primary" @click="checkMore">查看更多</el-button>
+          </div>
+        </div>
+      </template>
     </div>
 
     <TopChartList :title="props.title" :type="props.type" ref="topChartListRef" />
@@ -63,6 +101,20 @@ const props = defineProps({
   type: {
     required: true,
     type: String
+  },
+  loading: {
+    required: false,
+    type: Boolean,
+    default: false
+  },
+  error: {
+    required: false,
+    type: String,
+    default: ''
+  },
+  onRetry: {
+    required: false,
+    type: Function as PropType<() => void>
   }
 })
 
@@ -102,6 +154,10 @@ const displayScore = (item: ITrendItem) => ((item?.vote_average || 0) as number)
 
 const checkMore = () => {
   topChartListRef.value?.showDialog()
+}
+
+const handleRetry = () => {
+  props.onRetry?.()
 }
 </script>
 
@@ -146,6 +202,32 @@ const checkMore = () => {
     grid-template-columns: 1.2fr 1fr;
     gap: 1rem;
     padding: 12px 16px;
+
+    .skeleton-left {
+      width: 100%;
+      .el-skeleton__item {
+        border-radius: 8px;
+      }
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px 0;
+      color: var(--el-text-color-secondary);
+      .empty-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--el-text-color-primary);
+      }
+      .empty-desc {
+        font-size: 13px;
+      }
+    }
 
     .content-left {
       border-radius: 12px;

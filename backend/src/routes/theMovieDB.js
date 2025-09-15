@@ -13,6 +13,14 @@ import {
 
 const router = express.Router()
 
+// 识别 Axios 超时错误
+const isTimeoutError = error => {
+  if (!error) return false
+  if (error.code === 'ECONNABORTED') return true
+  const msg = String(error.message || '')
+  return msg.includes('timeout') || msg.includes('ETIMEDOUT')
+}
+
 // 获取TMDB当前电影/电视剧的图片（主要用于logo）
 const getMovieTvImages = async (type, id) => {
   try {
@@ -47,6 +55,10 @@ router.get('/todayTrending', async (req, res) => {
     )
     return res.success(trendList)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -66,6 +78,10 @@ router.get('/weekTrending', async (req, res) => {
     })
     return res.success(trendList)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -85,6 +101,10 @@ router.get('/movieNowPlaying', async (req, res) => {
     })
     return res.success(nowPlayingList)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -103,6 +123,10 @@ router.get('/moviePopular', async (req, res) => {
     }))
     return res.success(list)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -121,6 +145,10 @@ router.get('/tvPopular', async (req, res) => {
     }))
     return res.success(list)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -139,6 +167,10 @@ router.get('/movieTopRated', async (req, res) => {
     }))
     return res.success(list)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -157,6 +189,10 @@ router.get('/tvTopRated', async (req, res) => {
     }))
     return res.success(list)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })
@@ -203,6 +239,10 @@ router.get('/discover', async (req, res) => {
     const picked = urls.slice(0, num)
     return res.success(picked)
   } catch (error) {
+    console.log(error)
+    if (isTimeoutError(error)) {
+      return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
+    }
     return res.error(error)
   }
 })

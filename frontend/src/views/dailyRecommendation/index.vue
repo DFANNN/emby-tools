@@ -2,24 +2,45 @@
   <div>
     <HeroCarousel />
     <div class="top-rated-row">
-      <TopChartsPanel title="热门电影" type="moviePopular" :top-chart-list="moviePopularList" />
-      <TopChartsPanel title="热门剧集" type="tvPopular" :top-chart-list="tvPopularList" />
-      <TopChartsPanel title="高分电影" type="topRatedMovies" :top-chart-list="movieTopRatedList" />
-      <TopChartsPanel title="高分剧集" type="topRatedTV" :top-chart-list="tvTopRatedList" />
+      <TopChartsPanel
+        title="热门电影"
+        type="moviePopular"
+        :top-chart-list="moviePopularList"
+        :loading="moviePopularLoading"
+        :error="moviePopularError"
+        :on-retry="getMoviePopular"
+      />
+      <TopChartsPanel
+        title="热门剧集"
+        type="tvPopular"
+        :top-chart-list="tvPopularList"
+        :loading="tvPopularLoading"
+        :error="tvPopularError"
+        :on-retry="getTvPopular"
+      />
+      <TopChartsPanel
+        title="高分电影"
+        type="topRatedMovies"
+        :top-chart-list="movieTopRatedList"
+        :loading="movieTopRatedLoading"
+        :error="movieTopRatedError"
+        :on-retry="getMovieTopRated"
+      />
+      <TopChartsPanel
+        title="高分剧集"
+        type="topRatedTV"
+        :top-chart-list="tvTopRatedList"
+        :loading="tvTopRatedLoading"
+        :error="tvTopRatedError"
+        :on-retry="getTvTopRated"
+      />
     </div>
-    <el-dialog v-model="movieDialogVisible" title="高分电影" width="80%">
-      <TopRatedList :list="movieTopRatedList" />
-    </el-dialog>
-    <el-dialog v-model="tvDialogVisible" title="高分剧集" width="80%">
-      <TopRatedList :list="tvTopRatedList" />
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { topRatedMovies, topRatedTV, moviePopular, tvPopular } from '@/api/dailyRecommendation'
 import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
-import TopRatedList from '@/components/TopRatedList.vue'
 import TopChartsPanel from '@/components/TopChartsPanel.vue'
 import type { ITrendItem } from '@/types/dailyRecommendation'
 
@@ -27,31 +48,88 @@ const movieTopRatedList = ref<ITrendItem[]>([])
 const tvTopRatedList = ref<ITrendItem[]>([])
 const moviePopularList = ref<ITrendItem[]>([])
 const tvPopularList = ref<ITrendItem[]>([])
-const movieDialogVisible = ref(false)
-const tvDialogVisible = ref(false)
+
+// loading / error 状态
+const moviePopularLoading = ref<boolean>(false)
+const tvPopularLoading = ref<boolean>(false)
+const movieTopRatedLoading = ref<boolean>(false)
+const tvTopRatedLoading = ref<boolean>(false)
+
+const moviePopularError = ref<string>('')
+const tvPopularError = ref<string>('')
+const movieTopRatedError = ref<string>('')
+const tvTopRatedError = ref<string>('')
 
 // 获取热门电影
 const getMoviePopular = async () => {
-  const { data: res } = await moviePopular(1)
-  if (res.code === 200) moviePopularList.value = res.data
+  moviePopularLoading.value = true
+  moviePopularError.value = ''
+  try {
+    const { data: res } = await moviePopular(1)
+    if (res.code === 200) {
+      moviePopularList.value = res.data
+    } else {
+      moviePopularError.value = res.message || '加载失败'
+    }
+  } catch (e) {
+    moviePopularError.value = '请求失败或超时，请重试'
+  } finally {
+    moviePopularLoading.value = false
+  }
 }
 
 // 获取热门电影
 const getTvPopular = async () => {
-  const { data: res } = await tvPopular(1)
-  if (res.code === 200) tvPopularList.value = res.data
+  tvPopularLoading.value = true
+  tvPopularError.value = ''
+  try {
+    const { data: res } = await tvPopular(1)
+    if (res.code === 200) {
+      tvPopularList.value = res.data
+    } else {
+      tvPopularError.value = res.message || '加载失败'
+    }
+  } catch (e) {
+    tvPopularError.value = '请求失败或超时，请重试'
+  } finally {
+    tvPopularLoading.value = false
+  }
 }
 
 // 获取高分电影
 const getMovieTopRated = async () => {
-  const { data: res } = await topRatedMovies(1)
-  if (res.code === 200) movieTopRatedList.value = res.data
+  movieTopRatedLoading.value = true
+  movieTopRatedError.value = ''
+  try {
+    const { data: res } = await topRatedMovies(1)
+    if (res.code === 200) {
+      movieTopRatedList.value = res.data
+    } else {
+      movieTopRatedError.value = res.message || '加载失败'
+    }
+  } catch (e) {
+    movieTopRatedError.value = '请求失败或超时，请重试'
+  } finally {
+    movieTopRatedLoading.value = false
+  }
 }
 
 // 获取高分剧集
 const getTvTopRated = async () => {
-  const { data: res } = await topRatedTV(1)
-  if (res.code === 200) tvTopRatedList.value = res.data
+  tvTopRatedLoading.value = true
+  tvTopRatedError.value = ''
+  try {
+    const { data: res } = await topRatedTV(1)
+    if (res.code === 200) {
+      tvTopRatedList.value = res.data
+    } else {
+      tvTopRatedError.value = res.message || '加载失败'
+    }
+  } catch (e) {
+    tvTopRatedError.value = '请求失败或超时，请重试'
+  } finally {
+    tvTopRatedLoading.value = false
+  }
 }
 
 onMounted(() => {
