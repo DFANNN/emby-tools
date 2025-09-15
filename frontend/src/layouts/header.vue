@@ -1,13 +1,6 @@
 <template>
   <div class="header-container">
-    <div class="header-left">
-      <div class="icon-wrapper" @click="layoutStore.isCollapse = !layoutStore.isCollapse">
-        <el-icon>
-          <Expand v-if="layoutStore.isCollapse" />
-          <Fold v-else />
-        </el-icon>
-      </div>
-    </div>
+    <div class="header-left"></div>
     <div class="header-right">
       <div class="icon-wrapper" @click="openEmbyConfig">
         <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
@@ -42,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { Expand, Fold } from '@element-plus/icons-vue'
 import GithubIcon from '@/components/icon/GithubIcon.vue'
 import LightModeIcon from '@/components/icon/LightModeIcon.vue'
 import DarkModeIcon from '@/components/icon/DarkModeIcon.vue'
