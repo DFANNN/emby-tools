@@ -14,10 +14,19 @@ import {
 
 const router = express.Router()
 
+// 统一时间戳前缀
+const _now = () => {
+  const d = new Date()
+  const pad = n => String(n).padStart(2, '0')
+  return `[${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(
+    d.getMinutes()
+  )}:${pad(d.getSeconds())}]`
+}
+
 // 登录emby
 router.post('/login', async (req, res) => {
   const { protocol, ip, port, Username, Pw } = req.body
-  console.log(`[EMBY LOGIN] 开始登录 - 服务器: ${protocol}://${ip}:${port}, 用户: ${Username}`)
+  console.log(`${_now()} [EMBY LOGIN] 开始登录 - 服务器: ${protocol}://${ip}:${port}, 用户: ${Username}`)
   embyStore.url = `${protocol}://${ip}:${port}`
 
   try {
@@ -31,10 +40,10 @@ router.post('/login', async (req, res) => {
     embyStore.accessToken = AccessToken
     embyStore.user = params
 
-    console.log(`[EMBY LOGIN] 登录成功 - 用户ID: ${Id}, 用户名: ${Name}`)
+    console.log(`${_now()} [EMBY LOGIN] 登录成功 - 用户ID: ${Id}, 用户名: ${Name}`)
     return res.success({ ...params, EmbyAddress: embyStore.url }, '登录成功')
   } catch (error) {
-    console.error(`[EMBY LOGIN] 登录失败 - 用户: ${Username}, 错误:`, error.message)
+    console.error(`${_now()} [EMBY LOGIN] 登录失败 - 用户: ${Username}, 错误:`, error.message)
     // TODO: 优化具体错误信息
     return res.error('登录失败，请检查用户名和密码')
   }
@@ -42,24 +51,24 @@ router.post('/login', async (req, res) => {
 
 // 媒体库概览（统计电影、剧集、音乐数量）
 router.get('/mediaCount', async (req, res) => {
-  console.log('[EMBY MEDIA COUNT] 开始获取媒体库统计')
+  console.log(`${_now()} [EMBY MEDIA COUNT] 开始获取媒体库统计`)
   try {
     const { data: response } = await embyMediaCount()
     const { MovieCount, SeriesCount, SongCount } = response
     const TotalCount = MovieCount + SeriesCount + SongCount
     console.log(
-      `[EMBY MEDIA COUNT] 获取成功 - 电影: ${MovieCount}, 剧集: ${SeriesCount}, 音乐: ${SongCount}, 总计: ${TotalCount}`
+      `${_now()} [EMBY MEDIA COUNT] 获取成功 - 电影: ${MovieCount}, 剧集: ${SeriesCount}, 音乐: ${SongCount}, 总计: ${TotalCount}`
     )
     return res.success({ MovieCount, SeriesCount, SongCount, TotalCount })
   } catch (error) {
-    console.error('[EMBY MEDIA COUNT] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY MEDIA COUNT] 获取失败:`, error.message)
     return res.error(error)
   }
 })
 
 // 最近添加
 router.get('/latestAdd', async (req, res) => {
-  console.log('[EMBY LATEST ADD] 开始获取最近添加的媒体')
+  console.log(`${_now()} [EMBY LATEST ADD] 开始获取最近添加的媒体`)
   try {
     const { data: response } = await embyLatestAdd()
     const { Items } = response
@@ -83,10 +92,10 @@ router.get('/latestAdd', async (req, res) => {
         SeriesName: item.SeriesName ? item.SeriesName : ''
       }
     })
-    console.log(`[EMBY LATEST ADD] 获取成功 - 共 ${latestAddList.length} 项`)
+    console.log(`${_now()} [EMBY LATEST ADD] 获取成功 - 共 ${latestAddList.length} 项`)
     return res.success(latestAddList)
   } catch (error) {
-    console.error('[EMBY LATEST ADD] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY LATEST ADD] 获取失败:`, error.message)
     return res.error(error)
   }
 })
@@ -105,7 +114,7 @@ const getDiskInfo = async () => {
 
 // emby获取存储占用空间
 router.get('/storage', async (req, res) => {
-  console.log('[EMBY STORAGE] 开始获取存储空间信息')
+  console.log(`${_now()} [EMBY STORAGE] 开始获取存储空间信息`)
   try {
     // 同时发送三个请求
     const [movieResponse, episodeResponse, audioResponse] = await Promise.all([
@@ -136,7 +145,7 @@ router.get('/storage', async (req, res) => {
     const DiskSize = await getDiskInfo()
 
     console.log(
-      `[EMBY STORAGE] 获取成功 - 电影: ${MovieSize}GB, 剧集: ${EpisodeSize}GB, 音乐: ${AudioSize}GB, 总计: ${TotalSize}GB, 磁盘: ${DiskSize}GB`
+      `${_now()} [EMBY STORAGE] 获取成功 - 电影: ${MovieSize}GB, 剧集: ${EpisodeSize}GB, 音乐: ${AudioSize}GB, 总计: ${TotalSize}GB, 磁盘: ${DiskSize}GB`
     )
     return res.success({
       MovieSize,
@@ -146,14 +155,14 @@ router.get('/storage', async (req, res) => {
       DiskSize
     })
   } catch (error) {
-    console.error('[EMBY STORAGE] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY STORAGE] 获取失败:`, error.message)
     return res.error(error)
   }
 })
 
 // emby获取播放时间
 router.get('/playTime', async (req, res) => {
-  console.log('[EMBY PLAY TIME] 开始获取播放时间统计')
+  console.log(`${_now()} [EMBY PLAY TIME] 开始获取播放时间统计`)
   try {
     const [movieResponse, episodeResponse, audioResponse] = await Promise.all([
       embyPlayTime('Movie'),
@@ -191,18 +200,18 @@ router.get('/playTime', async (req, res) => {
     const TotalTime = Number((MovieTime + EpisodeTime + AudioTime).toFixed(2))
 
     console.log(
-      `[EMBY PLAY TIME] 获取成功 - 电影: ${MovieTime}小时, 剧集: ${EpisodeTime}小时, 音乐: ${AudioTime}小时, 总计: ${TotalTime}小时`
+      `${_now()} [EMBY PLAY TIME] 获取成功 - 电影: ${MovieTime}小时, 剧集: ${EpisodeTime}小时, 音乐: ${AudioTime}小时, 总计: ${TotalTime}小时`
     )
     return res.success({ MovieTime, EpisodeTime, AudioTime, TotalTime })
   } catch (error) {
-    console.error('[EMBY PLAY TIME] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY PLAY TIME] 获取失败:`, error.message)
     return res.error(error)
   }
 })
 
 // emby获取媒体库列表
 router.get('/mediaLibraryList', async (req, res) => {
-  console.log('[EMBY MEDIA LIBRARY] 开始获取媒体库列表')
+  console.log(`${_now()} [EMBY MEDIA LIBRARY] 开始获取媒体库列表`)
   try {
     const { data: response } = await embyMediaLibraryList()
     const { Items } = response
@@ -214,10 +223,10 @@ router.get('/mediaLibraryList', async (req, res) => {
         ImageUrl: `${embyStore.url}/Items/${item.Id}/Images/Primary`
       }
     }).filter(item => item.CollectionType === 'tvshows' || item.CollectionType === 'movies')
-    console.log(`[EMBY MEDIA LIBRARY] 获取成功 - 共 ${mediaLibraryList.length} 个媒体库`)
+    console.log(`${_now()} [EMBY MEDIA LIBRARY] 获取成功 - 共 ${mediaLibraryList.length} 个媒体库`)
     return res.success(mediaLibraryList)
   } catch (error) {
-    console.error('[EMBY MEDIA LIBRARY] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY MEDIA LIBRARY] 获取失败:`, error.message)
     return res.error(error)
   }
 })
@@ -227,13 +236,13 @@ router.get('/mediaLibraryList', async (req, res) => {
  */
 router.get('/radomEmbyPosterList', async (req, res) => {
   const { mediaId, radomNum } = req.query
-  console.log(`[EMBY POSTER LIST] 开始获取随机封面图 - 媒体库ID: ${mediaId}, 数量: ${radomNum || 10}`)
+  console.log(`${_now()} [EMBY POSTER LIST] 开始获取随机封面图 - 媒体库ID: ${mediaId}, 数量: ${radomNum || 10}`)
   try {
     const { data: response } = await embyMediaLibraryItems(mediaId)
     const { Items } = response
 
     if (!Items || !Array.isArray(Items)) {
-      console.error('[EMBY POSTER LIST] 媒体库数据为空')
+      console.error(`${_now()} [EMBY POSTER LIST] 媒体库数据为空`)
       return res.error('媒体库数据为空')
     }
 
@@ -244,7 +253,7 @@ router.get('/radomEmbyPosterList', async (req, res) => {
     )
 
     if (posterUrls.length === 0) {
-      console.error('[EMBY POSTER LIST] 该媒体库下没有剧集封面图')
+      console.error(`${_now()} [EMBY POSTER LIST] 该媒体库下没有剧集封面图`)
       return res.error('该媒体库下没有剧集封面图')
     }
 
@@ -264,10 +273,10 @@ router.get('/radomEmbyPosterList', async (req, res) => {
       }
     }
 
-    console.log(`[EMBY POSTER LIST] 获取成功 - 返回 ${result.length} 张封面图`)
+    console.log(`${_now()} [EMBY POSTER LIST] 获取成功 - 返回 ${result.length} 张封面图`)
     res.success(result)
   } catch (error) {
-    console.error('[EMBY POSTER LIST] 获取失败:', error.message)
+    console.error(`${_now()} [EMBY POSTER LIST] 获取失败:`, error.message)
     res.error(error)
   }
 })
@@ -275,18 +284,18 @@ router.get('/radomEmbyPosterList', async (req, res) => {
 // 替换媒体库封面
 router.post('/embyReplacePoster', async (req, res) => {
   const { mediaId, posterBase64 } = req.body
-  console.log(`[EMBY REPLACE POSTER] 开始替换封面 - 媒体ID: ${mediaId}`)
+  console.log(`${_now()} [EMBY REPLACE POSTER] 开始替换封面 - 媒体ID: ${mediaId}`)
   try {
     // 验证数据格式
     if (!mediaId || !posterBase64) {
-      console.error('[EMBY REPLACE POSTER] 数据格式错误，缺少mediaId或posterBase64')
+      console.error(`${_now()} [EMBY REPLACE POSTER] 数据格式错误，缺少mediaId或posterBase64`)
       return res.error('媒体数据格式错误，缺少mediaId或posterBase64')
     }
 
     // 替换单个媒体封面
     const response = await embyReplacePoster(mediaId, posterBase64)
 
-    console.log(`[EMBY REPLACE POSTER] 替换成功 - 媒体ID: ${mediaId}`)
+    console.log(`${_now()} [EMBY REPLACE POSTER] 替换成功 - 媒体ID: ${mediaId}`)
     return res.success(
       {
         mediaId: mediaId,
@@ -296,7 +305,7 @@ router.post('/embyReplacePoster', async (req, res) => {
       '封面替换成功'
     )
   } catch (error) {
-    console.error(`[EMBY REPLACE POSTER] 替换失败 - 媒体ID: ${mediaId}, 错误:`, error.message)
+    console.error(`${_now()} [EMBY REPLACE POSTER] 替换失败 - 媒体ID: ${mediaId}, 错误:`, error.message)
     return res.error('替换封面失败')
   }
 })
