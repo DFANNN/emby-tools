@@ -1,5 +1,8 @@
 import express from 'express'
 import axios from 'axios'
+import tmdbStore from '../store/tmdbStore.js'
+import { HttpsProxyAgent } from 'https-proxy-agent'
+import { SocksProxyAgent } from 'socks-proxy-agent'
 
 const router = express.Router()
 
@@ -21,6 +24,19 @@ router.get('/image', async (req, res) => {
       return res.status(400).send('host not allowed')
     }
 
+    // 基于 tmdbStore.proxy 选择代理
+    let agent = null
+    const proxyUrl = (tmdbStore.proxy || '').trim().toLowerCase()
+    if (proxyUrl.startsWith('http://') || proxyUrl.startsWith('https://')) {
+      agent = new HttpsProxyAgent(tmdbStore.proxy)
+    } else if (
+      proxyUrl.startsWith('socks://') ||
+      proxyUrl.startsWith('socks5://') ||
+      proxyUrl.startsWith('socks4://')
+    ) {
+      agent = new SocksProxyAgent(tmdbStore.proxy)
+    }
+
     const upstream = await axios.get(url, {
       responseType: 'arraybuffer',
       headers: {
@@ -29,7 +45,9 @@ router.get('/image', async (req, res) => {
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         Referer: 'https://www.themoviedb.org/'
       },
-      timeout: 15000
+      timeout: 15000,
+      httpAgent: agent || undefined,
+      httpsAgent: agent || undefined
     })
 
     const contentType = upstream.headers['content-type'] || 'image/jpeg'

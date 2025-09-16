@@ -10,6 +10,7 @@ import {
   discoverMovie,
   discoverTv
 } from '../services/theMovieDBService.js'
+import tmdbStore from '../store/tmdbStore.js'
 
 const router = express.Router()
 
@@ -258,5 +259,24 @@ router.get('/discover', async (req, res) => {
       return res.error('请求超时无法访问 TMDB，请自行配置代理或 DNS/hosts 后重试。')
     }
     return res.error(error)
+  }
+})
+
+// 读取当前 TMDB 代理地址
+router.get('/proxy', (req, res) => {
+  return res.success({ proxy: tmdbStore.proxy || '' })
+})
+
+// 设置 TMDB 代理地址
+router.post('/proxy', (req, res) => {
+  try {
+    const { proxy } = req.body || {}
+    if (proxy && typeof proxy !== 'string') {
+      return res.error('proxy 必须为字符串，例如 http://127.0.0.1:7890 或 socks5://127.0.0.1:7890')
+    }
+    tmdbStore.proxy = (proxy || '').trim()
+    return res.success({ proxy: tmdbStore.proxy })
+  } catch (e) {
+    return res.error('设置失败')
   }
 })
