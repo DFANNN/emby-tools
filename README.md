@@ -5,7 +5,7 @@
 </p>
 <h1 align="center">emby-tools</h1>
 
-一个用于 Emby 周边工具的一体化应用，提供 Emby 登录与统计、TMDB 数据获取、随机海报生成、重命名与批量删除等能力。前端基于 Vue3 + Vite，后端基于 Node.js + Express。支持本地开发与 Docker 生产部署，生产模式下由后端托管前端静态资源。
+一个用于 Emby 周边工具的一体化跨平台应用，提供 Emby 登录与统计、TMDB 数据获取、随机海报生成、重命名与批量删除等能力。前端基于 Vue3 + Vite，后端基于 Node.js + Express。支持本地开发与 Docker 生产部署，生产模式下由后端托管前端静态资源。
 
 ## 核心功能
 
