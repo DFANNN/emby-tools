@@ -9,7 +9,9 @@
 
   <el-menu-item v-else :index="menuItem.path">
     <el-icon v-if="menuItem.icon"><component :is="mapIcon[menuItem.icon]" /></el-icon>
-    <span>{{ menuItem.name }}</span>
+    <template #title>
+      <span>{{ menuItem.name }}</span>
+    </template>
   </el-menu-item>
 </template>
 

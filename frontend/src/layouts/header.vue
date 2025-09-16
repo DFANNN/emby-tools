@@ -1,34 +1,52 @@
 <template>
   <div class="header-container">
-    <div class="header-left"></div>
     <div class="header-right">
-      <div class="icon-wrapper" @click="openEmbyConfig">
-        <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
+      <el-tooltip content="Emby 连接配置" placement="bottom">
+        <div class="icon-wrapper" @click="openEmbyConfig">
+          <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
+            <el-icon>
+              <ConfigIcon />
+            </el-icon>
+          </el-badge>
+        </div>
+      </el-tooltip>
+      <el-tooltip
+        :content="
+          layoutStore.themeMode === 'dark'
+            ? '切换到浅色模式'
+            : layoutStore.themeMode === 'light'
+            ? '切换到深色模式'
+            : '切换到自动模式'
+        "
+        placement="bottom"
+      >
+        <div class="icon-wrapper" @click="layoutStore.toggleTheme">
           <el-icon>
-            <ConfigIcon />
+            <DarkModeIcon v-if="layoutStore.themeMode === 'dark'" />
+            <LightModeIcon v-else-if="layoutStore.themeMode === 'light'" />
+            <AutoModeIcon v-else />
           </el-icon>
-        </el-badge>
-      </div>
-      <div class="icon-wrapper" @click="layoutStore.toggleTheme">
-        <el-icon>
-          <DarkModeIcon v-if="layoutStore.themeMode === 'dark'" />
-          <LightModeIcon v-else-if="layoutStore.themeMode === 'light'" />
-          <AutoModeIcon v-else />
-        </el-icon>
-      </div>
-      <div class="icon-wrapper" @click="goToGithub">
-        <el-icon>
-          <GithubIcon />
-        </el-icon>
-      </div>
-      <div class="icon-wrapper" @click="openEmbyWeb">
-        <el-icon>
-          <EmbyIcon />
-        </el-icon>
-      </div>
-      <div class="tmdb-wrapper" @click="openTmdb">
-        <img :src="TMDBLogo" alt="" />
-      </div>
+        </div>
+      </el-tooltip>
+      <el-tooltip content="访问 GitHub 仓库" placement="bottom">
+        <div class="icon-wrapper" @click="goToGithub">
+          <el-icon>
+            <GithubIcon />
+          </el-icon>
+        </div>
+      </el-tooltip>
+      <el-tooltip content="打开 Emby 网页版" placement="bottom">
+        <div class="icon-wrapper" @click="openEmbyWeb">
+          <el-icon>
+            <EmbyIcon />
+          </el-icon>
+        </div>
+      </el-tooltip>
+      <el-tooltip content="访问 The Movie Database" placement="bottom">
+        <div class="tmdb-wrapper" @click="openTmdb">
+          <img :src="TMDBLogo" alt="" />
+        </div>
+      </el-tooltip>
       <LinkEmbyConfig ref="linkEmbyConfigRef" />
     </div>
   </div>
@@ -78,7 +96,7 @@ const goToGithub = () => {
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: end;
   .icon-wrapper {
     padding: 4px 8px 0;
     border-radius: 4px;
@@ -99,10 +117,6 @@ const goToGithub = () => {
     &:hover {
       background: #ccc;
     }
-  }
-  .header-left {
-    display: flex;
-    align-items: center;
   }
   .header-right {
     display: flex;

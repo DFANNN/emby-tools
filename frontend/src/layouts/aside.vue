@@ -20,7 +20,7 @@
       </template>
     </el-menu>
 
-    <!-- aside 最底部折叠按钮（无文字） -->
+    <!-- 折叠按钮 -->
     <div class="collapse-bottom" @click="layoutStore.isCollapse = !layoutStore.isCollapse">
       <el-icon>
         <Expand v-if="layoutStore.isCollapse" />
@@ -59,10 +59,10 @@ onMounted(() => {
     align-items: center;
     gap: 8px;
     padding-left: 12px;
-    margin-left: -12px;
+    margin-left: -6px;
     img {
-      width: 44px;
-      height: 44px;
+      width: 35px;
+      height: 35px;
     }
     .logo-text {
       font-size: 18px;
