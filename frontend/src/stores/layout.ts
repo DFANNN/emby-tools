@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { loginEmby } from '@/api/layout'
 import { ElMessage } from 'element-plus'
+import { setTmdbProxy } from '@/api/theMovieDB'
 import type { LinkEmbyConfigFormType, IEmbyUserInfoType } from '@/types/layout'
 
 export const useLayoutStore = defineStore('layout', () => {
@@ -78,6 +79,23 @@ export const useLayoutStore = defineStore('layout', () => {
     return res.code
   }
 
+  // tmdb代理地址
+  const tmdbProxy = ref('')
+
+  // 存储tmdb代理地址到storage
+  const storageTmdbProxy = () => {
+    localStorage.setItem('tmdbProxy', tmdbProxy.value)
+  }
+
+  // 保存tmdb代理地址
+  const saveProxy = async () => {
+    const { data: res } = await setTmdbProxy(tmdbProxy.value.trim())
+    if (res.code === 200) {
+      storageTmdbProxy()
+    }
+    return res.code
+  }
+
   return {
     isCollapse,
     themeMode,
@@ -85,6 +103,8 @@ export const useLayoutStore = defineStore('layout', () => {
     embyUserInfo,
     linkEmbyConfigForm,
     linkEmbyStatus,
-    connectToEmby
+    connectToEmby,
+    tmdbProxy,
+    saveProxy
   }
 })

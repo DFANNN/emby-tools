@@ -1,14 +1,7 @@
 <template>
   <div class="header-container">
     <div class="header-right">
-      <el-tooltip content="TMDB 代理设置" placement="bottom">
-        <div class="icon-wrapper" @click="openProxyDialog">
-          <el-icon>
-            <ConfigIcon />
-          </el-icon>
-        </div>
-      </el-tooltip>
-      <el-tooltip content="Emby 连接配置" placement="bottom">
+      <el-tooltip content="设置" placement="bottom">
         <div class="icon-wrapper" @click="openEmbyConfig">
           <el-badge :is-dot="true" :type="layoutStore.linkEmbyStatus ? 'success' : 'danger'">
             <el-icon>
@@ -55,27 +48,6 @@
         </div>
       </el-tooltip>
       <LinkEmbyConfig ref="linkEmbyConfigRef" />
-      <el-dialog v-model="showProxyDialog" title="TMDB 代理设置" width="520px">
-        <div class="proxy-form">
-          <el-alert
-            title="仅影响后端访问 TMDB API 与图片代理。示例：http://127.0.0.1:7890 或 socks5://127.0.0.1:7890"
-            type="info"
-            :closable="false"
-            class="mb-12"
-          />
-          <el-input
-            v-model="proxyInput"
-            placeholder="输入代理地址，例如 http://127.0.0.1:7890 或 socks5://127.0.0.1:7890"
-            clearable
-          />
-        </div>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="showProxyDialog = false">取消</el-button>
-            <el-button type="primary" :loading="saving" @click="saveProxy">保存</el-button>
-          </span>
-        </template>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -90,7 +62,6 @@ import EmbyIcon from '@/components/icon/EmbyIcon.vue'
 import ConfigIcon from '@/components/icon/ConfigIcon.vue'
 import TMDBLogo from '@/assets/tmdbLogo.svg'
 import { ElMessage } from 'element-plus'
-import { getTmdbProxy, setTmdbProxy } from '@/api/theMovieDB'
 
 const layoutStore = useLayoutStore()
 
@@ -98,34 +69,6 @@ const linkEmbyConfigRef = useTemplateRef('linkEmbyConfigRef')
 const openEmbyConfig = () => {
   // 预加载现有配置，弹出设置对话框
   linkEmbyConfigRef.value?.showDialog()
-}
-
-// TMDB 代理设置
-const showProxyDialog = ref(false)
-const proxyInput = ref('')
-const saving = ref(false)
-
-const openProxyDialog = async () => {
-  try {
-    const { data } = await getTmdbProxy()
-    proxyInput.value = data?.data?.proxy || ''
-  } catch (e) {
-    // 忽略错误，保持空
-  }
-  showProxyDialog.value = true
-}
-
-const saveProxy = async () => {
-  try {
-    saving.value = true
-    await setTmdbProxy(proxyInput.value.trim())
-    ElMessage.success('代理配置已保存')
-    showProxyDialog.value = false
-  } catch (e) {
-    ElMessage.error('保存失败')
-  } finally {
-    saving.value = false
-  }
 }
 
 // 跳转到emby
@@ -179,13 +122,5 @@ const goToGithub = () => {
     display: flex;
     align-items: center;
   }
-}
-.mb-12 {
-  margin-bottom: 12px;
-}
-.proxy-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 </style>
