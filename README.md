@@ -24,14 +24,13 @@ pnpm dev
 #### 技术实现
 
 - 使用 `concurrently` 同时启动前端和后端服务
-- 前端：Vite 开发服务器（端口 5173）
+- 前端：Vite 开发服务器（端口 3000）
 - 后端：Node.js + Express 服务（端口 3001）
 
 #### 访问地址
 
 - **前端页面**: http://localhost:5173
-- **后端 API**: http://localhost:3001
-- **API 文档**: http://localhost:3001/rename
+- **后端接口**: http://localhost:3001
 
 ### 二、Docker 部署运行（推荐生产环境）
 
@@ -39,10 +38,10 @@ pnpm dev
 
 ```bash
 # 1. 构建镜像
-docker build -t dfannn/emby-tools-allinone .
+docker build -t emby-tools-allinone .
 
 # 2. 运行容器
-docker run -d -p 3001:3001 --name emby-tools dfannn/emby-tools-allinone
+docker run -d -p 3001:3001 emby-tools-allinone
 
 # 3. 访问服务
 # 打开浏览器访问 http://localhost:3001
@@ -55,7 +54,7 @@ docker run -d -p 3001:3001 --name emby-tools dfannn/emby-tools-allinone
 docker pull dfannn/emby-tools-allinone
 
 # 2. 运行容器
-docker run -d -p 3001:3001 --name emby-tools dfannn/emby-tools-allinone
+docker run -d -p 3001:3001 dfannn/emby-tools-allinone
 
 # 3. 访问服务
 # 打开浏览器访问 http://localhost:3001
