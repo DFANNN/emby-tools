@@ -101,19 +101,29 @@ emby-tools/
 
 ## 本地开发
 
-1. 安装依赖
+1. 全局安装 nodemon（用于后端热重载）
+
+```bash
+# 使用 pnpm
+pnpm add -g nodemon
+
+# 或使用 npm
+npm install -g nodemon
+```
+
+2. 安装项目依赖（前后端一起安装）
 
 ```bash
 pnpm install:all
 ```
 
-2. 启动前后端（并行）
+3. 启动前后端（并行）
 
 ```bash
 pnpm dev
 ```
 
-3. 访问
+4. 访问
 
 - 前端开发服务器：http://localhost:3000
 
