@@ -41,9 +41,18 @@ const route = useRoute()
 // 默认激活的菜单
 const defaultActiveMenuItem = ref('')
 
+watch(
+  route,
+  () => {
+    defaultActiveMenuItem.value = route.path
+  },
+  {
+    immediate: true
+  }
+)
+
 onMounted(() => {
   menuStore.getMenu()
-  defaultActiveMenuItem.value = route.path
 })
 </script>
 

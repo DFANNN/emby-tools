@@ -12,6 +12,13 @@
 <script setup lang="ts">
 import RenameRules from '@/views/rename/renameRules.vue'
 import previewPoster from '@/views/rename/previewRename.vue'
+
+defineOptions({ name: 'embyRename' })
+const renameStore = useRenameStore()
+
+onBeforeUnmount(() => {
+  renameStore.clearData()
+})
 </script>
 
 <style scoped lang="scss">

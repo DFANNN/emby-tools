@@ -316,6 +316,20 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     }
   }
 
+  const clearData = () => {
+    loading.value = false
+    loadingText.value = ''
+    showPreviewPoster.value = false
+    embyMediaLibraryList.value = []
+    ruleForm.value = {
+      ids: [],
+      palette: [],
+      gradientType: undefined,
+      gradientStops: undefined
+    }
+    needGeneratePosterMediaLibraryList.value = []
+  }
+
   return {
     loading,
     loadingText,
@@ -327,6 +341,7 @@ export const useEmbyPosterStore = defineStore('embyPoster', () => {
     getRadomPoster,
     replacePoster,
     getEmbyMediaLibraryList,
-    getTmdbDiscover
+    getTmdbDiscover,
+    clearData
   }
 })

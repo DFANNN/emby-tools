@@ -17,6 +17,7 @@ import StorageComponents from '@/views/home/storage.vue'
 import LatestAdd from '@/views/home/latestAdd.vue'
 import WatchStats from '@/views/home/watchStats.vue'
 
+defineOptions({ name: 'home' })
 const homeStore = useHomeStore()
 </script>
 

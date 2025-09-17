@@ -44,6 +44,8 @@ import HeroCarousel from '@/views/dailyRecommendation/heroCarousel.vue'
 import TopChartsPanel from '@/components/TopChartsPanel.vue'
 import type { ITrendItem } from '@/types/dailyRecommendation'
 
+defineOptions({ name: 'dailyRecommendation' })
+
 const movieTopRatedList = ref<ITrendItem[]>([])
 const tvTopRatedList = ref<ITrendItem[]>([])
 const moviePopularList = ref<ITrendItem[]>([])
@@ -133,10 +135,15 @@ const getTvTopRated = async () => {
 }
 
 onMounted(() => {
+  console.log('组件挂载了')
   getMoviePopular()
   getTvPopular()
   getMovieTopRated()
   getTvTopRated()
+})
+
+onUnmounted(() => {
+  console.log('组件卸载了')
 })
 </script>
 

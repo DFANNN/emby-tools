@@ -9,17 +9,20 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="embyPoster">
 import PreviewPoster from '@/views/embyPoster/previewPoster.vue'
 import PosterRules from '@/views/embyPoster/posterRules.vue'
 
+defineOptions({ name: 'embyPoster' })
 const embyPosterStore = useEmbyPosterStore()
 
 onMounted(() => {
   embyPosterStore.getEmbyMediaLibraryList()
 })
 
-onBeforeUnmount(() => {})
+onBeforeUnmount(() => {
+  embyPosterStore.clearData()
+})
 </script>
 
 <style scoped lang="scss">

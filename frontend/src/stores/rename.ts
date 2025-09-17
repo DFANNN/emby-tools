@@ -318,6 +318,25 @@ export const useRenameStore = defineStore('rename', () => {
     ElMessage.success(res.message)
   }
 
+  const clearData = () => {
+    path.value = ''
+    ruleForm.value = {
+      model: 'tv', // 更名模式
+      newFileName: '', // 新文件名
+      seasonNumber: undefined, // 季号
+      startEpisode: 1, // 顺序模式起始集数（可为负数/0，默认1）
+      targetName: '', // 查找文本
+      replaceName: '', // 替换文本
+      insertText: '', // 插入文本
+      insertPosition: '' // 插入位置，'start' 或 'end'
+    }
+    dialogVisible.value = false
+    diskFolderList.value = []
+    currentPathList.value = []
+    renameFileList.value = []
+    selectRenameList.value = []
+  }
+
   return {
     path,
     ruleForm,
@@ -341,6 +360,7 @@ export const useRenameStore = defineStore('rename', () => {
     previewReplace,
     previewInsert,
     deleteFileBatch,
-    generateNewNamesBySequence
+    generateNewNamesBySequence,
+    clearData
   }
 })

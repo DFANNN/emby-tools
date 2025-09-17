@@ -1,5 +1,8 @@
 <template>
   <div class="header-container">
+    <div class="header-left">
+      <Tabs />
+    </div>
     <div class="header-right">
       <el-tooltip content="设置" placement="bottom">
         <div class="icon-wrapper" @click="openEmbyConfig">
@@ -61,6 +64,7 @@ import LinkEmbyConfig from '@/components/linkEmbyConfig.vue'
 import EmbyIcon from '@/components/icon/EmbyIcon.vue'
 import ConfigIcon from '@/components/icon/ConfigIcon.vue'
 import TMDBLogo from '@/assets/tmdbLogo.svg'
+import Tabs from '@/components/tabs.vue'
 import { ElMessage } from 'element-plus'
 
 const layoutStore = useLayoutStore()
@@ -96,7 +100,7 @@ const goToGithub = () => {
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
   .icon-wrapper {
     padding: 4px 8px 0;
     border-radius: 4px;
@@ -117,6 +121,9 @@ const goToGithub = () => {
     &:hover {
       background: #ccc;
     }
+  }
+  .header-left {
+    flex: 1;
   }
   .header-right {
     display: flex;

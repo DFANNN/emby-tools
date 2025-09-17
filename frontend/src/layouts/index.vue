@@ -7,7 +7,11 @@
           <HeaderComponent />
         </el-header>
         <el-main class="main">
-          <RouterView />
+          <RouterView v-slot="{ Component }">
+            <KeepAlive :include="tabsStore.keepAliveComponentName">
+              <component :is="Component" />
+            </KeepAlive>
+          </RouterView>
         </el-main>
       </el-container>
     </el-container>
@@ -17,6 +21,8 @@
 <script setup lang="ts">
 import AsideComponent from '@/layouts/aside.vue'
 import HeaderComponent from '@/layouts/header.vue'
+
+const tabsStore = useTabsStore()
 </script>
 
 <style scoped lang="scss">
