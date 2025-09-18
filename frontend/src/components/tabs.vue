@@ -1,21 +1,29 @@
 <template>
-  <div class="tabs-container">
-    <div
-      :class="{ 'tab-pane': true, active: item.name === currentPathName }"
-      v-for="(item, index) in tabsStore.tabList"
-      @click="router.push(item.name)"
-    >
-      <el-icon>
-        <component :is="mapIcon[item.icon]" />
-      </el-icon>
-      <div class="tab-pane-title">{{ item.title }}</div>
-      <el-icon class="close" v-if="item.name !== 'home'" @click.stop="close(item, index)"><Close /></el-icon>
+  <div class="tabs-wrapper">
+    <button class="nav-btn left" v-show="showNavButtons" :disabled="!canScrollLeft" @click="scrollBy(-1)">
+      <el-icon><ArrowLeft /></el-icon>
+    </button>
+    <div class="tabs-container" ref="tabsContainerRef">
+      <div
+        :class="{ 'tab-pane': true, active: item.name === currentPathName }"
+        v-for="(item, index) in tabsStore.tabList"
+        @click="router.push(item.name)"
+      >
+        <el-icon>
+          <component :is="mapIcon[item.icon]" />
+        </el-icon>
+        <div class="tab-pane-title">{{ item.title }}</div>
+        <el-icon class="close" v-if="item.name !== 'home'" @click.stop="close(item, index)"><Close /></el-icon>
+      </div>
     </div>
+    <button class="nav-btn right" v-show="showNavButtons" :disabled="!canScrollRight" @click="scrollBy(1)">
+      <el-icon><ArrowRight /></el-icon>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Picture, EditPen, Guide, Star, Close } from '@element-plus/icons-vue'
+import { Picture, EditPen, Guide, Star, Close, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import type { RouteRecordNameGeneric } from 'vue-router'
 import type { ITabType } from '@/types/components/tabs'
 
@@ -31,6 +39,44 @@ const mapIcon: Record<string, any> = {
 }
 
 const currentPathName = ref<RouteRecordNameGeneric>('')
+
+// 横向滚动控制
+const tabsContainerRef = ref<HTMLDivElement | null>(null)
+const canScrollLeft = ref<boolean>(false)
+const canScrollRight = ref<boolean>(false)
+const showNavButtons = ref<boolean>(false)
+
+const updateScrollState = () => {
+  const el = tabsContainerRef.value
+  if (!el) return
+
+  const isOverflowing = el.scrollWidth > el.clientWidth
+  showNavButtons.value = isOverflowing
+
+  if (isOverflowing) {
+    canScrollLeft.value = el.scrollLeft > 0
+    canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+  } else {
+    canScrollLeft.value = false
+    canScrollRight.value = false
+  }
+}
+
+const scrollBy = (direction: number) => {
+  const el = tabsContainerRef.value
+  if (!el) return
+  const amount = Math.max(120, Math.floor(el.clientWidth * 0.8))
+  el.scrollBy({ left: direction * amount, behavior: 'smooth' })
+}
+
+const scrollActiveTabIntoView = () => {
+  const el = tabsContainerRef.value
+  if (!el) return
+  const active = el.querySelector('.tab-pane.active') as HTMLElement | null
+  if (active) {
+    active.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+  }
+}
 
 const close = (item: ITabType, currentIndex: number) => {
   if (currentPathName.value === item.name) {
@@ -54,12 +100,39 @@ watch(
       })
       tabsStore.keepAliveComponentName = tabsStore.tabList.map(item => item.name)
     }
+    nextTick(() => {
+      scrollActiveTabIntoView()
+      updateScrollState()
+    })
   },
   { immediate: true }
 )
+
+onMounted(() => {
+  const el = tabsContainerRef.value
+  if (el) {
+    el.addEventListener('scroll', updateScrollState)
+  }
+  window.addEventListener('resize', updateScrollState)
+  nextTick(updateScrollState)
+})
+
+onBeforeUnmount(() => {
+  const el = tabsContainerRef.value
+  if (el) {
+    el.removeEventListener('scroll', updateScrollState)
+  }
+  window.removeEventListener('resize', updateScrollState)
+})
 </script>
 
 <style scoped lang="scss">
+.tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .tabs-container {
   width: 100%;
   overflow-x: auto;
@@ -97,5 +170,27 @@ watch(
       background: var(--el-color-primary);
     }
   }
+}
+
+.nav-btn {
+  border: none;
+  background: transparent;
+  color: var(--el-text-color-regular);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: pointer;
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+.nav-btn.left {
+  margin-right: 4px;
+}
+.nav-btn.right {
+  margin-left: 4px;
 }
 </style>
