@@ -1,10 +1,12 @@
 <template>
   <div class="header-container">
     <div class="title-section">
-      <div class="title-icon">📊</div>
       <div class="title-text">
-        <h1>Emby 信息看板</h1>
-        <p>
+        <div class="title">
+          <div class="title-icon">📊</div>
+          <h1>Emby 信息看板</h1>
+        </div>
+        <div>
           <p v-if="layoutStore.linkEmbyStatus">
             <el-tag type="success" size="small">Emby 已连接</el-tag>
             <span style="margin-left: 8px" v-if="homeStore.isLoading">正在刷新数据…</span>
@@ -13,7 +15,7 @@
           <p v-else>
             <el-tag type="info" size="small">Emby 未连接</el-tag>
           </p>
-        </p>
+        </div>
       </div>
     </div>
     <div class="header-actions">
@@ -23,7 +25,7 @@
         :disabled="homeStore.isLoading || !layoutStore.linkEmbyStatus"
         @click="homeStore.getEmbyAllInfo()"
       >
-        <el-icon><Refresh /></el-icon>
+        <el-icon class="refresh-icon"><Refresh /></el-icon>
         刷新数据
       </el-button>
     </div>
@@ -35,7 +37,6 @@ import { Refresh } from '@element-plus/icons-vue'
 
 const homeStore = useHomeStore()
 const layoutStore = useLayoutStore()
-
 </script>
 
 <style scoped lang="scss">
@@ -53,17 +54,21 @@ const layoutStore = useLayoutStore()
     align-items: center;
     gap: 0.6rem;
     flex-shrink: 0;
-    .title-icon {
-      font-size: 2rem;
-    }
     .title-text {
-      h1 {
-        font-size: 1.6rem;
-        color: var(--el-text-color-primary);
-        margin: 0;
-        font-weight: 700;
+      .title {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        h1 {
+          font-size: 1.6rem;
+          color: var(--el-text-color-primary);
+          margin: 0;
+          font-weight: 700;
+        }
+        .title-icon {
+          font-size: 2rem;
+        }
       }
-
       p {
         margin: 0.25rem 0 0 0;
         font-size: 0.875rem;
@@ -76,12 +81,19 @@ const layoutStore = useLayoutStore()
     transform: translateY(-4px);
     box-shadow: var(--el-box-shadow-light);
   }
+
+  .refresh-icon {
+    margin-right: 0.4rem;
+  }
 }
 
 @media (max-width: 768px) {
   .header-container {
     flex-direction: column;
     gap: 1rem;
+    .title {
+      justify-content: center;
+    }
   }
 }
 </style>
