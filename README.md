@@ -5,6 +5,19 @@
 </p>
 <h1 align="center">emby-tools</h1>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3.x-4FC08D?style=flat-square&logo=vue.js" alt="Vue">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js" alt="Node.js">
+  <img src="https://img.shields.io/badge/Docker-支持-2496ED?style=flat-square&logo=docker" alt="Docker">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/dfannn/emby-tools?style=flat-square" alt="GitHub stars">
+  <img src="https://img.shields.io/github/forks/dfannn/emby-tools?style=flat-square" alt="GitHub forks">
+  <img src="https://img.shields.io/github/issues/dfannn/emby-tools?style=flat-square" alt="GitHub issues">
+</p>
+
 一个用于 Emby 周边工具的一体化跨平台应用，提供 Emby 登录与统计、TMDB 数据获取、随机海报生成、重命名与批量删除等能力。前端基于 Vue3 + Vite，后端基于 Node.js + Express。支持本地开发与 Docker 生产部署，生产模式下由后端托管前端静态资源。
 
 ## 核心功能
@@ -153,3 +166,7 @@ docker run -d -p 3001:3001 --name emby-tools dfannn/emby-tools-allinone
   - TMDB 访问不畅时，点击右上角设置按钮进入「TMDB 代理设置」配置 http/https/socks 代理；留空则直连 TMDB，或检查网络 DNS/hosts 配置。
 - 文件操作权限
   - 批量重命名/删除依赖容器内用户对挂载路径的权限，请确保挂载卷拥有读写权限。
+
+## 许可证
+
+本项目基于 [MIT License](LICENSE) 开源协议。
